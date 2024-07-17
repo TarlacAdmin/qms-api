@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Request, Response } from 'express';
 import { body, param, validationResult } from "express-validator";
 import queueService from "../services/queueService";
 import { API_ENDPOINTS } from "../config/endpointsConfig";
@@ -110,11 +110,11 @@ async function create(req: express.Request, res: express.Response) {
  * @route  PUT /api/queue/update
  * @access Private
  */
-async function update(req: express.Request, res: express.Response) {
-  await body(config.VALIDATION.QUEUE.BODY.QUEUE_NUMBER)
-    .notEmpty()
-    .withMessage(config.VALIDATION.QUEUE.ERROR.REQUIRED_QUEUE)
-    .run(req);
+async function update(req: Request, res: Response) {
+  // await body(config.VALIDATION.QUEUE.BODY.QUEUE_NUMBER)
+  //   .notEmpty()
+  //   .withMessage(config.VALIDATION.QUEUE.ERROR.REQUIRED_QUEUE)
+  //   .run(req);
 
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -123,6 +123,7 @@ async function update(req: express.Request, res: express.Response) {
 
   try {
     const updatedQueue = await queueService.update(req.body.id, req.body);
+    (req as any).io.emit('queueUpdated', updatedQueue);
     res.status(200).send(updatedQueue);
   } catch (error) {
     if (error instanceof Error) {
