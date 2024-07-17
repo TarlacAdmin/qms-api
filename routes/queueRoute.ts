@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Request, Response } from "express";
 import { body, param, validationResult } from "express-validator";
 import queueService from "../services/queueService";
 import { API_ENDPOINTS } from "../config/endpointsConfig";
@@ -19,7 +19,7 @@ export default router;
  * @route  GET /api/queue/get/all
  * @access Private
  */
-async function getAllQueues(req: express.Request, res: express.Response) {
+async function getAllQueues(req: Request, res: Response) {
   const params = {
     query: req.query.query || {},
     queryArray: req.query.queryArray,
@@ -48,7 +48,7 @@ async function getAllQueues(req: express.Request, res: express.Response) {
  * @route  GET /api/queue/get/:id
  * @access Private
  */
-async function getById(req: express.Request, res: express.Response) {
+async function getById(req: Request, res: Response) {
   await param(config.VALIDATION.QUEUE.PARAMS.ID)
     .isMongoId()
     .withMessage(config.VALIDATION.QUEUE.PARAMS.INVALID_ID)
@@ -82,7 +82,7 @@ async function getById(req: express.Request, res: express.Response) {
  * @route  POST /api/queue/create
  * @access Private
  */
-async function create(req: express.Request, res: express.Response) {
+async function create(req: Request, res: Response) {
   await body(config.VALIDATION.QUEUE.BODY.QUEUE_NUMBER)
     .notEmpty()
     .withMessage(config.VALIDATION.QUEUE.ERROR.REQUIRED_QUEUE)
@@ -110,7 +110,7 @@ async function create(req: express.Request, res: express.Response) {
  * @route  PUT /api/queue/update
  * @access Private
  */
-async function update(req: express.Request, res: express.Response) {
+async function update(req: Request, res: Response) {
   await body(config.VALIDATION.QUEUE.BODY.QUEUE_NUMBER)
     .notEmpty()
     .withMessage(config.VALIDATION.QUEUE.ERROR.REQUIRED_QUEUE)
@@ -138,7 +138,7 @@ async function update(req: express.Request, res: express.Response) {
  * @route  DELETE /api/queue/remove/:id
  * @access Private
  */
-async function remove(req: express.Request, res: express.Response) {
+async function remove(req: Request, res: Response) {
   await param(config.VALIDATION.QUEUE.PARAMS.ID)
     .isMongoId()
     .withMessage(config.VALIDATION.QUEUE.PARAMS.INVALID_ID)
