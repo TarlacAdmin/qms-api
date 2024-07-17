@@ -15,7 +15,11 @@ const queueSchema: Schema = new Schema(
     queueNumber: { type: String, required: true },
     counter: String,
     status: String,
-    timestamp: { type: Schema.Types.Mixed, required: true },
+    timestamp: { 
+      type: Schema.Types.Mixed, 
+      required: true,
+      default: Date.now
+    },
     metadata: {
       patient: {
         type: mongoose.Schema.Types.ObjectId,
