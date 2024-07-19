@@ -22,6 +22,7 @@ export const API_ENDPOINTS = {
     GET_BY_ID: "/queue/get/:id",
     CREATE: "/queue/create",
     UPDATE: "/queue/update",
+    SEARCH: "/queue/search",
     REMOVE_BY_ID: "/queue/remove/:id",
   },
 };

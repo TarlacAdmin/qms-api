@@ -55,13 +55,13 @@ export const config = {
   CORS: {
     METHODS: ["GET", "POST", "PUT", "DELETE"],
     LOCAL: "http://localhost:5173",
-    DEV_BRANCH: "https://example-app-dev",
-    TEST_BRANCH: "https://example-app-test",
+    DEV_BRANCH: "https://qms-app-dev.web.app",
+    TEST_BRANCH: "https://qms-app-test.web.app",
     DEV_SITE: function (origin: string, callback: CallbackFunction) {
-      wildCardOrigin(origin, callback, "https://example-app-dev");
+      wildCardOrigin(origin, callback, "https://qms-app-dev");
     },
     TEST_SITE: function (origin: string, callback: CallbackFunction) {
-      wildCardOrigin(origin, callback, "https://example-test-dev");
+      wildCardOrigin(origin, callback, "https://qms-app-test");
     },
   },
 
