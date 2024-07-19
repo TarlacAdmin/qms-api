@@ -103,7 +103,14 @@ async function remove(id: string): Promise<IQueue | null> {
 
 async function search(params: any = {}): Promise<IQueue[]> {
   try {
-    return await Queue.find(params).sort({ createdAt: -1 }).exec();;
+    // return await Queue.find(params).sort({ createdAt: -1 }).exec();;
+    let query = Queue.find();
+    query.setQuery(params.query);
+    query.populate(params.populateArray);
+    query.projection(params.projection);
+    query.setOptions(params.options);
+    query.lean(params.lean);
+    return query.exec();
   } catch (error) {
     throw error;
   }
