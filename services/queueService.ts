@@ -1,4 +1,5 @@
 import queueRepository from "../repository/queueRepository";
+import userRepository from "../repository/userRepository";
 import { IQueue } from "../models/queueModel";
 import { config } from "../config/config";
 
@@ -8,6 +9,7 @@ const queueService = {
   create,
   update,
   remove,
+  search,
 };
 
 export default queueService;
@@ -94,7 +96,27 @@ async function create(data: Partial<IQueue>): Promise<IQueue> {
   }
 
   try {
+    const today = new Date();
+    today.setUTCHours(0, 0, 0, 0);
+
+    const latestQueue = await queueRepository.search({
+      counter: data.counter,
+      createdAt: { $gte: today }
+    });
+
+    let queueNumber;
+    if (latestQueue && latestQueue.length > 0) {
+      const latestNumber = parseInt(latestQueue[0].queueNumber, 10);
+      queueNumber = String(latestNumber + 1).padStart(3, '0');
+    } else {
+      queueNumber = '001';
+    }
+
+    data.queueNumber = queueNumber;
+    //TODO
+    // data.metadata.patient = await userRepository.findOrCreate(data.metadata?.patient)
     return await queueRepository.create(data);
+
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);
@@ -104,13 +126,13 @@ async function create(data: Partial<IQueue>): Promise<IQueue> {
   }
 }
 
-async function update(id: string, data: Partial<IQueue>): Promise<IQueue | null> {
-  if (!id || !data) {
+async function update(data: Partial<IQueue>): Promise<IQueue | null> {
+  if (!data) {
     throw new Error(config.RESPONSE.ERROR.QUEUE.INVALID_PARAMETER.UPDATE);
   }
 
   try {
-    return await queueRepository.update(id, data);
+    return await queueRepository.update(data);
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);
@@ -127,6 +149,20 @@ async function remove(id: string): Promise<IQueue | null> {
 
   try {
     return await queueRepository.remove(id);
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(error.message);
+    } else {
+      throw new Error(String(error));
+    }
+  }
+}
+
+async function search(params: any): Promise<IQueue[] | null> {
+  //TODO: VAlidation
+
+  try {
+    return await queueRepository.search(params);
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);

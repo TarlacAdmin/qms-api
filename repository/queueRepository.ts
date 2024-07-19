@@ -18,6 +18,7 @@ const queueRepository = {
   update,
   remove,
   findById,
+  search
 };
 
 export default queueRepository;
@@ -74,10 +75,10 @@ async function create(data: Partial<IQueue>): Promise<IQueue> {
   }
 }
 
-async function update(id: string, data: Partial<IQueue>): Promise<IQueue | null> {
+async function update(data: Partial<IQueue>): Promise<IQueue | null> {
   try {
-    return await Queue.findByIdAndUpdate(id, data, { new: true })
-      .select("-metadata.patient.emr")
+    return await Queue.findByIdAndUpdate(data._id, data, { new: true })
+      // .select("-metadata.patient.emr")
       .lean();
   } catch (error) {
     throw error;
@@ -95,6 +96,14 @@ async function findById(id: string): Promise<IQueue | null> {
 async function remove(id: string): Promise<IQueue | null> {
   try {
     return await Queue.findByIdAndDelete(id);
+  } catch (error) {
+    throw error;
+  }
+}
+
+async function search(params: any = {}): Promise<IQueue[]> {
+  try {
+    return await Queue.find(params).sort({ createdAt: -1 }).exec();;
   } catch (error) {
     throw error;
   }
