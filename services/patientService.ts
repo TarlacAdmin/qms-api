@@ -91,20 +91,17 @@ async function getAllPatients(params: any): Promise<PatientModel[]> {
   }
 }
 
-async function findOrCreate(patientData: Partial<PatientModel> | ObjectId): Promise<PatientModel> {
-  if (patientData instanceof ObjectId) {
-    const patient = await patientRepository.findById(patientData);
-    if (!patient) {
-      throw new Error("Patient not found");
-    }
-    return patient;
-  } else {
-    let patient = await patientRepository.findOne({ _id: patientData._id });
-    if (!patient) {
-      patient = await patientRepository.create(patientData);
-    }
-    return patient;
+async function findOrCreate(
+  patientQueryOrData: Partial<PatientModel> | ObjectId
+): Promise<PatientModel> {
+  const query =
+    patientQueryOrData instanceof ObjectId ? { _id: patientQueryOrData } : patientQueryOrData;
+
+  let patient = await patientRepository.findOne(query);
+  if (!patient) {
+    patient = await patientRepository.create(patientQueryOrData as Partial<PatientModel>);
   }
+  return patient;
 }
 
 async function create(data: Partial<PatientModel>): Promise<PatientModel> {
