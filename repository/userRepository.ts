@@ -19,7 +19,7 @@ const userRepository = {
   updateUser,
   deleteUser,
   search,
-  findOrCreate
+  findOrCreate,
 };
 
 export default userRepository;
@@ -119,16 +119,16 @@ async function search(query: string): Promise<IUser[]> {
   }
 }
 
-async function findOrCreate(params: any){
+async function findOrCreate(params: any) {
   //TODO: Add one more checker
-  // let user = await User.findOne({ 
+  // let user = await User.findOne({
   //   firstName: params.firstName,
   //   lastName: params.lastName,
-  //   middleName: params.middleName
+  //   middleName: params.middleName,
   // });
   // if (!user) {
   //   const newUser = await User.create(params);
-  //   return newUser._id,
+  //   return newUser._id;
   // }
   // return user._id;
 }

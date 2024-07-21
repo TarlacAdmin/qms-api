@@ -25,4 +25,13 @@ export const API_ENDPOINTS = {
     SEARCH: "/queue/search",
     REMOVE_BY_ID: "/queue/remove/:id",
   },
+
+  PATIENT: {
+    GET_ALL: "/patient/get/all",
+    GET_BY_ID: "/patient/get/:id",
+    CREATE: "/patient/create",
+    UPDATE: "/patient/update",
+    SEARCH: "/patient/search",
+    REMOVE_BY_ID: "/patient/remove/:id",
+  },
 };

@@ -16,24 +16,24 @@ const queueSchema: Schema = new Schema(
     counter: String,
     status: {
       type: String,
-      default: "new"
+      default: "new",
     },
-    timestamp: { 
-      type: Schema.Types.Mixed, 
+    timestamp: {
+      type: Schema.Types.Mixed,
       required: true,
-      default: Date.now
+      default: Date.now,
     },
     metadata: {
-      patient: {
-        lastName: String,
-        firstName: String,
-        middleName: String
-      },
-      doctor: String
       // patient: {
-      //   type: mongoose.Schema.Types.ObjectId,
-      //   ref: "Patient",
+      //   lastName: String,
+      //   firstName: String,
+      //   middleName: String
       // },
+      patient: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Patient",
+      },
+      doctor: String,
     },
   },
   {

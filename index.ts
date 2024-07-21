@@ -1,19 +1,19 @@
 // Description: This is the main file of the application.
 // It is responsible for starting the server and listening to the port.
-import express, { Request, Response, NextFunction } from 'express';
-import cookieParser from 'cookie-parser';
-import mainRoute from './routes/mainRoute';
-import errorHandler from './middleware/errorHandler';
-import conditionalTokenValidation from './middleware/conditionalTokenValidation';
-import corsConfig from './config/corsConfig';
-import sessionConfig from './config/sessionConfig';
-import connectDb from './config/dbConnection';
-import routes from './config/routeConfig';
-import { config } from './config/config';
-import { API_ENDPOINTS } from './config/endpointsConfig';
-import http from 'http';
-import { Server } from 'socket.io';
-require('dotenv').config();
+import express, { Request, Response, NextFunction } from "express";
+import cookieParser from "cookie-parser";
+import mainRoute from "./routes/mainRoute";
+import errorHandler from "./middleware/errorHandler";
+import conditionalTokenValidation from "./middleware/conditionalTokenValidation";
+import corsConfig from "./config/corsConfig";
+import sessionConfig from "./config/sessionConfig";
+import connectDb from "./config/dbConnection";
+import routes from "./config/routeConfig";
+import { config } from "./config/config";
+import { API_ENDPOINTS } from "./config/endpointsConfig";
+import http from "http";
+import { Server } from "socket.io";
+require("dotenv").config();
 
 const app = express();
 const port = process.env.PORT || config.PORT;
@@ -21,9 +21,9 @@ const port = process.env.PORT || config.PORT;
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: 'http://localhost:5173',
-    methods: ['GET', 'POST']
-  }
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST"],
+  },
 });
 
 app.use((req: Request, res: Response, next: NextFunction) => {
