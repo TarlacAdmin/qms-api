@@ -6,8 +6,6 @@ import { CallbackFunction } from "../helper/types";
 // Configuration object
 export const config = {
   PORT: 5000,
-  REDIS_URL: "redis://localhost:6379",
-  NODE_ENV: "production",
 
   MSG: {
     WELCOME: "You're successfully connected to Tarlac Solutions (API)",
