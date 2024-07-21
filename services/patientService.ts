@@ -1,23 +1,23 @@
 import { config } from "../config/config";
-import { IQueue } from "../models/queueModel";
-import { ObjectId } from "mongodb";
-import queueRepository from "../repository/queueRepository";
-import patientService from "./patientService";
+import { ObjectId } from "bson";
+import { PatientModel } from "../models/patientModel";
+import patientRepository from "../repository/patientRepository";
 
-const queueService = {
+const patientService = {
   getById,
-  getAllQueues,
+  getAllPatients,
   create,
   update,
   remove,
   search,
+  findOrCreate,
 };
 
-export default queueService;
+export default patientService;
 
-async function getById(id: string, params: any): Promise<IQueue | null> {
+async function getById(id: string, params: any): Promise<PatientModel | null> {
   if (!id) {
-    throw new Error(config.RESPONSE.ERROR.QUEUE.INVALID_PARAMETER.GET);
+    throw new Error(config.RESPONSE.ERROR.PATIENT.INVALID_PARAMETER.GET);
   }
 
   try {
@@ -37,7 +37,7 @@ async function getById(id: string, params: any): Promise<IQueue | null> {
       dbParams.options.lean = params.lean;
     }
 
-    return await queueRepository.getById(id, dbParams);
+    return await patientRepository.getById(id, dbParams);
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);
@@ -47,9 +47,9 @@ async function getById(id: string, params: any): Promise<IQueue | null> {
   }
 }
 
-async function getAllQueues(params: any): Promise<IQueue[]> {
+async function getAllPatients(params: any): Promise<PatientModel[]> {
   if (!params) {
-    throw new Error(config.RESPONSE.ERROR.QUEUE.INVALID_PARAMETER.GET_ALL);
+    throw new Error(config.RESPONSE.ERROR.PATIENT.INVALID_PARAMETER.GET_ALL);
   }
 
   try {
@@ -81,7 +81,7 @@ async function getAllQueues(params: any): Promise<IQueue[]> {
       dbParams.options.lean = params.lean;
     }
 
-    return await queueRepository.getAllQueues(dbParams);
+    return await patientRepository.getAllPatients(dbParams);
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);
@@ -91,43 +91,29 @@ async function getAllQueues(params: any): Promise<IQueue[]> {
   }
 }
 
-async function create(data: Partial<IQueue>): Promise<IQueue> {
+async function findOrCreate(patientData: Partial<PatientModel> | ObjectId): Promise<PatientModel> {
+  if (patientData instanceof ObjectId) {
+    const patient = await patientRepository.findById(patientData);
+    if (!patient) {
+      throw new Error("Patient not found");
+    }
+    return patient;
+  } else {
+    let patient = await patientRepository.findOne({ _id: patientData._id });
+    if (!patient) {
+      patient = await patientRepository.create(patientData);
+    }
+    return patient;
+  }
+}
+
+async function create(data: Partial<PatientModel>): Promise<PatientModel> {
   if (!data) {
-    throw new Error(config.RESPONSE.ERROR.QUEUE.INVALID_PARAMETER.CREATE);
+    throw new Error(config.RESPONSE.ERROR.PATIENT.INVALID_PARAMETER.CREATE);
   }
 
   try {
-    const today = new Date();
-    today.setUTCHours(0, 0, 0, 0);
-
-    const queues = await search({
-      query: {
-        counter: data.counter,
-        createdAt: { $gte: today },
-      },
-      sort: "-createdAt",
-      limit: 999,
-      select: "queueNumber",
-    });
-
-    let queueNumber;
-    if (queues && queues.length > 0) {
-      const latestNumber = parseInt(queues[0].queueNumber, 10);
-      queueNumber = String(latestNumber + 1).padStart(3, "0");
-    } else {
-      queueNumber = "001";
-    }
-
-    data.queueNumber = queueNumber;
-
-    if (data.metadata?.patient) {
-      const patient = await patientService.findOrCreate(data.metadata.patient);
-      data.metadata.patient = patient._id as ObjectId;
-    }
-
-    const createdQueue = await queueRepository.create(data);
-
-    return createdQueue;
+    return await patientRepository.create(data);
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);
@@ -137,13 +123,13 @@ async function create(data: Partial<IQueue>): Promise<IQueue> {
   }
 }
 
-async function update(data: Partial<IQueue>): Promise<IQueue | null> {
+async function update(data: Partial<PatientModel>): Promise<PatientModel | null> {
   if (!data) {
-    throw new Error(config.RESPONSE.ERROR.QUEUE.INVALID_PARAMETER.UPDATE);
+    throw new Error(config.RESPONSE.ERROR.PATIENT.INVALID_PARAMETER.UPDATE);
   }
 
   try {
-    return await queueRepository.update(data);
+    return await patientRepository.update(data);
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);
@@ -153,13 +139,13 @@ async function update(data: Partial<IQueue>): Promise<IQueue | null> {
   }
 }
 
-async function remove(id: string): Promise<IQueue | null> {
+async function remove(id: string): Promise<PatientModel | null> {
   if (!id) {
-    throw new Error(config.RESPONSE.ERROR.QUEUE.INVALID_PARAMETER.REMOVE);
+    throw new Error(config.RESPONSE.ERROR.PATIENT.INVALID_PARAMETER.REMOVE);
   }
 
   try {
-    return await queueRepository.remove(id);
+    return await patientRepository.remove(id);
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);
@@ -169,9 +155,7 @@ async function remove(id: string): Promise<IQueue | null> {
   }
 }
 
-async function search(params: any): Promise<IQueue[] | null> {
-  //TODO: VAlidation
-
+async function search(params: any): Promise<PatientModel[] | null> {
   try {
     let dbParams = {
       query: {},
@@ -201,7 +185,7 @@ async function search(params: any): Promise<IQueue[] | null> {
 
     dbParams.lean = params.lean || true;
 
-    return await queueRepository.search(dbParams);
+    return await patientRepository.search(dbParams);
   } catch (error) {
     console.error(error);
     throw error;

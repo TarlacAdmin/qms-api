@@ -18,7 +18,8 @@ const queueRepository = {
   update,
   remove,
   findById,
-  search
+  search,
+  pushPatientToMetadata,
 };
 
 export default queueRepository;
@@ -70,6 +71,18 @@ async function getAllQueues(dbParams: DbParams = {}): Promise<IQueue[]> {
 async function create(data: Partial<IQueue>): Promise<IQueue> {
   try {
     return await Queue.create(data);
+  } catch (error) {
+    throw error;
+  }
+}
+
+async function pushPatientToMetadata(queueId: string, patientId: string): Promise<IQueue | null> {
+  try {
+    return await Queue.findByIdAndUpdate(
+      queueId,
+      { $set: { "metadata.patient": patientId } },
+      { new: true }
+    ).lean();
   } catch (error) {
     throw error;
   }

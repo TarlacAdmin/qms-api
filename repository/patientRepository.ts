@@ -1,4 +1,5 @@
 import Patient, { PatientModel } from "../models/patientModel";
+import { ObjectId } from "mongodb";
 
 interface DbParams {
   query?: any;
@@ -19,6 +20,8 @@ const patientRepository = {
   remove,
   findById,
   search,
+  findOne,
+  findOrCreate,
 };
 
 export default patientRepository;
@@ -75,6 +78,31 @@ async function create(data: Partial<PatientModel>): Promise<PatientModel> {
   }
 }
 
+async function findOrCreate(data: Partial<PatientModel> | ObjectId): Promise<PatientModel> {
+  try {
+    let patient;
+    if (data instanceof ObjectId) {
+      patient = await Patient.findById(data).lean<PatientModel>();
+    } else {
+      patient = await Patient.findOne({ _id: data._id }).lean<PatientModel>();
+    }
+    if (!patient) {
+      patient = (await Patient.create(data)).toObject();
+    }
+    return patient;
+  } catch (error) {
+    throw error;
+  }
+}
+
+async function findOne(query: any): Promise<PatientModel | null> {
+  try {
+    return await Patient.findOne(query).lean();
+  } catch (error) {
+    throw error;
+  }
+}
+
 async function update(data: Partial<PatientModel>): Promise<PatientModel | null> {
   try {
     return await Patient.findByIdAndUpdate(data._id, data, { new: true }).lean();
@@ -83,7 +111,7 @@ async function update(data: Partial<PatientModel>): Promise<PatientModel | null>
   }
 }
 
-async function findById(id: string): Promise<PatientModel | null> {
+async function findById(id: string | ObjectId): Promise<PatientModel | null> {
   try {
     return await Patient.findById(id).lean();
   } catch (error) {

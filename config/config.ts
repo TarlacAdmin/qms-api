@@ -6,6 +6,8 @@ import { CallbackFunction } from "../helper/types";
 // Configuration object
 export const config = {
   PORT: 5000,
+  REDIS_URL: "redis://localhost:6379",
+  NODE_ENV: "production",
 
   MSG: {
     WELCOME: "You're successfully connected to Tarlac Solutions (API)",
@@ -79,8 +81,7 @@ export const config = {
   },
 
   ERROR: {
-    MONGODB_NOT_DEFINE:
-      "MONGODB_URI is not defined in the environment variables.",
+    MONGODB_NOT_DEFINE: "MONGODB_URI is not defined in the environment variables.",
     CONNECTION_FAILED: "Database connection failed:",
     UNEXPECTED: "An unexpected error occurred. Please try again later.",
 
@@ -128,6 +129,25 @@ export const config = {
         INVALID_ID: "Invalid queue id",
       },
     },
+
+    PATIENT: {
+      ERROR: {
+        REQUIRED_PATIENT: "Fill all required patient fields",
+        INVALID_ID: "Invalid Patient ID",
+      },
+
+      BODY: {
+        PATIENT_FIRSTNAME: "firstname",
+        PATIENT_LASTNAME: "lastname",
+        PATIENT_MIDDLENAME: "middlename",
+        ID: "_id",
+      },
+
+      PARAMS: {
+        ID: "id",
+        INVALID_ID: "Invalid patient id",
+      },
+    },
   },
 
   RESPONSE: {
@@ -147,6 +167,23 @@ export const config = {
           ID: "queueService.update params._id is missing!",
           REMOVE: "queueService.remove params is missing!",
           SEARCH: "queueService.search params is missing!",
+        },
+      },
+      PATIENT: {
+        ID: "patientId is missing!",
+        NOT_FOUND: "Patient not found",
+        REMOVE: "Error removing field",
+        UPDATE: "Error updating field",
+        ALREADY_EXISTS: "Patient already exists",
+        NOT_FOUND_ID: "Patient not found! with the provided _id",
+        INVALID_PARAMETER: {
+          GET: "patientService.get params is missing!",
+          GET_ALL: "patientService.getAllField params is missing!",
+          CREATE: "patientService.create params is missing!",
+          UPDATE: "patientService.update params is missing!",
+          ID: "patientService.update params._id is missing!",
+          REMOVE: "patientService.remove params is missing!",
+          SEARCH: "patientService.search params is missing!",
         },
       },
     },
