@@ -57,11 +57,15 @@ export const config = {
     LOCAL: "http://localhost:5174",
     DEV_BRANCH: "https://qms-app-dev.web.app",
     TEST_BRANCH: "https://qms-app-test.web.app",
+    PROD_BRANCH: "https://qms-app-prod.web.app",
     DEV_SITE: function (origin: string, callback: CallbackFunction) {
       wildCardOrigin(origin, callback, "https://qms-app-dev");
     },
     TEST_SITE: function (origin: string, callback: CallbackFunction) {
       wildCardOrigin(origin, callback, "https://qms-app-test");
+    },
+    PROD_SITE: function (origin: string, callback: CallbackFunction) {
+      wildCardOrigin(origin, callback, "https://qms-app-prod");
     },
   },
 
