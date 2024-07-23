@@ -5,7 +5,7 @@ import { CallbackFunction } from "../helper/types";
 
 // Configuration object
 export const config = {
-  PORT: 5000,
+  PORT: 5001,
 
   MSG: {
     WELCOME: "You're successfully connected to Tarlac Solutions (API)",
@@ -54,7 +54,7 @@ export const config = {
 
   CORS: {
     METHODS: ["GET", "POST", "PUT", "DELETE"],
-    LOCAL: "http://localhost:5173",
+    LOCAL: "http://localhost:5174",
     DEV_BRANCH: "https://qms-app-dev.web.app",
     TEST_BRANCH: "https://qms-app-test.web.app",
     DEV_SITE: function (origin: string, callback: CallbackFunction) {
