@@ -12,9 +12,9 @@ export interface PatientModel extends Document {
   religion?: string;
   civilStatus?: string;
   cellphoneNumber?: string;
-  visualActivity: {
-    rightEyeVisualActivity?: string;
-    leftEyeVisualActivity?: string;
+  visualAcuity: {
+    right?: string;
+    left?: string;
     pinHole?: string;
     cc?: string;
   };

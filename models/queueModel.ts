@@ -24,11 +24,6 @@ const queueSchema: Schema = new Schema(
       default: Date.now,
     },
     metadata: {
-      // patient: {
-      //   lastName: String,
-      //   firstName: String,
-      //   middleName: String
-      // },
       patient: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Patient",

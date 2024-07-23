@@ -125,8 +125,9 @@ async function create(data: Partial<IQueue>): Promise<IQueue> {
       data.metadata.patient = patient._id as ObjectId;
     }
     
-    const createdQueue = await queueRepository.create(data);
-
+    let createdQueue = await queueRepository.create(data);
+    createdQueue = await createdQueue.populate('metadata.patient');
+    
     return createdQueue;
   } catch (error) {
     if (error instanceof Error) {
