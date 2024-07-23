@@ -10,6 +10,8 @@ const allowedOrigins = [
   config.CORS.DEV_SITE,
   config.CORS.TEST_BRANCH,
   config.CORS.TEST_SITE,
+  config.CORS.PROD_BRANCH,
+  config.CORS.PROD_SITE,
 ];
 
 const corsOptions: CorsOptions = {
