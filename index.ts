@@ -21,7 +21,12 @@ const port = process.env.PORT || config.PORT;
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173",
+    origin: [
+      config.CORS.LOCAL,
+      config.CORS.DEV_BRANCH,
+      config.CORS.TEST_BRANCH,
+      config.CORS.PROD_BRANCH,
+    ],
     methods: ["GET", "POST"],
   },
 });

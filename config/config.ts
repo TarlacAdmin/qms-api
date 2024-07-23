@@ -5,7 +5,7 @@ import { CallbackFunction } from "../helper/types";
 
 // Configuration object
 export const config = {
-  PORT: 5001,
+  PORT: 5000,
 
   MSG: {
     WELCOME: "You're successfully connected to Tarlac Solutions (API)",
@@ -69,6 +69,7 @@ export const config = {
     },
   },
 
+  //TODO: process.env
   DB: {
     URI: "mongodb+srv://tarlacsolutionsinc:RJc83AVcrahVG4RC@tarlac-prod-clusterm2.ofhfszm.mongodb.net/prod?retryWrites=true&w=majority&appName=Tarlac-Prod-ClusterM2",
     COLLECTION: "sessions",
