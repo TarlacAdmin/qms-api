@@ -54,7 +54,7 @@ export const config = {
 
   CORS: {
     METHODS: ["GET", "POST", "PUT", "DELETE"],
-    LOCAL: "http://localhost:5174",
+    LOCAL: "http://localhost:5173",
     DEV_BRANCH: "https://qms-app-dev.web.app",
     TEST_BRANCH: "https://qms-app-test.web.app",
     PROD_BRANCH: "https://qms-app-prod.web.app",

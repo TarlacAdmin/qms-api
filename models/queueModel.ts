@@ -13,10 +13,14 @@ export interface IQueue extends Document {
 const queueSchema: Schema = new Schema(
   {
     queueNumber: { type: String, required: true },
-    counter: String,
+    counter: {
+      type: String,
+      index: true
+    },
     status: {
       type: String,
       default: "new",
+      index: true,
     },
     timestamp: {
       type: Schema.Types.Mixed,
@@ -28,7 +32,10 @@ const queueSchema: Schema = new Schema(
         type: mongoose.Schema.Types.ObjectId,
         ref: "Patient",
       },
-      doctor: String,
+      doctor: {
+        type: String,
+        index: true
+      }
     },
   },
   {
@@ -36,4 +43,5 @@ const queueSchema: Schema = new Schema(
   }
 );
 
+// queueSchema.set("autoIndex", false);
 export default mongoose.model<IQueue>("Queue", queueSchema);

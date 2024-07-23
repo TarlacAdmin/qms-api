@@ -22,20 +22,32 @@ export interface PatientModel extends Document {
 
 const patientSchema: Schema = new Schema(
   {
-    firstName: { type: String, required: true },
-    middleName: { type: String, required: true },
-    lastName: { type: String, required: true },
+    firstName: { 
+      type: String, 
+      required: true,
+      index: true
+    },
+    middleName: { 
+      type: String,
+      required: true,
+      index: true
+    },
+    lastName: { 
+      type: String, 
+      required: true,
+      index: true
+    },
     province: String,
     city: String,
     barangay: String,
     streetNumber: String,
-    birthdate: Date,
+    birthday: Date,
     religion: String,
     civilStatus: String,
     cellphoneNumber: String,
-    visualAcvitiy: {
-      rightEyeVisualActivity: String,
-      leftEyeVisualActivity: String,
+    visualAcuity: {
+      right: String,
+      left: String,
       pinHole: String,
       cc: String,
     },
@@ -45,4 +57,5 @@ const patientSchema: Schema = new Schema(
   }
 );
 
+// patientSchema.set("autoIndex", false);
 export default mongoose.model<PatientModel>("Patient", patientSchema);

@@ -155,33 +155,11 @@ async function remove(id: string): Promise<PatientModel | null> {
 async function search(params: any): Promise<PatientModel[] | null> {
   try {
     let dbParams = {
-      query: {},
-      populateArray: [],
-      options: {},
-      lean: true,
+      search: params.search,
+      sort: params.sort || "-createdAt",
+      project: params.project,
+      limit: params.limit || 10
     };
-    dbParams.query = params.query;
-
-    //Build Populate Options
-    if (params.populateArray) {
-      dbParams["populateArray"] = params.populateArray;
-    }
-
-    //Build Query Options
-    let optionsObj = {
-      sort: "",
-      skip: 0,
-      select: "",
-      limit: 0,
-    };
-    optionsObj["sort"] = params.sort || "-createdAt";
-    optionsObj["skip"] = params.skip || 0;
-    optionsObj["select"] = params.select || "_id";
-    optionsObj["limit"] = params.limit || 10;
-    dbParams.options = optionsObj;
-
-    dbParams.lean = params.lean || true;
-
     return await patientRepository.search(dbParams);
   } catch (error) {
     console.error(error);

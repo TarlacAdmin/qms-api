@@ -129,13 +129,17 @@ async function remove(id: string): Promise<PatientModel | null> {
 
 async function search(params: any = {}): Promise<PatientModel[]> {
   try {
-    let query = Patient.find();
-    query.setQuery(params.query);
-    query.populate(params.populateArray);
-    query.projection(params.projection);
-    query.setOptions(params.options);
-    query.lean(params.lean);
-    return query.exec();
+    let aggregate = Patient.aggregate();
+    if(params.search){
+        aggregate.search(params.search)
+    }
+    if(params.match){
+        aggregate.match(params.match)
+    }
+    aggregate.project(params.project)
+    aggregate.sort(params.sort)
+    aggregate.limit(params.limit)
+    return await aggregate.exec()    
   } catch (error) {
     throw error;
   }
