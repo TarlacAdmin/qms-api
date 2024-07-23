@@ -13,6 +13,7 @@ const sessionConfig: session.SessionOptions = {
   store: MongoStore.create({
     mongoUrl: process.env.MONGODB_URI || config.DB.URI,
     collectionName: config.DB.COLLECTION,
+    ttl: 14 * 24 * 60 * 60, // 14 days
   }),
 };
 

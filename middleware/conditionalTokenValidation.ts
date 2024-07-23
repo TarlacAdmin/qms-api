@@ -25,17 +25,21 @@ const excludeFromTokenValidation: Exclusion[] = [
     path: API_ENDPOINTS.USER.LOGIN,
     method: config.METHOD.POST,
   },
+  {
+    path: API_ENDPOINTS.QUEUE.CREATE,
+    method: config.METHOD.POST,
+  },
 ];
 
 // Middleware to conditionally validate token
 const conditionalTokenValidation = (req: Request, res: Response, next: NextFunction): void => {
-  const isExcluded = excludeFromTokenValidation.some(
-    (exclusion) => req.path.endsWith(exclusion.path) && req.method === exclusion.method
-  );
-  if (isExcluded) {
+  // const isExcluded = excludeFromTokenValidation.some(
+  //   (exclusion) => req.path.endsWith(exclusion.path) && req.method === exclusion.method
+  // );
+  // if (isExcluded) {
     return next();
-  }
-  unifiedAuthMiddleware(req, res, next);
+  // }
+  // unifiedAuthMiddleware(req, res, next);
 };
 
 export default conditionalTokenValidation;
