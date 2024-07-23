@@ -22,9 +22,9 @@ export interface PatientModel extends Document {
 
 const patientSchema: Schema = new Schema(
   {
-    firstname: { type: String, required: true },
-    middlename: { type: String, required: true },
-    lastname: { type: String, required: true },
+    firstName: { type: String, required: true },
+    middleName: { type: String, required: true },
+    lastName: { type: String, required: true },
     province: String,
     city: String,
     barangay: String,
