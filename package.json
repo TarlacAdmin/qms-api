@@ -1,5 +1,5 @@
 {
-  "name": "unlad-template-service-tx",
+  "name": "qpms-api",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -11,7 +11,7 @@
     "dev": "nodemon --exec ts-node index.ts"
   },
   "keywords": [],
-  "author": "",
+  "author": "Gab Almighty",
   "license": "ISC",
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",

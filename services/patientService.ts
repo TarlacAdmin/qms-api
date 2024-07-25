@@ -92,10 +92,11 @@ async function getAllPatients(params: any): Promise<PatientModel[]> {
 }
 
 async function findOrCreate(
-  patientQueryOrData: Partial<PatientModel> | ObjectId
-): Promise<PatientModel> {
+  patientQueryOrData: any): Promise<PatientModel> {
   const query =
-    patientQueryOrData instanceof ObjectId ? { _id: patientQueryOrData } : patientQueryOrData;
+    patientQueryOrData._id ? 
+    { _id: patientQueryOrData._id } : 
+    { firstName: patientQueryOrData.firstName, middleName: patientQueryOrData.middleName, lastName: patientQueryOrData.lastName };
 
   let patient = await patientRepository.findOne(query);
   if (!patient) {
