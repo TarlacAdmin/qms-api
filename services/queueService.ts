@@ -97,28 +97,10 @@ async function create(data: Partial<IQueue>): Promise<IQueue> {
   }
 
   try {
-    const today = new Date();
-    today.setUTCHours(0, 0, 0, 0);
-
-    const queues = await search({
-      query: {
-        counter: data.counter,
-        createdAt: { $gte: today },
-      },
-      sort: "-createdAt",
-      limit: 999,
-      select: "queueNumber",
-    });
-
-    let queueNumber;
-    if (queues && queues.length > 0) {
-      const latestNumber = parseInt(queues[0].queueNumber, 10);
-      queueNumber = String(latestNumber + 1).padStart(3, "0");
-    } else {
-      queueNumber = "001";
+    
+    if(data.counter === "interview"){
+      data.queueNumber = await generateQueueNumber(data.counter);
     }
-
-    data.queueNumber = queueNumber;
 
     if (data.metadata?.patient) {
       const patient = await patientService.findOrCreate(data.metadata.patient);
@@ -206,5 +188,30 @@ async function search(params: any): Promise<IQueue[] | null> {
   } catch (error) {
     console.error(error);
     throw error;
+  }
+}
+
+async function generateQueueNumber(counterName: string) : Promise<string> {
+
+  const today = new Date();
+  today.setUTCHours(0, 0, 0, 0);
+
+  const queues = await search({
+    query: {
+      counter: counterName,
+      createdAt: { $gte: today },
+    },
+    sort: "-createdAt",
+    limit: 999,
+    select: "queueNumber",
+  });
+
+  let queueNumber;
+  //TODO: Check if counter = interview. Generate new number. ELSE, use existing "data.queueNumber"
+  if (queues && queues.length > 0) {
+    const latestNumber = parseInt(queues[0].queueNumber, 10);
+    return queueNumber = String(latestNumber + 1).padStart(3, "0");
+  } else {
+    return queueNumber = "001";
   }
 }
