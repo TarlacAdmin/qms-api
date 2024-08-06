@@ -251,6 +251,7 @@ export const config = {
         ALREADY_EXISTS: "Appointment already exists",
         NOT_FOUND_ID: "Appointment not found! with the provided _id",
         FAILED: "Failed to associate doctor with the appointment.",
+        EXISTS: "Appointment already exists",
         INVALID_PARAMETER: {
           GET: "appointmentService.get params is missing!",
           GET_ALL: "appointmentService.getAllField params is missing!",

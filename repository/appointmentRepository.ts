@@ -20,7 +20,7 @@ const appointmentRepository = {
   remove,
   findById,
   search,
-  findOne,
+  findByDate,
   addDoctorToAppointment,
 };
 
@@ -78,9 +78,9 @@ async function findById(id: string | ObjectId): Promise<AppointmentModel | null>
   }
 }
 
-async function findOne(query: any): Promise<AppointmentModel | null> {
+async function findByDate(date: Date): Promise<AppointmentModel | null> {
   try {
-    return await Appointment.findOne(query).lean();
+    return await Appointment.findOne({ date }).lean();
   } catch (error) {
     throw error;
   }

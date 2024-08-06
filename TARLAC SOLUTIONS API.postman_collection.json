@@ -2,7 +2,7 @@
 	"info": {
 		"_postman_id": "b7be9563-6f9f-4236-9ad5-f224ce170115",
 		"name": "TARLAC SOLUTIONS API",
-		"description": "# 🚀 Get started here\n\nThis collection guides you through CRUD operations (GET, POST, PUT, DELETE), variables, and tests.\n\n## 🔖 **How to use this collection**\n\n#### **Step 1: Send requests**\n\nRESTful APIs allow you to perform CRUD operations using the POST, GET, PUT, and DELETE HTTP methods.\n\nThis collection contains each of these request types. Open each request and click \"Send\" to see what happens.\n\n#### **Step 2: View responses**\n\nObserve the response tab for status code (200 OK), response time, and size.\n\n#### **Step 3: Send new Body data**\n\nUpdate or add new data in \"Body\" in the POST request. Typically, Body data is also used in PUT and PATCH requests.\n\n```\n{\n    \"name\": \"Add your name in the body\"\n}\n\n```\n\n#### **Step 4: Update the variable**\n\nVariables enable you to store and reuse values in Postman. We have created a variable called `base_url` with the sample request [https://postman-api-learner.glitch.me](https://postman-api-learner.glitch.me). Replace it with your API endpoint to customize this collection.\n\n#### **Step 5: Add tests in the \"Tests\" tab**\n\nTests help you confirm that your API is working as expected. You can write test scripts in JavaScript and view the output in the \"Test Results\" tab.\n\n<img src=\"https://content.pstmn.io/b5f280a7-4b09-48ec-857f-0a7ed99d7ef8/U2NyZWVuc2hvdCAyMDIzLTAzLTI3IGF0IDkuNDcuMjggUE0ucG5n\">\n\n## 💪 Pro tips\n\n- Use folders to group related requests and organize the collection.\n- Add more scripts in \"Tests\" to verify if the API works as expected and execute flows.\n    \n\n## ℹ️ Resources\n\n[Building requests](https://learning.postman.com/docs/sending-requests/requests/)  \n[Authorizing requests](https://learning.postman.com/docs/sending-requests/authorization/)  \n[Using variables](https://learning.postman.com/docs/sending-requests/variables/)  \n[Managing environments](https://learning.postman.com/docs/sending-requests/managing-environments/)  \n[Writing scripts](https://learning.postman.com/docs/writing-scripts/intro-to-scripts/)",
+		"description": "# 🚀 Get started here\n\nThis collection guides you through CRUD operations (GET, POST, PUT, DELETE), variables, and tests.\n\n## 🔖 **How to use this collection**\n\n#### **Step 1: Send requests**\n\nRESTful APIs allow you to perform CRUD operations using the POST, GET, PUT, and DELETE HTTP methods.\n\nThis collection contains each of these request types. Open each request and click \"Send\" to see what happens.\n\n#### **Step 2: View responses**\n\nObserve the response tab for status code (200 OK), response time, and size.\n\n#### **Step 3: Send new Body data**\n\nUpdate or add new data in \"Body\" in the POST request. Typically, Body data is also used in PUT and PATCH requests.\n\n```\n{\n    \"name\": \"Add your name in the body\"\n}\n\n ```\n\n#### **Step 4: Update the variable**\n\nVariables enable you to store and reuse values in Postman. We have created a variable called `base_url` with the sample request [https://postman-api-learner.glitch.me](https://postman-api-learner.glitch.me). Replace it with your API endpoint to customize this collection.\n\n#### **Step 5: Add tests in the \"Tests\" tab**\n\nTests help you confirm that your API is working as expected. You can write test scripts in JavaScript and view the output in the \"Test Results\" tab.\n\n<img src=\"https://content.pstmn.io/b5f280a7-4b09-48ec-857f-0a7ed99d7ef8/U2NyZWVuc2hvdCAyMDIzLTAzLTI3IGF0IDkuNDcuMjggUE0ucG5n\">\n\n## 💪 Pro tips\n\n- Use folders to group related requests and organize the collection.\n    \n- Add more scripts in \"Tests\" to verify if the API works as expected and execute flows.\n    \n\n## ℹ️ Resources\n\n[Building requests](https://learning.postman.com/docs/sending-requests/requests/)  \n[Authorizing requests](https://learning.postman.com/docs/sending-requests/authorization/)  \n[Using variables](https://learning.postman.com/docs/sending-requests/variables/)  \n[Managing environments](https://learning.postman.com/docs/sending-requests/managing-environments/)  \n[Writing scripts](https://learning.postman.com/docs/writing-scripts/intro-to-scripts/)",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "30947035"
 	},
@@ -395,7 +395,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/api/queue/get/all?select=name&select=key&select=image&select=defaultItemTypes&limit=15",
+							"raw": "{{base_url}}/api/queue/get/all?select",
 							"host": [
 								"{{base_url}}"
 							],
@@ -408,23 +408,7 @@
 							"query": [
 								{
 									"key": "select",
-									"value": "name"
-								},
-								{
-									"key": "select",
-									"value": "key"
-								},
-								{
-									"key": "select",
-									"value": "image"
-								},
-								{
-									"key": "select",
-									"value": "defaultItemTypes"
-								},
-								{
-									"key": "limit",
-									"value": "15"
+									"value": null
 								}
 							]
 						}
@@ -598,7 +582,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/api/patient/get/all?select=name&select=key&select=image&select=defaultItemTypes&limit=15",
+							"raw": "{{base_url}}/api/patient/get/all?select=firstname&select=lastname&select=middlename&limit=10",
 							"host": [
 								"{{base_url}}"
 							],
@@ -611,23 +595,19 @@
 							"query": [
 								{
 									"key": "select",
-									"value": "name"
+									"value": "firstname"
 								},
 								{
 									"key": "select",
-									"value": "key"
+									"value": "lastname"
 								},
 								{
 									"key": "select",
-									"value": "image"
-								},
-								{
-									"key": "select",
-									"value": "defaultItemTypes"
+									"value": "middlename"
 								},
 								{
 									"key": "limit",
-									"value": "15"
+									"value": "10"
 								}
 							]
 						}
@@ -772,6 +752,408 @@
 							"path": [
 								"api",
 								"patient",
+								"update"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Doctor",
+			"item": [
+				{
+					"name": "Get ALL",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/doctor/get/all?select=firstname&select=lastname&select=middlename&limit=10",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"doctor",
+								"get",
+								"all"
+							],
+							"query": [
+								{
+									"key": "select",
+									"value": "firstname"
+								},
+								{
+									"key": "select",
+									"value": "lastname"
+								},
+								{
+									"key": "select",
+									"value": "middlename"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get By Id",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/doctor/get/<id>",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"doctor",
+								"get",
+								"<id>"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"firstname\": \"{{$randomFirstName}}\",\r\n    \"lastname\": \"{{$randomLastName}}\",\r\n    \"degree\": \"MD\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/doctor/create",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"doctor",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Remove",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/doctor/remove/66b230e095ab84a68e7e4efa",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"doctor",
+								"remove",
+								"66b230e095ab84a68e7e4efa"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/doctor/update",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"doctor",
+								"update"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Appointment",
+			"item": [
+				{
+					"name": "Get ALL",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/appointment/get/all?select=firstname&select=lastname&select=middlename&select=doctor&limit=10",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"appointment",
+								"get",
+								"all"
+							],
+							"query": [
+								{
+									"key": "select",
+									"value": "firstname"
+								},
+								{
+									"key": "select",
+									"value": "lastname"
+								},
+								{
+									"key": "select",
+									"value": "middlename"
+								},
+								{
+									"key": "select",
+									"value": "doctor"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get By Id",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/appointment/get/<id>",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"appointment",
+								"get",
+								"<id>"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"date\": \"2023-10-01T10:00:00Z\",\r\n    \"firstname\": \"John\",\r\n    \"lastname\": \"Doe\",\r\n    \"middlename\": \"A.\",\r\n    \"birthdate\": \"1990-01-01\",\r\n    \"sex\": \"Male\",\r\n    \"civilStatus\": \"Single\",\r\n    \"religion\": \"Christian\",\r\n    \"contactNumber\": \"1234567890\",\r\n    \"barangay\": \"Barangay 1\",\r\n    \"city\": \"Cityville\",\r\n    \"chiefComplaint\": \"Headache\",\r\n    \"doctor\": \"66b2321095ab84a68e7e4ef1\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/appointment/create",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"appointment",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Remove",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/appointment/remove/66b230e095ab84a68e7e4efa",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"appointment",
+								"remove",
+								"66b230e095ab84a68e7e4efa"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/appointment/update",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"appointment",
 								"update"
 							]
 						}

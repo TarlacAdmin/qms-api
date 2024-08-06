@@ -92,12 +92,19 @@ async function getAllAppointments(params: any): Promise<AppointmentModel[]> {
 async function create(
   data: Partial<AppointmentModel> & { doctorId: string }
 ): Promise<AppointmentModel> {
-  if (!data || !data.doctorId) {
+  if (!data) {
     throw new Error(config.RESPONSE.ERROR.APPOINTMENT.INVALID_PARAMETER.CREATE);
   }
 
   try {
+    const appointmentExists = await appointmentRepository.findByDate(data.date as Date);
+
+    if (appointmentExists) {
+      throw new Error(config.RESPONSE.ERROR.APPOINTMENT.EXISTS);
+    }
+
     const appointment = await appointmentRepository.create(data);
+
     const addDoctorToAppointment = await appointmentRepository.addDoctorToAppointment(
       appointment._id as string,
       data.doctorId
