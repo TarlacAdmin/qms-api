@@ -1,4 +1,4 @@
-import Doctor, { DoctorModel } from "../models/doctorModel";
+import Appointment, { AppointmentModel } from "../models/appointmentModel";
 import { ObjectId } from "mongodb";
 
 interface DbParams {
@@ -12,22 +12,23 @@ interface DbParams {
   };
 }
 
-const doctorRepository = {
+const appointmentRepository = {
   getById,
-  getAllDoctors,
+  getAllAppointments,
   create,
   update,
   remove,
   findById,
   search,
   findOne,
+  addDoctorToAppointment,
 };
 
-export default doctorRepository;
+export default appointmentRepository;
 
-async function getById(id: string, dbParams: DbParams = {}): Promise<DoctorModel | null> {
+async function getById(id: string, dbParams: DbParams = {}): Promise<AppointmentModel | null> {
   try {
-    let query = Doctor.findById(id);
+    let query = Appointment.findById(id);
 
     (dbParams.options?.populateArray || []).forEach((populateOption) => {
       query = query.populate(populateOption);
@@ -46,9 +47,9 @@ async function getById(id: string, dbParams: DbParams = {}): Promise<DoctorModel
   }
 }
 
-async function getAllDoctors(dbParams: DbParams = {}): Promise<DoctorModel[]> {
+async function getAllAppointments(dbParams: DbParams = {}): Promise<AppointmentModel[]> {
   try {
-    let query = Doctor.find(dbParams.query);
+    let query = Appointment.find(dbParams.query);
 
     (dbParams.options?.populateArray || []).forEach((populateOption) => {
       query = query.populate(populateOption);
@@ -69,49 +70,72 @@ async function getAllDoctors(dbParams: DbParams = {}): Promise<DoctorModel[]> {
   }
 }
 
-async function findById(id: string | ObjectId): Promise<DoctorModel | null> {
+async function findById(id: string | ObjectId): Promise<AppointmentModel | null> {
   try {
-    return await Doctor.findById(id).lean();
+    return await Appointment.findById(id).lean();
   } catch (error) {
     throw error;
   }
 }
 
-async function findOne(query: any): Promise<DoctorModel | null> {
+async function findOne(query: any): Promise<AppointmentModel | null> {
   try {
-    return await Doctor.findOne(query).lean();
+    return await Appointment.findOne(query).lean();
   } catch (error) {
     throw error;
   }
 }
 
-async function create(data: Partial<DoctorModel>): Promise<DoctorModel> {
+async function create(data: Partial<AppointmentModel>): Promise<AppointmentModel> {
   try {
-    return await Doctor.create(data);
+    return await Appointment.create(data);
   } catch (error) {
     throw error;
   }
 }
 
-async function update(data: Partial<DoctorModel>): Promise<DoctorModel | null> {
+async function addDoctorToAppointment(
+  appointmentId: string,
+  doctorId: string
+): Promise<AppointmentModel | null> {
   try {
-    return await Doctor.findByIdAndUpdate(data._id, data, { new: true }).lean();
+    return await Appointment.findByIdAndUpdate(
+      {
+        _id: appointmentId,
+      },
+      {
+        $set: {
+          doctor: doctorId,
+        },
+      },
+      {
+        new: true,
+      }
+    ).lean();
   } catch (error) {
     throw error;
   }
 }
 
-async function remove(id: string): Promise<DoctorModel | null> {
+async function update(data: Partial<AppointmentModel>): Promise<AppointmentModel | null> {
   try {
-    return await Doctor.findByIdAndDelete(id).lean();
+    return await Appointment.findByIdAndUpdate(data._id, data, { new: true }).lean();
   } catch (error) {
     throw error;
   }
 }
 
-async function search(params: any = {}): Promise<DoctorModel[]> {
+async function remove(id: string): Promise<AppointmentModel | null> {
   try {
-    let aggregate = Doctor.aggregate();
+    return await Appointment.findByIdAndDelete(id).lean();
+  } catch (error) {
+    throw error;
+  }
+}
+
+async function search(params: any = {}): Promise<AppointmentModel[]> {
+  try {
+    let aggregate = Appointment.aggregate();
     if (params.search) {
       aggregate.search(params.search);
     }

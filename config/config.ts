@@ -170,6 +170,23 @@ export const config = {
         INVALID_ID: "Invalid doctor id",
       },
     },
+
+    APPOINTMENT: {
+      ERROR: {
+        REQUIRED_APPOINTMENT: "Fill all required appointment fields",
+        INVALID_ID: "Invalid Appointment ID",
+      },
+
+      BODY: {
+        APPOINTMENT_DATE: "date",
+        ID: "_id",
+      },
+
+      PARAMS: {
+        ID: "id",
+        INVALID_ID: "Invalid appointment id",
+      },
+    },
   },
 
   RESPONSE: {
@@ -223,6 +240,25 @@ export const config = {
           ID: "doctorService.update params._id is missing!",
           REMOVE: "doctorService.remove params is missing!",
           SEARCH: "doctorService.search params is missing!",
+        },
+      },
+
+      APPOINTMENT: {
+        ID: "appointmentId is missing!",
+        NOT_FOUND: "Appointment not found",
+        REMOVE: "Error removing field",
+        UPDATE: "Error updating field",
+        ALREADY_EXISTS: "Appointment already exists",
+        NOT_FOUND_ID: "Appointment not found! with the provided _id",
+        FAILED: "Failed to associate doctor with the appointment.",
+        INVALID_PARAMETER: {
+          GET: "appointmentService.get params is missing!",
+          GET_ALL: "appointmentService.getAllField params is missing!",
+          CREATE: "appointmentService.create params is missing!",
+          UPDATE: "appointmentService.update params is missing!",
+          ID: "appointmentService.update params._id is missing!",
+          REMOVE: "appointmentService.remove params is missing!",
+          SEARCH: "appointmentService.search params is missing!",
         },
       },
     },
