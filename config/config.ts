@@ -151,6 +151,42 @@ export const config = {
         INVALID_ID: "Invalid patient id",
       },
     },
+
+    DOCTOR: {
+      ERROR: {
+        REQUIRED_DOCTOR: "Fill all required doctor fields",
+        INVALID_ID: "Invalid Doctor ID",
+      },
+
+      BODY: {
+        DOCTOR_FIRSTNAME: "firstname",
+        DOCTOR_LASTNAME: "lastname",
+        DOCTOR_MIDDLENAME: "middlename",
+        ID: "_id",
+      },
+
+      PARAMS: {
+        ID: "id",
+        INVALID_ID: "Invalid doctor id",
+      },
+    },
+
+    APPOINTMENT: {
+      ERROR: {
+        REQUIRED_APPOINTMENT: "Fill all required appointment fields",
+        INVALID_ID: "Invalid Appointment ID",
+      },
+
+      BODY: {
+        APPOINTMENT_DATE: "date",
+        ID: "_id",
+      },
+
+      PARAMS: {
+        ID: "id",
+        INVALID_ID: "Invalid appointment id",
+      },
+    },
   },
 
   RESPONSE: {
@@ -187,6 +223,43 @@ export const config = {
           ID: "patientService.update params._id is missing!",
           REMOVE: "patientService.remove params is missing!",
           SEARCH: "patientService.search params is missing!",
+        },
+      },
+      DOCTOR: {
+        ID: "doctorId is missing!",
+        NOT_FOUND: "Doctor not found",
+        REMOVE: "Error removing field",
+        UPDATE: "Error updating field",
+        ALREADY_EXISTS: "Doctor already exists",
+        NOT_FOUND_ID: "Doctor not found! with the provided _id",
+        INVALID_PARAMETER: {
+          GET: "doctorService.get params is missing!",
+          GET_ALL: "doctorService.getAllField params is missing!",
+          CREATE: "doctorService.create params is missing!",
+          UPDATE: "doctorService.update params is missing!",
+          ID: "doctorService.update params._id is missing!",
+          REMOVE: "doctorService.remove params is missing!",
+          SEARCH: "doctorService.search params is missing!",
+        },
+      },
+
+      APPOINTMENT: {
+        ID: "appointmentId is missing!",
+        NOT_FOUND: "Appointment not found",
+        REMOVE: "Error removing field",
+        UPDATE: "Error updating field",
+        ALREADY_EXISTS: "Appointment already exists",
+        NOT_FOUND_ID: "Appointment not found! with the provided _id",
+        FAILED: "Failed to associate doctor with the appointment.",
+        EXISTS: "Appointment already exists",
+        INVALID_PARAMETER: {
+          GET: "appointmentService.get params is missing!",
+          GET_ALL: "appointmentService.getAllField params is missing!",
+          CREATE: "appointmentService.create params is missing!",
+          UPDATE: "appointmentService.update params is missing!",
+          ID: "appointmentService.update params._id is missing!",
+          REMOVE: "appointmentService.remove params is missing!",
+          SEARCH: "appointmentService.search params is missing!",
         },
       },
     },

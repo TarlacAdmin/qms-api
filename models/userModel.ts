@@ -1,6 +1,6 @@
 import mongoose, { Document, Schema } from "mongoose";
 
-export interface IUser extends Document {
+export interface UserModel extends Document {
   id: string;
   username: string;
   firstname: string;
@@ -8,7 +8,7 @@ export interface IUser extends Document {
   email: string;
   password: string;
   status: "active" | "inactive" | "suspended";
-  type: "admin" | "user";
+  type: "admin" | "user" | "viewer";
 }
 
 const userSchema: Schema = new Schema(
@@ -50,7 +50,7 @@ const userSchema: Schema = new Schema(
     },
     type: {
       type: String,
-      enum: ["admin", "user"],
+      enum: ["admin", "user", "viewer"],
       default: "user",
     },
   },
@@ -59,4 +59,4 @@ const userSchema: Schema = new Schema(
   }
 );
 
-export default mongoose.model<IUser>("User", userSchema);
+export default mongoose.model<UserModel>("User", userSchema);
