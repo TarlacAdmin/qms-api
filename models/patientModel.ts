@@ -2,12 +2,13 @@ import mongoose, { Document, Schema } from "mongoose";
 
 export interface PatientModel extends Document {
   firstName: string;
-  middleName: string;
+  middleName?: string;
   lastName: string;
   province?: string;
   city?: string;
   barangay?: string;
   streetNumber?: string;
+  region?: string;
   birthdate?: Date;
   religion?: string;
   civilStatus?: string;
@@ -22,21 +23,22 @@ export interface PatientModel extends Document {
 
 const patientSchema: Schema = new Schema(
   {
-    firstName: { 
-      type: String, 
-      required: true,
-      index: true
-    },
-    middleName: { 
+    firstName: {
       type: String,
       required: true,
-      index: true
+      index: true,
     },
-    lastName: { 
-      type: String, 
+    middleName: {
+      type: String,
       required: true,
-      index: true
+      index: true,
     },
+    lastName: {
+      type: String,
+      required: true,
+      index: true,
+    },
+    region: String,
     province: String,
     city: String,
     barangay: String,

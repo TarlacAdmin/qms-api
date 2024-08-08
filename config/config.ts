@@ -265,3 +265,14 @@ export const config = {
     },
   },
 };
+
+export const CIVIL_STATUS = [
+  "single",
+  "married",
+  "divorced",
+  "widower",
+  "window",
+  "widowed",
+  "separated",
+  "partnered",
+];
