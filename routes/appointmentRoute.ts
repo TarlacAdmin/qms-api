@@ -1,26 +1,26 @@
 import express, { Request, Response } from "express";
 import { body, param, validationResult } from "express-validator";
-import patientService from "../services/patientService";
+import appointmentService from "../services/appointmentService";
 import { API_ENDPOINTS } from "../config/endpointsConfig";
 import { config } from "../config/config";
 
 const router = express.Router();
 
-router.get(API_ENDPOINTS.PATIENT.GET_ALL, getAllPatients);
-router.get(API_ENDPOINTS.PATIENT.GET_BY_ID, getById);
-router.post(API_ENDPOINTS.PATIENT.CREATE, create);
-router.post(API_ENDPOINTS.PATIENT.SEARCH, search);
-router.put(API_ENDPOINTS.PATIENT.UPDATE, update);
-router.delete(API_ENDPOINTS.PATIENT.REMOVE_BY_ID, remove);
+router.get(API_ENDPOINTS.APPOINTMENT.GET_ALL, getAllAppointments);
+router.get(API_ENDPOINTS.APPOINTMENT.GET_BY_ID, getById);
+router.post(API_ENDPOINTS.APPOINTMENT.CREATE, create);
+router.post(API_ENDPOINTS.APPOINTMENT.SEARCH, search);
+router.put(API_ENDPOINTS.APPOINTMENT.UPDATE, update);
+router.delete(API_ENDPOINTS.APPOINTMENT.REMOVE_BY_ID, remove);
 
 export default router;
 
 /*
- * @desc   get all patient
- * @route  GET /api/patient/get/all
+ * @desc   get all appointment
+ * @route  GET /api/appointment/get/all
  * @access Private
  */
-async function getAllPatients(req: Request, res: Response) {
+async function getAllAppointments(req: Request, res: Response) {
   const params = {
     query: req.query.query || {},
     queryArray: req.query.queryArray,
@@ -33,7 +33,7 @@ async function getAllPatients(req: Request, res: Response) {
   };
 
   try {
-    const patients = await patientService.getAllPatients(params);
+    const patients = await appointmentService.getAllAppointments(params);
     res.status(200).send(patients);
   } catch (error) {
     if (error instanceof Error) {
@@ -45,14 +45,14 @@ async function getAllPatients(req: Request, res: Response) {
 }
 
 /*
- * @desc   get patient by id
- * @route  GET /api/patient/get/:id
+ * @desc   get appointment by id
+ * @route  GET /api/appointment/get/:id
  * @access Private
  */
 async function getById(req: Request, res: Response) {
-  await param(config.VALIDATION.PATIENT.PARAMS.ID)
+  await param(config.VALIDATION.APPOINTMENT.PARAMS.ID)
     .isMongoId()
-    .withMessage(config.VALIDATION.PATIENT.PARAMS.INVALID_ID)
+    .withMessage(config.VALIDATION.APPOINTMENT.PARAMS.INVALID_ID)
     .run(req);
 
   const errors = validationResult(req);
@@ -67,7 +67,7 @@ async function getById(req: Request, res: Response) {
   };
 
   try {
-    const patient = await patientService.getById(req.params.id, params);
+    const patient = await appointmentService.getById(req.params.id, params);
     res.status(200).send(patient);
   } catch (error) {
     if (error instanceof Error) {
@@ -79,23 +79,15 @@ async function getById(req: Request, res: Response) {
 }
 
 /*
- * @desc   create patient
- * @route  POST /api/patient/create
+ * @desc   create appointment
+ * @route  POST /api/appointment/create
  * @access Private
  */
 async function create(req: Request, res: Response) {
   await Promise.all([
-    body(config.VALIDATION.PATIENT.BODY.PATIENT_FIRSTNAME)
+    body(config.VALIDATION.APPOINTMENT.BODY.APPOINTMENT_DATE)
       .notEmpty()
-      .withMessage(config.VALIDATION.PATIENT.ERROR.REQUIRED_PATIENT)
-      .run(req),
-    body(config.VALIDATION.PATIENT.BODY.PATIENT_LASTNAME)
-      .notEmpty()
-      .withMessage(config.VALIDATION.PATIENT.ERROR.REQUIRED_PATIENT)
-      .run(req),
-    body(config.VALIDATION.PATIENT.BODY.PATIENT_MIDDLENAME)
-      .notEmpty()
-      .withMessage(config.VALIDATION.PATIENT.ERROR.REQUIRED_PATIENT)
+      .withMessage(config.VALIDATION.APPOINTMENT.ERROR.REQUIRED_APPOINTMENT)
       .run(req),
   ]);
 
@@ -105,8 +97,8 @@ async function create(req: Request, res: Response) {
   }
 
   try {
-    const newPatient = await patientService.create(req.body);
-    (req as any).io.emit("patientCreated", newPatient);
+    const newPatient = await appointmentService.create(req.body);
+    (req as any).io.emit("appointmentCreated", newPatient);
     res.status(200).send(newPatient);
   } catch (error) {
     if (error instanceof Error) {
@@ -118,14 +110,26 @@ async function create(req: Request, res: Response) {
 }
 
 /*
- * @desc   update patient
- * @route  PUT /api/patient/update
+ * @desc   update appointment
+ * @route  PUT /api/appointment/update
  * @access Private
  */
 async function update(req: Request, res: Response) {
+  await Promise.all([
+    body(config.VALIDATION.APPOINTMENT.BODY.APPOINTMENT_DATE)
+      .notEmpty()
+      .withMessage(config.VALIDATION.APPOINTMENT.ERROR.REQUIRED_APPOINTMENT)
+      .run(req),
+  ]);
+
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).send({ error: errors.array() });
+  }
+
   try {
-    const updatedPatient = await patientService.update(req.body);
-    (req as any).io.emit("patientUpdated", updatedPatient);
+    const updatedPatient = await appointmentService.update(req.body);
+    (req as any).io.emit("appointmentUpdated", updatedPatient);
     res.status(200).send(updatedPatient);
   } catch (error) {
     if (error instanceof Error) {
@@ -137,14 +141,14 @@ async function update(req: Request, res: Response) {
 }
 
 /*
- * @desc   remove patient
- * @route  DELETE /api/patient/remove/:id
+ * @desc   remove appointment
+ * @route  DELETE /api/appointment/remove/:id
  * @access Private
  */
 async function remove(req: Request, res: Response) {
-  await param(config.VALIDATION.PATIENT.PARAMS.ID)
+  await param(config.VALIDATION.APPOINTMENT.PARAMS.ID)
     .isMongoId()
-    .withMessage(config.VALIDATION.PATIENT.PARAMS.INVALID_ID)
+    .withMessage(config.VALIDATION.APPOINTMENT.PARAMS.INVALID_ID)
     .run(req);
 
   const errors = validationResult(req);
@@ -153,7 +157,7 @@ async function remove(req: Request, res: Response) {
   }
 
   try {
-    const removedPatient = await patientService.remove(req.params.id);
+    const removedPatient = await appointmentService.remove(req.params.id);
     res.status(200).send(removedPatient);
   } catch (error) {
     if (error instanceof Error) {
@@ -165,13 +169,13 @@ async function remove(req: Request, res: Response) {
 }
 
 /*
- * @desc   remove patient
- * @route  DELETE /api/patient/search
+ * @desc   search appointment
+ * @route  DELETE /api/appointment/search
  * @access Private
  */
 async function search(req: Request, res: Response) {
   try {
-    const searchedPatient = await patientService.search(req.body);
+    const searchedPatient = await appointmentService.search(req.body);
     res.status(200).send(searchedPatient);
   } catch (error) {
     if (error instanceof Error) {

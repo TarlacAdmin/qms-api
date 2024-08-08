@@ -1,4 +1,4 @@
-import User, { IUser } from "../models/userModel";
+import User, { UserModel } from "../models/userModel";
 
 interface DbParams {
   query?: any;
@@ -24,7 +24,7 @@ const userRepository = {
 
 export default userRepository;
 
-async function getUser(id: string, dbParams: DbParams = {}): Promise<IUser | null> {
+async function getUser(id: string, dbParams: DbParams = {}): Promise<UserModel | null> {
   try {
     let query = User.findById(id);
 
@@ -45,7 +45,7 @@ async function getUser(id: string, dbParams: DbParams = {}): Promise<IUser | nul
   }
 }
 
-async function getUsers(dbParams: DbParams): Promise<IUser[]> {
+async function getUsers(dbParams: DbParams): Promise<UserModel[]> {
   try {
     let query = User.find(dbParams.query);
 
@@ -68,7 +68,7 @@ async function getUsers(dbParams: DbParams): Promise<IUser[]> {
   }
 }
 
-async function findByEmail(email: string): Promise<IUser | null> {
+async function findByEmail(email: string): Promise<UserModel | null> {
   try {
     return await User.findOne({ email });
   } catch (error) {
@@ -76,17 +76,17 @@ async function findByEmail(email: string): Promise<IUser | null> {
   }
 }
 
-async function createUser(data: Partial<IUser>): Promise<IUser | null> {
+async function createUser(data: Partial<UserModel>): Promise<UserModel | null> {
   try {
     let user = await User.create(data);
     const userWithoutPassword = await User.findById(user.id).select("-password").lean();
-    return userWithoutPassword as IUser | null;
+    return userWithoutPassword as UserModel | null;
   } catch (error) {
     throw error;
   }
 }
 
-async function updateUser(id: string, data: Partial<IUser>): Promise<IUser | null> {
+async function updateUser(id: string, data: Partial<UserModel>): Promise<UserModel | null> {
   try {
     return await User.findByIdAndUpdate(id, data, { new: true });
   } catch (error) {
@@ -94,7 +94,7 @@ async function updateUser(id: string, data: Partial<IUser>): Promise<IUser | nul
   }
 }
 
-async function deleteUser(id: string): Promise<IUser | null> {
+async function deleteUser(id: string): Promise<UserModel | null> {
   try {
     return await User.findByIdAndDelete(id);
   } catch (error) {
@@ -102,7 +102,7 @@ async function deleteUser(id: string): Promise<IUser | null> {
   }
 }
 
-async function search(query: string): Promise<IUser[]> {
+async function search(query: string): Promise<UserModel[]> {
   try {
     return User.find(
       {
