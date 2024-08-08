@@ -1,4 +1,5 @@
 import mongoose, { Document, Schema } from "mongoose";
+import { CIVIL_STATUS } from "../config/config";
 
 export interface AppointmentModel extends Document {
   date: Date;
@@ -7,11 +8,14 @@ export interface AppointmentModel extends Document {
   middlename?: string;
   birthdate: Date;
   sex: string;
-  civilStatus: ["Single", "Married", "Divorced", "Widowed"];
+  civilStatus: typeof CIVIL_STATUS;
   religion?: string;
   contactNumber: string;
-  barangay: string;
-  city: string;
+  province?: string;
+  city?: string;
+  barangay?: string;
+  streetNumber?: string;
+  region?: string;
   chiefComplaint?: string;
   doctor: mongoose.Schema.Types.ObjectId;
 }
@@ -47,11 +51,15 @@ const apointmentSchema: Schema = new Schema(
     },
     civilStatus: {
       type: String,
-      enum: ["Single", "Married", "Divorced", "Widowed"],
+      enum: CIVIL_STATUS,
       required: true,
     },
     religion: String,
     contactNumber: {
+      type: String,
+      required: true,
+    },
+    province: {
       type: String,
       required: true,
     },
@@ -60,6 +68,14 @@ const apointmentSchema: Schema = new Schema(
       required: true,
     },
     city: {
+      type: String,
+      required: true,
+    },
+    streetNumber: {
+      type: String,
+      required: true,
+    },
+    region: {
       type: String,
       required: true,
     },
