@@ -2,7 +2,7 @@ import { config } from "../config/config";
 import { DoctorModel } from "../models/doctorModel";
 import doctorRepository from "../repository/doctorRepository";
 
-const patientService = {
+const doctorService = {
   getById,
   getAllDoctors,
   create,
@@ -11,7 +11,7 @@ const patientService = {
   search,
 };
 
-export default patientService;
+export default doctorService;
 
 async function getById(id: string, params: any): Promise<DoctorModel | null> {
   if (!id) {
