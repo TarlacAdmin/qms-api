@@ -228,7 +228,9 @@ async function loginUser(req: Request, res: Response, next: NextFunction): Promi
       id: user.id,
       email: user.email,
       firstname: user.firstname,
+      middlename: user.middlename,
       lastname: user.lastname,
+      type: user.type,
     };
 
     const token = generateToken(user);
