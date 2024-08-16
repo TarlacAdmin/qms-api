@@ -10,6 +10,7 @@ const appointmentService = {
   update,
   remove,
   search,
+  getTotalAppointments,
 };
 
 export default appointmentService;
@@ -166,5 +167,20 @@ async function search(params: any): Promise<AppointmentModel[] | null> {
   } catch (error) {
     console.error(error);
     throw error;
+  }
+}
+
+async function getTotalAppointments(): Promise<{
+  total: number;
+  appointments: { [key: string]: number };
+}> {
+  try {
+    return await appointmentRepository.getTotalAppointments();
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(error.message);
+    } else {
+      throw new Error(String(error));
+    }
   }
 }

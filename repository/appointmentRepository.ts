@@ -22,6 +22,7 @@ const appointmentRepository = {
   search,
   findByDate,
   addDoctorToAppointment,
+  getTotalAppointments,
 };
 
 export default appointmentRepository;
@@ -146,6 +147,39 @@ async function search(params: any = {}): Promise<AppointmentModel[]> {
     aggregate.sort(params.sort);
     aggregate.limit(params.limit);
     return await aggregate.exec();
+  } catch (error) {
+    throw error;
+  }
+}
+
+async function getTotalAppointments(): Promise<{
+  total: number;
+  appointments: { [key: string]: number };
+}> {
+  try {
+    const total = await Appointment.countDocuments();
+    const appointments = await Appointment.aggregate([
+      {
+        $group: {
+          _id: "$doctor",
+          count: { $sum: 1 },
+        },
+      },
+      {
+        $project: {
+          doctor: "$_id",
+          count: 1,
+          _id: 0,
+        },
+      },
+    ]);
+
+    const appointmentsByDoctor: { [key: string]: number } = {};
+    appointments.forEach((doc) => {
+      appointmentsByDoctor[doc.doctor] = doc.count;
+    });
+
+    return { total, appointments: appointmentsByDoctor };
   } catch (error) {
     throw error;
   }
