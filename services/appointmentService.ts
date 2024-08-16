@@ -1,6 +1,7 @@
 import { config } from "../config/config";
 import { AppointmentModel } from "../models/appointmentModel";
 import appointmentRepository from "../repository/appointmentRepository";
+import patientService from "./patientService";
 
 const appointmentService = {
   getById,
@@ -90,18 +91,15 @@ async function getAllAppointments(params: any): Promise<AppointmentModel[]> {
 }
 
 async function create(
-  data: Partial<AppointmentModel> & { doctorId: string }
+  data: Partial<AppointmentModel> & { doctorId: string; patient: any }
 ): Promise<AppointmentModel> {
   if (!data) {
     throw new Error(config.RESPONSE.ERROR.APPOINTMENT.INVALID_PARAMETER.CREATE);
   }
 
   try {
-    const appointmentExists = await appointmentRepository.findByDate(data.date as Date);
-
-    if (appointmentExists) {
-      throw new Error(config.RESPONSE.ERROR.APPOINTMENT.EXISTS);
-    }
+    const patient = await patientService.findOrCreate(data.patient);
+    data.patient = patient._id;
 
     const appointment = await appointmentRepository.create(data);
 

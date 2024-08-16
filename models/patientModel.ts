@@ -15,7 +15,7 @@ export interface PatientModel extends Document {
   barangay?: string;
   streetNumber?: string;
   region?: string;
-  visualAcuity: {
+  visualAcuity?: {
     right?: string;
     left?: string;
     pinHole?: string;
