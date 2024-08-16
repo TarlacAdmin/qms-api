@@ -95,9 +95,9 @@ async function create(data: Partial<DoctorModel>): Promise<DoctorModel> {
   }
 
   try {
-    if (data.metadata && data.metadata.schedule) {
-      data.metadata.schedule = parseSchedule(data.metadata.schedule);
-    }
+    // if (data.metadata && data.metadata.schedule) {
+    //   data.metadata.schedule = parseSchedule(data.metadata.schedule);
+    // }
     return await doctorRepository.create(data);
   } catch (error) {
     if (error instanceof Error) {
@@ -155,23 +155,23 @@ async function search(params: any): Promise<DoctorModel[] | null> {
   }
 }
 
-function parseSchedule(schedule: any): any {
-  const days = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
-  const parsedSchedule: any = {};
+// function parseSchedule(schedule: any): any {
+//   const days = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
+//   const parsedSchedule: any = {};
 
-  days.forEach((day) => {
-    if (schedule[day]) {
-      parsedSchedule[day] = {
-        am: schedule[day].am ? schedule[day].am : false,
-        pm: schedule[day].pm ? schedule[day].pm : false,
-      };
-    } else {
-      parsedSchedule[day] = {
-        am: false,
-        pm: false,
-      };
-    }
-  });
+//   days.forEach((day) => {
+//     if (schedule[day]) {
+//       parsedSchedule[day] = {
+//         am: schedule[day].am ? schedule[day].am : false,
+//         pm: schedule[day].pm ? schedule[day].pm : false,
+//       };
+//     } else {
+//       parsedSchedule[day] = {
+//         am: false,
+//         pm: false,
+//       };
+//     }
+//   });
 
-  return parsedSchedule;
-}
+//   return parsedSchedule;
+// }
