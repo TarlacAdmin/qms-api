@@ -7,7 +7,7 @@ export interface PatientModel extends Document {
   middleName?: string;
   birthdate?: Date;
   sex: string;
-  civilStatus: typeof CIVIL_STATUS;
+  civilStatus?: typeof CIVIL_STATUS;
   religion?: string;
   cellphoneNumber?: string;
   province?: string;
@@ -37,7 +37,6 @@ const patientSchema: Schema = new Schema(
     },
     middleName: {
       type: String,
-      required: true,
       index: true,
     },
     birthdate: Date,
@@ -45,7 +44,6 @@ const patientSchema: Schema = new Schema(
     civilStatus: {
       type: String,
       enum: CIVIL_STATUS,
-      required: true,
     },
     religion: String,
     cellphoneNumber: String,
