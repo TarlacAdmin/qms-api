@@ -136,17 +136,17 @@ async function remove(id: string): Promise<AppointmentModel | null> {
 
 async function search(params: any = {}): Promise<AppointmentModel[]> {
   try {
-    let aggregate = Appointment.aggregate();
-    if (params.search) {
-      aggregate.search(params.search);
-    }
+    let query = Appointment.find();
+    query.setQuery(params.query);
+    query.populate(params.populateArray);
+    query.projection(params.projection);
+    query.setOptions(params.options);
+    query.lean(params.lean);
+
     if (params.match) {
-      aggregate.match(params.match);
+      query.where(params.match);
     }
-    aggregate.project(params.project);
-    aggregate.sort(params.sort);
-    aggregate.limit(params.limit);
-    return await aggregate.exec();
+    return query.exec();
   } catch (error) {
     throw error;
   }

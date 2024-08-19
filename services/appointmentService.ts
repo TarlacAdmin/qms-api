@@ -158,11 +158,37 @@ async function remove(id: string): Promise<AppointmentModel | null> {
 async function search(params: any): Promise<AppointmentModel[] | null> {
   try {
     let dbParams = {
-      search: params.search,
-      sort: params.sort || "-createdAt",
-      project: params.project,
-      limit: params.limit || 10,
+      query: {},
+      populateArray: [],
+      options: {},
+      lean: true,
+      match: {},
     };
+    dbParams.query = params.query;
+
+    //Build Populate Options
+    if (params.populateArray) {
+      dbParams["populateArray"] = params.populateArray;
+    }
+
+    //Build Query Options
+    let optionsObj = {
+      sort: "",
+      skip: 0,
+      select: "",
+      limit: 0,
+    };
+    optionsObj["sort"] = params.sort || "-createdAt";
+    optionsObj["skip"] = params.skip || 0;
+    optionsObj["select"] = params.select || "_id";
+    optionsObj["limit"] = params.limit || 10;
+    dbParams.options = optionsObj;
+
+    dbParams.lean = params.lean || true;
+
+    if (params.match) {
+      dbParams.match = params.match;
+    }
     return await appointmentRepository.search(dbParams);
   } catch (error) {
     console.error(error);

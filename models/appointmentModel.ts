@@ -1,7 +1,7 @@
 import mongoose, { Document, Schema } from "mongoose";
 
 export interface AppointmentModel extends Document {
-  date: Date;
+  date: string;
   patient: mongoose.Schema.Types.ObjectId;
   chiefComplaint?: string;
   doctor: mongoose.Schema.Types.ObjectId;
@@ -10,7 +10,7 @@ export interface AppointmentModel extends Document {
 const apointmentSchema: Schema = new Schema(
   {
     date: {
-      type: Date,
+      type: String,
       required: true,
       index: true,
     },
