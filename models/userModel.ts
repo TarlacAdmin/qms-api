@@ -4,6 +4,7 @@ export interface UserModel extends Document {
   id: string;
   username: string;
   firstname: string;
+  middlename?: string;
   lastname: string;
   email: string;
   password: string;

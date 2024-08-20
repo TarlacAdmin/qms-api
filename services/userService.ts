@@ -10,7 +10,7 @@ import { CustomRequest } from "./types";
 const saltFactor = 10;
 
 const userService = {
-  registerUser,
+  createUser,
   getUser,
   updateUser,
   deleteUser,
@@ -110,10 +110,11 @@ async function getUsers(req: Request, res: Response, next: NextFunction): Promis
   }
 }
 
-async function registerUser(req: Request, res: Response, next: NextFunction): Promise<Response> {
+async function createUser(req: Request, res: Response, next: NextFunction): Promise<Response> {
   const trimmedBody = trimAll(req.body);
   try {
-    const { email, password, username, firstname, lastname } = trimmedBody;
+    const { email, password, username, firstname, lastname, middlename, type, status } =
+      trimmedBody;
 
     const userAvailable = await userRepository.findByEmail(email);
     if (userAvailable) {
@@ -125,8 +126,11 @@ async function registerUser(req: Request, res: Response, next: NextFunction): Pr
     const user = await userRepository.createUser({
       username,
       firstname,
+      middlename,
       lastname,
       email,
+      type,
+      status,
       password: hashedPassword,
     });
 
@@ -224,7 +228,9 @@ async function loginUser(req: Request, res: Response, next: NextFunction): Promi
       id: user.id,
       email: user.email,
       firstname: user.firstname,
+      middlename: user.middlename,
       lastname: user.lastname,
+      type: user.type,
     };
 
     const token = generateToken(user);
