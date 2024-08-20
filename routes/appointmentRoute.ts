@@ -194,13 +194,18 @@ async function remove(req: Request, res: Response) {
  */
 async function search(req: Request, res: Response) {
   try {
-    const searchedAppointment = await appointmentService.search(req.body);
-    res.status(200).send(searchedAppointment);
+    const searchParams = {
+      textQuery: req.body.textQuery,
+      startDate: req.body.startDate,
+      endDate: req.body.endDate,
+      searchType: req.body.searchType, // 'patient', 'doctor', 'appointment', or 'all'
+      sort: req.body.sort,
+      limit: req.body.limit,
+    };
+    const searchedPatients = await appointmentService.search(searchParams);
+    res.status(200).json(searchedPatients);
   } catch (error) {
-    if (error instanceof Error) {
-      res.status(400).send({ error: error.message });
-    } else {
-      res.status(400).send({ error: "An unknown error occurred" });
-    }
+    console.error("Route search error:", error);
+    res.status(400).json({ error: "An error occurred during the search" });
   }
 }

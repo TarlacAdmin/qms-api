@@ -1,5 +1,14 @@
 import Appointment, { AppointmentModel } from "../models/appointmentModel";
+import Patient from "../models/patientModel";
+import Doctor from "../models/doctorModel";
 import { ObjectId } from "mongodb";
+import { SearchParams } from "../types/searchTypes";
+import {
+  buildPatientPipeline,
+  buildDoctorPipeline,
+  buildAppointmentPipeline,
+  formatResults,
+} from "../helper/searchHelpers";
 
 interface DbParams {
   query?: any;
@@ -134,20 +143,41 @@ async function remove(id: string): Promise<AppointmentModel | null> {
   }
 }
 
-async function search(params: any = {}): Promise<AppointmentModel[]> {
+// Purpose: Search for patients, doctors, and appointments
+async function search(params: SearchParams): Promise<any> {
   try {
-    let query = Appointment.find();
-    query.setQuery(params.query);
-    query.populate(params.populateArray);
-    query.projection(params.projection);
-    query.setOptions(params.options);
-    query.lean(params.lean);
+    const searchTypes =
+      params.searchType === "all" || !params.searchType
+        ? ["patient", "doctor", "appointment"]
+        : [params.searchType];
 
-    if (params.match) {
-      query.where(params.match);
-    }
-    return query.exec();
+    const searchPromises = searchTypes.map((type) => {
+      switch (type) {
+        case "patient":
+          return Patient.aggregate(buildPatientPipeline(params)).then((results) => ({
+            type,
+            results,
+          }));
+        case "doctor":
+          return Doctor.aggregate(buildDoctorPipeline(params)).then((results) => ({
+            type,
+            results,
+          }));
+        case "appointment":
+          return Appointment.aggregate(buildAppointmentPipeline(params)).then((results) => ({
+            type,
+            results,
+          }));
+        default:
+          return Promise.resolve({ type, results: [] });
+      }
+    });
+
+    const searchResults = await Promise.all(searchPromises);
+
+    return formatResults(searchResults, params.searchType);
   } catch (error) {
+    console.error("Search error:", error);
     throw error;
   }
 }
