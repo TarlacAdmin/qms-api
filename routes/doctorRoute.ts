@@ -183,8 +183,8 @@ async function remove(req: Request, res: Response) {
  */
 async function search(req: Request, res: Response) {
   try {
-    const searchedPatient = await doctorService.search(req.body);
-    res.status(200).send(searchedPatient);
+    const searchedDoctor = await doctorService.search(req.body);
+    res.status(200).send(searchedDoctor);
   } catch (error) {
     if (error instanceof Error) {
       res.status(400).send({ error: error.message });

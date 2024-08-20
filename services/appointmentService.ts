@@ -1,6 +1,7 @@
 import { config } from "../config/config";
 import { AppointmentModel } from "../models/appointmentModel";
 import appointmentRepository from "../repository/appointmentRepository";
+import patientService from "./patientService";
 
 const appointmentService = {
   getById,
@@ -9,6 +10,7 @@ const appointmentService = {
   update,
   remove,
   search,
+  getTotalAppointments,
 };
 
 export default appointmentService;
@@ -90,18 +92,15 @@ async function getAllAppointments(params: any): Promise<AppointmentModel[]> {
 }
 
 async function create(
-  data: Partial<AppointmentModel> & { doctorId: string }
+  data: Partial<AppointmentModel> & { doctorId: string; patient: any }
 ): Promise<AppointmentModel> {
   if (!data) {
     throw new Error(config.RESPONSE.ERROR.APPOINTMENT.INVALID_PARAMETER.CREATE);
   }
 
   try {
-    const appointmentExists = await appointmentRepository.findByDate(data.date as Date);
-
-    if (appointmentExists) {
-      throw new Error(config.RESPONSE.ERROR.APPOINTMENT.EXISTS);
-    }
+    const patient = await patientService.findOrCreate(data.patient);
+    data.patient = patient._id;
 
     const appointment = await appointmentRepository.create(data);
 
@@ -159,14 +158,55 @@ async function remove(id: string): Promise<AppointmentModel | null> {
 async function search(params: any): Promise<AppointmentModel[] | null> {
   try {
     let dbParams = {
-      search: params.search,
-      sort: params.sort || "-createdAt",
-      project: params.project,
-      limit: params.limit || 10,
+      query: {},
+      populateArray: [],
+      options: {},
+      lean: true,
+      match: {},
     };
+    dbParams.query = params.query;
+
+    //Build Populate Options
+    if (params.populateArray) {
+      dbParams["populateArray"] = params.populateArray;
+    }
+
+    //Build Query Options
+    let optionsObj = {
+      sort: "",
+      skip: 0,
+      select: "",
+      limit: 0,
+    };
+    optionsObj["sort"] = params.sort || "-createdAt";
+    optionsObj["skip"] = params.skip || 0;
+    optionsObj["select"] = params.select || "_id";
+    optionsObj["limit"] = params.limit || 10;
+    dbParams.options = optionsObj;
+
+    dbParams.lean = params.lean || true;
+
+    if (params.match) {
+      dbParams.match = params.match;
+    }
     return await appointmentRepository.search(dbParams);
   } catch (error) {
     console.error(error);
     throw error;
+  }
+}
+
+async function getTotalAppointments(): Promise<{
+  total: number;
+  appointments: { [key: string]: number };
+}> {
+  try {
+    return await appointmentRepository.getTotalAppointments();
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(error.message);
+    } else {
+      throw new Error(String(error));
+    }
   }
 }

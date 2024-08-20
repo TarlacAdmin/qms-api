@@ -10,32 +10,32 @@ export interface DoctorModel extends Document {
   metadata: {
     schedule: {
       monday: {
-        am: string;
-        pm: string;
+        start: string;
+        end: string;
       };
       tuesday: {
-        am: string;
-        pm: string;
+        start: string;
+        end: string;
       };
       wednesday: {
-        am: string;
-        pm: string;
+        start: string;
+        end: string;
       };
       thursday: {
-        am: string;
-        pm: string;
+        start: string;
+        end: string;
       };
       friday: {
-        am: string;
-        pm: string;
+        start: string;
+        end: string;
       };
       saturday?: {
-        am: string;
-        pm: string;
+        start: string;
+        end: string;
       };
       sunday?: {
-        am: string;
-        pm: string;
+        start: string;
+        end: string;
       };
     };
   };
@@ -63,32 +63,32 @@ const doctorSchema: Schema = new Schema(
     metadata: {
       schedule: {
         monday: {
-          am: String,
-          pm: String,
+          start: String,
+          end: String,
         },
         tuesday: {
-          am: String,
-          pm: String,
+          start: String,
+          end: String,
         },
         wednesday: {
-          am: String,
-          pm: String,
+          start: String,
+          end: String,
         },
         thursday: {
-          am: String,
-          pm: String,
+          start: String,
+          end: String,
         },
         friday: {
-          am: String,
-          pm: String,
+          start: String,
+          end: String,
         },
         saturday: {
-          am: String,
-          pm: String,
+          start: String,
+          end: String,
         },
         sunday: {
-          am: String,
-          pm: String,
+          start: String,
+          end: String,
         },
       },
     },

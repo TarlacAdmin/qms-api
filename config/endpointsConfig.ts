@@ -47,6 +47,7 @@ export const API_ENDPOINTS = {
   APPOINTMENT: {
     GET_ALL: "/appointment/get/all",
     GET_BY_ID: "/appointment/get/:id",
+    GET_TOTAL: "/appointment/get/total",
     CREATE: "/appointment/create",
     UPDATE: "/appointment/update",
     SEARCH: "/appointment/search",
