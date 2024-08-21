@@ -3,6 +3,7 @@ import { body, param, validationResult } from "express-validator";
 import appointmentService from "../services/appointmentService";
 import { API_ENDPOINTS } from "../config/endpointsConfig";
 import { config } from "../config/config";
+import { SearchParams } from "../types/searchTypes";
 
 const router = express.Router();
 
@@ -194,18 +195,28 @@ async function remove(req: Request, res: Response) {
  */
 async function search(req: Request, res: Response) {
   try {
-    const searchParams = {
+    const searchParams: SearchParams = {
+      searchType: req.body.searchType,
       textQuery: req.body.textQuery,
       startDate: req.body.startDate,
       endDate: req.body.endDate,
-      searchType: req.body.searchType, // 'patient', 'doctor', 'appointment', or 'all'
+      query: req.body.query,
+      match: req.body.match,
+      populateArray: req.body.populateArray,
+      projection: req.body.projection,
+      options: req.body.options,
       sort: req.body.sort,
       limit: req.body.limit,
+      lean: req.body.lean,
     };
-    const searchedPatients = await appointmentService.search(searchParams);
-    res.status(200).json(searchedPatients);
+    const searchResults = await appointmentService.search(searchParams);
+    res.status(200).json(searchResults);
   } catch (error) {
     console.error("Route search error:", error);
-    res.status(400).json({ error: "An error occurred during the search" });
+    if (error instanceof Error) {
+      res.status(400).json({ error: error.message });
+    } else {
+      res.status(400).json({ error: "An unknown error occurred during the search" });
+    }
   }
 }

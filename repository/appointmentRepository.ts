@@ -3,12 +3,7 @@ import Patient from "../models/patientModel";
 import Doctor from "../models/doctorModel";
 import { ObjectId } from "mongodb";
 import { SearchParams } from "../types/searchTypes";
-import {
-  buildPatientPipeline,
-  buildDoctorPipeline,
-  buildAppointmentPipeline,
-  formatResults,
-} from "../helper/searchHelpers";
+import { buildSearchQuery, formatResults } from "../helper/searchHelpers";
 
 interface DbParams {
   query?: any;
@@ -151,33 +146,31 @@ async function search(params: SearchParams): Promise<any> {
         ? ["patient", "doctor", "appointment"]
         : [params.searchType];
 
-    const searchPromises = searchTypes.map((type) => {
+    const searchPromises = searchTypes.map(async (type) => {
+      let query;
       switch (type) {
         case "patient":
-          return Patient.aggregate(buildPatientPipeline(params)).then((results) => ({
-            type,
-            results,
-          }));
+          query = buildSearchQuery(Patient, { ...params, populateArray: undefined });
+          break;
         case "doctor":
-          return Doctor.aggregate(buildDoctorPipeline(params)).then((results) => ({
-            type,
-            results,
-          }));
+          query = buildSearchQuery(Doctor, { ...params, populateArray: undefined });
+          break;
         case "appointment":
-          return Appointment.aggregate(buildAppointmentPipeline(params)).then((results) => ({
-            type,
-            results,
-          }));
+          query = buildSearchQuery(Appointment, params);
+          break;
         default:
-          return Promise.resolve({ type, results: [] });
+          return { type, results: [] };
       }
+
+      const results = await query.exec();
+      return { type, results };
     });
 
     const searchResults = await Promise.all(searchPromises);
 
     return formatResults(searchResults, params.searchType);
   } catch (error) {
-    console.error("Search error:", error);
+    console.error("Repository search error:", error);
     throw error;
   }
 }

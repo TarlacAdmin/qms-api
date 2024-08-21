@@ -157,6 +157,10 @@ async function remove(id: string): Promise<AppointmentModel | null> {
 
 async function search(params: any): Promise<any[]> {
   try {
+    if (!params.searchType) {
+      throw new Error("Search type is required");
+    }
+
     const results = await appointmentRepository.search(params);
     return results;
   } catch (error) {
