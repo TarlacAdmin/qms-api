@@ -23,11 +23,7 @@ const userService = {
 
 export default userService;
 
-async function getUser(
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<Response> {
+async function getUser(req: Request, res: Response, next: NextFunction): Promise<Response> {
   try {
     const params = {
       populateArray: Array.isArray(req.query.populateArray)
@@ -64,11 +60,7 @@ async function getUser(
   }
 }
 
-async function getUsers(
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<Response> {
+async function getUsers(req: Request, res: Response, next: NextFunction): Promise<Response> {
   const params = {
     query: req.query.query || {},
     queryArray: req.query.queryArray,
@@ -118,11 +110,7 @@ async function getUsers(
   }
 }
 
-async function createUser(
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<Response> {
+async function createUser(req: Request, res: Response, next: NextFunction): Promise<Response> {
   const trimmedBody = trimAll(req.body);
   try {
     const {
@@ -158,9 +146,7 @@ async function createUser(
       password: hashedPassword,
     });
 
-    return res
-      .status(201)
-      .json({ message: config.SUCCESS.USER.REGISTER, user });
+    return res.status(201).json({ message: config.SUCCESS.USER.REGISTER, user });
   } catch (error) {
     if (error instanceof Error) {
       return res.status(500).json({ message: error.message });
@@ -170,15 +156,14 @@ async function createUser(
   }
 }
 
-async function updateUser(
-  req: CustomRequest,
-  res: Response,
-  next: NextFunction
-): Promise<Response> {
+async function updateUser(req: Request, res: Response, next: NextFunction): Promise<Response> {
   const trimmedBody = trimAll(req.body);
   try {
-    const { email, password, firstname, lastname, username, ...otherUpdates } =
-      trimmedBody;
+    const { _id, email, password, firstname, lastname, username, ...otherUpdates } = trimmedBody;
+
+    if (!_id) {
+      return res.status(400).json({ message: "User ID is required" });
+    }
 
     if (email && !validator.isEmail(email)) {
       return res.status(400).json({ message: config.ERROR.USER.INVALID_EMAIL });
@@ -195,7 +180,7 @@ async function updateUser(
     if (lastname) updates.lastname = lastname;
     if (username) updates.username = username;
 
-    const updatedUser = await userRepository.updateUser(req.user!.id, updates);
+    const updatedUser = await userRepository.updateUser(_id, updates);
 
     if (!updatedUser) {
       return res.status(400).json({ message: config.ERROR.USER.NOT_FOUND });
@@ -203,14 +188,10 @@ async function updateUser(
 
     const { password: _, ...userWithoutPassword } = updatedUser.toObject();
 
-    return res
-      .status(200)
-      .json({ message: config.SUCCESS.USER.UPDATE, user: userWithoutPassword });
+    return res.status(200).json({ message: config.SUCCESS.USER.UPDATE, user: userWithoutPassword });
   } catch (error) {
     if (error instanceof Error && (error as any).code === 11000) {
-      return res
-        .status(400)
-        .json({ message: config.ERROR.USER.EMAIL_ALREADY_EXISTS });
+      return res.status(400).json({ message: config.ERROR.USER.EMAIL_ALREADY_EXISTS });
     } else {
       if (error instanceof Error) {
         return res.status(500).json({
@@ -227,20 +208,14 @@ async function updateUser(
   }
 }
 
-async function deleteUser(
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<Response> {
+async function deleteUser(req: Request, res: Response, next: NextFunction): Promise<Response> {
   try {
     const user = await userRepository.getUser(req.params.id);
     if (!user) {
       return res.status(400).json({ message: config.ERROR.USER.NOT_FOUND });
     }
     const deletedUser = await userRepository.deleteUser(req.params.id);
-    return res
-      .status(200)
-      .json({ message: config.SUCCESS.USER.DELETE, user: deletedUser });
+    return res.status(200).json({ message: config.SUCCESS.USER.DELETE, user: deletedUser });
   } catch (error) {
     if (error instanceof Error) {
       return res.status(500).json({ message: error.message });
@@ -250,11 +225,7 @@ async function deleteUser(
   }
 }
 
-async function loginUser(
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<any> {
+async function loginUser(req: Request, res: Response, next: NextFunction): Promise<any> {
   const trimmedBody = trimAll(req.body);
   try {
     const { email, password } = trimmedBody;
@@ -264,9 +235,7 @@ async function loginUser(
       return res.status(400).json({ message: config.ERROR.USER.NO_ACCOUNT });
     }
     if (!(await bcrypt.compare(password, user.password))) {
-      return res
-        .status(400)
-        .json({ message: config.ERROR.USER.INVALID_CREDENTIALS });
+      return res.status(400).json({ message: config.ERROR.USER.INVALID_CREDENTIALS });
     }
 
     const userResponse = {
@@ -301,14 +270,10 @@ async function currentUser(
 ): Promise<Response> {
   try {
     if (!req.user) {
-      return res
-        .status(401)
-        .json({ message: config.ERROR.USER.NOT_AUTHORIZED });
+      return res.status(401).json({ message: config.ERROR.USER.NOT_AUTHORIZED });
     }
     const { password, ...userWithoutPassword } = req.user;
-    return res
-      .status(200)
-      .json({ user: userWithoutPassword, token: (req as any).token });
+    return res.status(200).json({ user: userWithoutPassword, token: (req as any).token });
   } catch (error) {
     if (error instanceof Error) {
       return res.status(500).json({ message: error.message });
@@ -318,11 +283,7 @@ async function currentUser(
   }
 }
 
-async function logoutUser(
-  req: CustomRequest,
-  res: Response,
-  next: NextFunction
-): Promise<any> {
+async function logoutUser(req: CustomRequest, res: Response, next: NextFunction): Promise<any> {
   try {
     const user = req.user;
 
@@ -342,11 +303,7 @@ async function logoutUser(
   }
 }
 
-async function search(
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<Response> {
+async function search(req: Request, res: Response, next: NextFunction): Promise<Response> {
   try {
     const query = req.query.search as string;
     const users = await userRepository.search(query);

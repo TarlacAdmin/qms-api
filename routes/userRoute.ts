@@ -67,11 +67,14 @@ async function createUser(req: Request, res: Response, next: NextFunction) {
  */
 async function updateUser(req: Request, res: Response, next: NextFunction) {
   await Promise.all([
+    body("_id").isMongoId().withMessage("Invalid user ID").run(req),
     body(config.VALIDATION.USER.EMAIL)
+      .optional()
       .isEmail()
       .withMessage(config.ERROR.USER.INVALID_EMAIL)
       .run(req),
-    body(config.VALIDATION.USER.EMAIL, config.VALIDATION.USER.PASSWORD)
+    body(config.VALIDATION.USER.PASSWORD)
+      .optional()
       .notEmpty()
       .withMessage(config.ERROR.USER.REQUIRED_FIELDS)
       .run(req),
