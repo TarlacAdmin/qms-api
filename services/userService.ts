@@ -113,8 +113,18 @@ async function getUsers(req: Request, res: Response, next: NextFunction): Promis
 async function createUser(req: Request, res: Response, next: NextFunction): Promise<Response> {
   const trimmedBody = trimAll(req.body);
   try {
-    const { email, password, username, firstname, lastname, middlename, type, status } =
-      trimmedBody;
+    const {
+      customId,
+      email,
+      password,
+      username,
+      firstname,
+      lastname,
+      middlename,
+      type,
+      role,
+      status,
+    } = trimmedBody;
 
     const userAvailable = await userRepository.findByEmail(email);
     if (userAvailable) {
@@ -124,12 +134,14 @@ async function createUser(req: Request, res: Response, next: NextFunction): Prom
     const hashedPassword = await bcrypt.hash(password, saltFactor);
 
     const user = await userRepository.createUser({
+      customId,
       username,
       firstname,
       middlename,
       lastname,
       email,
       type,
+      role,
       status,
       password: hashedPassword,
     });
@@ -144,14 +156,14 @@ async function createUser(req: Request, res: Response, next: NextFunction): Prom
   }
 }
 
-async function updateUser(
-  req: CustomRequest,
-  res: Response,
-  next: NextFunction
-): Promise<Response> {
+async function updateUser(req: Request, res: Response, next: NextFunction): Promise<Response> {
   const trimmedBody = trimAll(req.body);
   try {
-    const { email, password, firstname, lastname, username, ...otherUpdates } = trimmedBody;
+    const { _id, email, password, firstname, lastname, username, ...otherUpdates } = trimmedBody;
+
+    if (!_id) {
+      return res.status(400).json({ message: "User ID is required" });
+    }
 
     if (email && !validator.isEmail(email)) {
       return res.status(400).json({ message: config.ERROR.USER.INVALID_EMAIL });
@@ -168,7 +180,7 @@ async function updateUser(
     if (lastname) updates.lastname = lastname;
     if (username) updates.username = username;
 
-    const updatedUser = await userRepository.updateUser(req.user!.id, updates);
+    const updatedUser = await userRepository.updateUser(_id, updates);
 
     if (!updatedUser) {
       return res.status(400).json({ message: config.ERROR.USER.NOT_FOUND });
@@ -182,13 +194,15 @@ async function updateUser(
       return res.status(400).json({ message: config.ERROR.USER.EMAIL_ALREADY_EXISTS });
     } else {
       if (error instanceof Error) {
-        return res
-          .status(500)
-          .json({ message: config.ERROR.USER.UPDATE_FAILED, error: error.message });
+        return res.status(500).json({
+          message: config.ERROR.USER.UPDATE_FAILED,
+          error: error.message,
+        });
       } else {
-        return res
-          .status(500)
-          .json({ message: config.ERROR.USER.UPDATE_FAILED, error: "Unknown error" });
+        return res.status(500).json({
+          message: config.ERROR.USER.UPDATE_FAILED,
+          error: "Unknown error",
+        });
       }
     }
   }
@@ -226,10 +240,13 @@ async function loginUser(req: Request, res: Response, next: NextFunction): Promi
 
     const userResponse = {
       id: user.id,
+      customId: user.customId,
       email: user.email,
+      username: user.username,
       firstname: user.firstname,
       middlename: user.middlename,
       lastname: user.lastname,
+      role: user.role,
       type: user.type,
     };
 

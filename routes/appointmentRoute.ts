@@ -3,6 +3,7 @@ import { body, param, validationResult } from "express-validator";
 import appointmentService from "../services/appointmentService";
 import { API_ENDPOINTS } from "../config/endpointsConfig";
 import { config } from "../config/config";
+import { SearchParams } from "../types/searchTypes";
 
 const router = express.Router();
 
@@ -194,13 +195,28 @@ async function remove(req: Request, res: Response) {
  */
 async function search(req: Request, res: Response) {
   try {
-    const searchedAppointment = await appointmentService.search(req.body);
-    res.status(200).send(searchedAppointment);
+    const searchParams: SearchParams = {
+      searchType: req.body.searchType,
+      textQuery: req.body.textQuery,
+      startDate: req.body.startDate,
+      endDate: req.body.endDate,
+      query: req.body.query,
+      match: req.body.match,
+      populateArray: req.body.populateArray,
+      projection: req.body.projection,
+      options: req.body.options,
+      sort: req.body.sort,
+      limit: req.body.limit,
+      lean: req.body.lean,
+    };
+    const searchResults = await appointmentService.search(searchParams);
+    res.status(200).json(searchResults);
   } catch (error) {
+    console.error("Route search error:", error);
     if (error instanceof Error) {
-      res.status(400).send({ error: error.message });
+      res.status(400).json({ error: error.message });
     } else {
-      res.status(400).send({ error: "An unknown error occurred" });
+      res.status(400).json({ error: "An unknown error occurred during the search" });
     }
   }
 }

@@ -1,5 +1,9 @@
 import Appointment, { AppointmentModel } from "../models/appointmentModel";
+import Patient from "../models/patientModel";
+import Doctor from "../models/doctorModel";
 import { ObjectId } from "mongodb";
+import { SearchParams } from "../types/searchTypes";
+import { buildSearchQuery, formatResults } from "../helper/searchHelpers";
 
 interface DbParams {
   query?: any;
@@ -134,20 +138,39 @@ async function remove(id: string): Promise<AppointmentModel | null> {
   }
 }
 
-async function search(params: any = {}): Promise<AppointmentModel[]> {
+// Purpose: Search for patients, doctors, and appointments
+async function search(params: SearchParams): Promise<any> {
   try {
-    let query = Appointment.find();
-    query.setQuery(params.query);
-    query.populate(params.populateArray);
-    query.projection(params.projection);
-    query.setOptions(params.options);
-    query.lean(params.lean);
+    const searchTypes =
+      params.searchType === "all" || !params.searchType
+        ? ["patient", "doctor", "appointment"]
+        : [params.searchType];
 
-    if (params.match) {
-      query.where(params.match);
-    }
-    return query.exec();
+    const searchPromises = searchTypes.map(async (type) => {
+      let query;
+      switch (type) {
+        case "patient":
+          query = buildSearchQuery(Patient, { ...params, populateArray: undefined });
+          break;
+        case "doctor":
+          query = buildSearchQuery(Doctor, { ...params, populateArray: undefined });
+          break;
+        case "appointment":
+          query = buildSearchQuery(Appointment, params);
+          break;
+        default:
+          return { type, results: [] };
+      }
+
+      const results = await query.exec();
+      return { type, results };
+    });
+
+    const searchResults = await Promise.all(searchPromises);
+
+    return formatResults(searchResults, params.searchType);
   } catch (error) {
+    console.error("Repository search error:", error);
     throw error;
   }
 }

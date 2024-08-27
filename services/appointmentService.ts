@@ -155,47 +155,19 @@ async function remove(id: string): Promise<AppointmentModel | null> {
   }
 }
 
-async function search(params: any): Promise<AppointmentModel[] | null> {
+async function search(params: any): Promise<any[]> {
   try {
-    let dbParams = {
-      query: {},
-      populateArray: [],
-      options: {},
-      lean: true,
-      match: {},
-    };
-    dbParams.query = params.query;
-
-    //Build Populate Options
-    if (params.populateArray) {
-      dbParams["populateArray"] = params.populateArray;
+    if (!params.searchType) {
+      throw new Error("Search type is required");
     }
 
-    //Build Query Options
-    let optionsObj = {
-      sort: "",
-      skip: 0,
-      select: "",
-      limit: 0,
-    };
-    optionsObj["sort"] = params.sort || "-createdAt";
-    optionsObj["skip"] = params.skip || 0;
-    optionsObj["select"] = params.select || "_id";
-    optionsObj["limit"] = params.limit || 10;
-    dbParams.options = optionsObj;
-
-    dbParams.lean = params.lean || true;
-
-    if (params.match) {
-      dbParams.match = params.match;
-    }
-    return await appointmentRepository.search(dbParams);
+    const results = await appointmentRepository.search(params);
+    return results;
   } catch (error) {
-    console.error(error);
+    console.error("Service search error:", error);
     throw error;
   }
 }
-
 async function getTotalAppointments(): Promise<{
   total: number;
   appointments: { [key: string]: number };
