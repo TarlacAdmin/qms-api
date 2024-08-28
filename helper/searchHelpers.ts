@@ -11,6 +11,7 @@ export function buildSearchQuery(model: Model<any>, params: SearchParams): Query
         $or: [
           { firstName: { $regex: params.textQuery, $options: "i" } },
           { lastName: { $regex: params.textQuery, $options: "i" } },
+          { middleName: { $regex: params.textQuery, $options: "i" } },
         ],
       });
     } else if (model.modelName === "Doctor") {
@@ -18,10 +19,16 @@ export function buildSearchQuery(model: Model<any>, params: SearchParams): Query
         $or: [
           { firstname: { $regex: params.textQuery, $options: "i" } },
           { lastname: { $regex: params.textQuery, $options: "i" } },
+          { middlename: { $regex: params.textQuery, $options: "i" } },
         ],
       });
-    } else {
-      query = query.find({ $text: { $search: params.textQuery } });
+    } else if (model.modelName === "Appointment") {
+      query = query.find({
+        $or: [
+          { chiefComplaint: { $regex: params.textQuery, $options: "i" } },
+          { date: { $regex: params.textQuery, $options: "i" } },
+        ],
+      });
     }
   }
 
