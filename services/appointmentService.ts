@@ -168,6 +168,7 @@ async function search(params: any): Promise<any[]> {
     throw error;
   }
 }
+
 async function getTotalAppointments(): Promise<{
   total: number;
   appointments: { [key: string]: number };
