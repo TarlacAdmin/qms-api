@@ -5,7 +5,7 @@ import { trimAll } from "../helper/trimHelper";
 import { generateToken, sendResponseCookie } from "../utils/token";
 import bcrypt from "bcrypt";
 import validator from "validator";
-import { CustomRequest } from "./types";
+import { CustomRequest } from "../types/types";
 
 const saltFactor = 10;
 
