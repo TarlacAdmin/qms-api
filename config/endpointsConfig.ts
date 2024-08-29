@@ -53,4 +53,31 @@ export const API_ENDPOINTS = {
     SEARCH: "/appointment/search",
     REMOVE_BY_ID: "/appointment/remove/:id",
   },
+
+  ANNOUNCEMENT: {
+    GET_ALL: "/announcement/get/all",
+    GET_BY_ID: "/announcement/get/:id",
+    CREATE: "/announcement/create",
+    UPDATE: "/announcement/update",
+    SEARCH: "/announcement/search",
+    REMOVE_BY_ID: "/announcement/remove/:id",
+  },
+
+  SPECIALDATE: {
+    GET_ALL: "/specialdate/get/all",
+    GET_BY_ID: "/specialdate/get/:id",
+    CREATE: "/specialdate/create",
+    UPDATE: "/specialdate/update",
+    SEARCH: "/specialdate/search",
+    REMOVE_BY_ID: "/specialdate/remove/:id",
+  },
+
+  VIDEO: {
+    GET_ALL: "/video/get/all",
+    GET_BY_ID: "/video/get/:id",
+    CREATE: "/video/create",
+    UPDATE: "/video/update",
+    SEARCH: "/video/search",
+    REMOVE_BY_ID: "/video/remove/:id",
+  },
 };

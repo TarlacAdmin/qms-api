@@ -187,6 +187,57 @@ export const config = {
         INVALID_ID: "Invalid appointment id",
       },
     },
+
+    ANNOUNCEMENT: {
+      ERROR: {
+        REQUIRED_ANNOUNCEMENT: "Fill all required announcement fields",
+        INVALID_ID: "Invalid Announcement ID",
+      },
+
+      BODY: {
+        ANNOUNCEMENT_HEADLINE: "headline",
+        ID: "_id",
+      },
+
+      PARAMS: {
+        ID: "id",
+        INVALID_ID: "Invalid announcement id",
+      },
+    },
+
+    SPECIALDATE: {
+      ERROR: {
+        REQUIRED_SPECIALDATE: "Fill all required special date fields",
+        INVALID_ID: "Invalid Special Date ID",
+      },
+
+      BODY: {
+        SPECIALDATE_DATE: "date",
+        ID: "_id",
+      },
+
+      PARAMS: {
+        ID: "id",
+        INVALID_ID: "Invalid special date id",
+      },
+    },
+
+    VIDEO: {
+      ERROR: {
+        REQUIRED_VIDEO: "Fill all required video fields",
+        INVALID_ID: "Invalid Video ID",
+      },
+
+      BODY: {
+        VIDEO_URL: "url",
+        ID: "_id",
+      },
+
+      PARAMS: {
+        ID: "id",
+        INVALID_ID: "Invalid video id",
+      },
+    },
   },
 
   RESPONSE: {
@@ -260,6 +311,60 @@ export const config = {
           ID: "appointmentService.update params._id is missing!",
           REMOVE: "appointmentService.remove params is missing!",
           SEARCH: "appointmentService.search params is missing!",
+        },
+      },
+
+      ANNOUNCEMENT: {
+        ID: "announcementId is missing!",
+        NOT_FOUND: "Announcement not found",
+        REMOVE: "Error removing field",
+        UPDATE: "Error updating field",
+        ALREADY_EXISTS: "Announcement already exists",
+        NOT_FOUND_ID: "Announcement not found! with the provided _id",
+        INVALID_PARAMETER: {
+          GET: "announcementService.get params is missing!",
+          GET_ALL: "announcementService.getAllField params is missing!",
+          CREATE: "announcementService.create params is missing!",
+          UPDATE: "announcementService.update params is missing!",
+          ID: "announcementService.update params._id is missing!",
+          REMOVE: "announcementService.remove params is missing!",
+          SEARCH: "announcementService.search params is missing!",
+        },
+      },
+
+      SPECIALDATE: {
+        ID: "specialDateId is missing!",
+        NOT_FOUND: "SpecialDate not found",
+        REMOVE: "Error removing field",
+        UPDATE: "Error updating field",
+        ALREADY_EXISTS: "SpecialDate already exists",
+        NOT_FOUND_ID: "SpecialDate not found! with the provided _id",
+        INVALID_PARAMETER: {
+          GET: "specialDateService.get params is missing!",
+          GET_ALL: "specialDateService.getAllField params is missing!",
+          CREATE: "specialDateService.create params is missing!",
+          UPDATE: "specialDateService.update params is missing!",
+          ID: "specialDateService.update params._id is missing!",
+          REMOVE: "specialDateService.remove params is missing!",
+          SEARCH: "specialDateService.search params is missing!",
+        },
+      },
+
+      VIDEO: {
+        ID: "videoId is missing!",
+        NOT_FOUND: "Video not found",
+        REMOVE: "Error removing field",
+        UPDATE: "Error updating field",
+        ALREADY_EXISTS: "Video already exists",
+        NOT_FOUND_ID: "Video not found! with the provided _id",
+        INVALID_PARAMETER: {
+          GET: "videoService.get params is missing!",
+          GET_ALL: "videoService.getAllField params is missing!",
+          CREATE: "videoService.create params is missing!",
+          UPDATE: "videoService.update params is missing!",
+          ID: "videoService.update params._id is missing!",
+          REMOVE: "videoService.remove params is missing!",
+          SEARCH: "videoService.search params is missing!",
         },
       },
     },
