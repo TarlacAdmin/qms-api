@@ -7,6 +7,7 @@ export interface IQueue extends Document {
   timestamp: string | number;
   metadata: {
     patient?: mongoose.Types.ObjectId;
+    doctor?: mongoose.Types.ObjectId;
   };
 }
 
@@ -15,7 +16,7 @@ const queueSchema: Schema = new Schema(
     queueNumber: { type: String, required: true },
     counter: {
       type: String,
-      index: true
+      index: true,
     },
     status: {
       type: String,
@@ -33,9 +34,9 @@ const queueSchema: Schema = new Schema(
         ref: "Patient",
       },
       doctor: {
-        type: String,
-        index: true
-      }
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Doctor",
+      },
     },
   },
   {

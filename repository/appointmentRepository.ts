@@ -1,5 +1,9 @@
 import Appointment, { AppointmentModel } from "../models/appointmentModel";
+import Patient from "../models/patientModel";
+import Doctor from "../models/doctorModel";
 import { ObjectId } from "mongodb";
+import { SearchParams } from "../types/searchTypes";
+import { buildSearchQuery, formatResults } from "../helper/searchHelpers";
 
 interface DbParams {
   query?: any;
@@ -22,6 +26,7 @@ const appointmentRepository = {
   search,
   findByDate,
   addDoctorToAppointment,
+  getTotalAppointments,
 };
 
 export default appointmentRepository;
@@ -133,19 +138,71 @@ async function remove(id: string): Promise<AppointmentModel | null> {
   }
 }
 
-async function search(params: any = {}): Promise<AppointmentModel[]> {
+// Purpose: Search for patients, doctors, and appointments
+async function search(params: SearchParams): Promise<any> {
   try {
-    let aggregate = Appointment.aggregate();
-    if (params.search) {
-      aggregate.search(params.search);
-    }
-    if (params.match) {
-      aggregate.match(params.match);
-    }
-    aggregate.project(params.project);
-    aggregate.sort(params.sort);
-    aggregate.limit(params.limit);
-    return await aggregate.exec();
+    const searchTypes =
+      params.searchType === "all" || !params.searchType
+        ? ["patient", "doctor", "appointment"]
+        : [params.searchType];
+
+    const searchPromises = searchTypes.map(async (type) => {
+      let query;
+      switch (type) {
+        case "patient":
+          query = buildSearchQuery(Patient, { ...params, populateArray: undefined });
+          break;
+        case "doctor":
+          query = buildSearchQuery(Doctor, { ...params, populateArray: undefined });
+          break;
+        case "appointment":
+          query = buildSearchQuery(Appointment, params);
+          break;
+        default:
+          return { type, results: [] };
+      }
+
+      const results = await query.exec();
+      return { type, results };
+    });
+
+    const searchResults = await Promise.all(searchPromises);
+
+    return formatResults(searchResults, params.searchType);
+  } catch (error) {
+    console.error("Repository search error:", error);
+    throw error;
+  }
+}
+
+async function getTotalAppointments(): Promise<{
+  total: number;
+  appointments: { [key: string]: number };
+}> {
+  try {
+    const total = await Appointment.countDocuments();
+    const appointments = await Appointment.aggregate([
+      {
+        $group: {
+          _id: "$doctor",
+          count: { $sum: 1 },
+        },
+      },
+      {
+        $project: {
+          doctor: "$_id",
+          count: 1,
+          _id: 0,
+        },
+      },
+    ]);
+
+    const appointmentsByDoctor: { [key: string]: number } = {};
+    appointments.forEach((doc) => {
+      appointmentsByDoctor[doc.doctor] = doc.count;
+    });
+
+    return { total, appointments: appointmentsByDoctor };
   } catch (error) {
     throw error;
   }

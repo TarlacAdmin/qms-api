@@ -91,12 +91,13 @@ async function getAllPatients(params: any): Promise<PatientModel[]> {
   }
 }
 
-async function findOrCreate(
-  patientQueryOrData: any): Promise<PatientModel> {
-  const query =
-    patientQueryOrData._id ? 
-    { _id: patientQueryOrData._id } : 
-    { firstName: patientQueryOrData.firstName, middleName: patientQueryOrData.middleName, lastName: patientQueryOrData.lastName };
+async function findOrCreate(patientQueryOrData: any): Promise<PatientModel> {
+  const query = patientQueryOrData._id
+    ? { _id: patientQueryOrData._id }
+    : {
+        firstName: patientQueryOrData.firstName,
+        lastName: patientQueryOrData.lastName,
+      };
 
   let patient = await patientRepository.findOne(query);
   if (!patient) {
@@ -159,7 +160,7 @@ async function search(params: any): Promise<PatientModel[] | null> {
       search: params.search,
       sort: params.sort || "-createdAt",
       project: params.project,
-      limit: params.limit || 10
+      limit: params.limit || 10,
     };
     return await patientRepository.search(dbParams);
   } catch (error) {

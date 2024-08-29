@@ -3,10 +3,12 @@ import { body, param, validationResult } from "express-validator";
 import appointmentService from "../services/appointmentService";
 import { API_ENDPOINTS } from "../config/endpointsConfig";
 import { config } from "../config/config";
+import { SearchParams } from "../types/searchTypes";
 
 const router = express.Router();
 
 router.get(API_ENDPOINTS.APPOINTMENT.GET_ALL, getAllAppointments);
+router.get(API_ENDPOINTS.APPOINTMENT.GET_TOTAL, getTotalAppointments);
 router.get(API_ENDPOINTS.APPOINTMENT.GET_BY_ID, getById);
 router.post(API_ENDPOINTS.APPOINTMENT.CREATE, create);
 router.post(API_ENDPOINTS.APPOINTMENT.SEARCH, search);
@@ -14,6 +16,24 @@ router.put(API_ENDPOINTS.APPOINTMENT.UPDATE, update);
 router.delete(API_ENDPOINTS.APPOINTMENT.REMOVE_BY_ID, remove);
 
 export default router;
+
+/*
+ * @desc   get total appointments and appointments per doctor
+ * @route  GET /api/appointment/get/total
+ * @access Private
+ */
+async function getTotalAppointments(req: Request, res: Response) {
+  try {
+    const result = await appointmentService.getTotalAppointments();
+    res.status(200).send(result);
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(400).send({ error: error.message });
+    } else {
+      res.status(400).send({ error: "An unknown error occurred" });
+    }
+  }
+}
 
 /*
  * @desc   get all appointment
@@ -175,13 +195,28 @@ async function remove(req: Request, res: Response) {
  */
 async function search(req: Request, res: Response) {
   try {
-    const searchedPatient = await appointmentService.search(req.body);
-    res.status(200).send(searchedPatient);
+    const searchParams: SearchParams = {
+      searchType: req.body.searchType,
+      textQuery: req.body.textQuery,
+      startDate: req.body.startDate,
+      endDate: req.body.endDate,
+      query: req.body.query,
+      match: req.body.match,
+      populateArray: req.body.populateArray,
+      projection: req.body.projection,
+      options: req.body.options,
+      sort: req.body.sort,
+      limit: req.body.limit,
+      lean: req.body.lean,
+    };
+    const searchResults = await appointmentService.search(searchParams);
+    res.status(200).json(searchResults);
   } catch (error) {
+    console.error("Route search error:", error);
     if (error instanceof Error) {
-      res.status(400).send({ error: error.message });
+      res.status(400).json({ error: error.message });
     } else {
-      res.status(400).send({ error: "An unknown error occurred" });
+      res.status(400).json({ error: "An unknown error occurred during the search" });
     }
   }
 }

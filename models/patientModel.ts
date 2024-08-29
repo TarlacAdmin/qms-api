@@ -1,23 +1,37 @@
 import mongoose, { Document, Schema } from "mongoose";
+import { CIVIL_STATUS } from "../config/config";
 
 export interface PatientModel extends Document {
   firstName: string;
-  middleName?: string;
   lastName: string;
+  middleName?: string;
+  birthdate?: Date;
+  sex: string;
+  civilStatus?: typeof CIVIL_STATUS;
+  religion?: string;
+  cellphoneNumber?: string;
   province?: string;
   city?: string;
   barangay?: string;
   streetNumber?: string;
   region?: string;
-  birthdate?: Date;
-  religion?: string;
-  civilStatus?: string;
-  cellphoneNumber?: string;
-  visualAcuity: {
+  visualAcuity?: {
     right?: string;
     left?: string;
     pinHole?: string;
     cc?: string;
+  };
+  metadata: {
+    bhw?: {
+      profile: {
+        firstname: string;
+        lastname: string;
+        middlename?: string;
+        barangay: string;
+        city: string;
+      };
+      label: string;
+    }[];
   };
 }
 
@@ -28,30 +42,47 @@ const patientSchema: Schema = new Schema(
       required: true,
       index: true,
     },
-    middleName: {
-      type: String,
-      required: true,
-      index: true,
-    },
     lastName: {
       type: String,
       required: true,
       index: true,
     },
-    region: String,
+    middleName: {
+      type: String,
+      index: true,
+    },
+    birthdate: Date,
+    sex: String,
+    civilStatus: {
+      type: String,
+      enum: CIVIL_STATUS,
+    },
+    religion: String,
+    cellphoneNumber: String,
     province: String,
     city: String,
     barangay: String,
     streetNumber: String,
-    birthday: Date,
-    religion: String,
-    civilStatus: String,
-    cellphoneNumber: String,
+    region: String,
     visualAcuity: {
       right: String,
       left: String,
       pinHole: String,
       cc: String,
+    },
+    metadata: {
+      bhw: [
+        {
+          profile: {
+            firstname: String,
+            lastname: String,
+            middlename: String,
+            barangay: String,
+            city: String,
+          },
+          label: String,
+        },
+      ],
     },
   },
   {

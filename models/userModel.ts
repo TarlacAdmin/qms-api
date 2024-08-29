@@ -2,17 +2,31 @@ import mongoose, { Document, Schema } from "mongoose";
 
 export interface UserModel extends Document {
   id: string;
+  customId: string;
   username: string;
   firstname: string;
+  middlename?: string;
   lastname: string;
   email: string;
   password: string;
   status: "active" | "inactive" | "suspended";
+  role:
+    | "admin"
+    | "doctor"
+    | "receptionist"
+    | "livescreen"
+    | "interview"
+    | "payment"
+    | "assessment"
+    | "consultation";
   type: "admin" | "user" | "viewer";
 }
 
 const userSchema: Schema = new Schema(
   {
+    customId: {
+      type: String,
+    },
     username: {
       type: String,
       minLength: 1,
@@ -47,6 +61,19 @@ const userSchema: Schema = new Schema(
       type: String,
       enum: ["active", "inactive", "suspended"],
       default: "active",
+    },
+    role: {
+      type: String,
+      enum: [
+        "admin",
+        "doctor",
+        "receptionist",
+        "livescreen",
+        "interview",
+        "payment",
+        "assessment",
+        "consultation",
+      ],
     },
     type: {
       type: String,

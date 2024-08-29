@@ -7,7 +7,7 @@ import { API_ENDPOINTS } from "../config/endpointsConfig";
 const router = express.Router();
 
 router.route(API_ENDPOINTS.USER.GET_ALL).get(getUsers);
-router.route(API_ENDPOINTS.USER.CREATE).post(registerUser);
+router.route(API_ENDPOINTS.USER.CREATE).post(createUser);
 router.route(API_ENDPOINTS.USER.GET_BY_ID).get(getUser);
 router.route(API_ENDPOINTS.USER.UPDATE).put(updateUser);
 router.route(API_ENDPOINTS.USER.REMOVE).delete(deleteUser);
@@ -40,7 +40,7 @@ async function getUser(req: Request, res: Response, next: NextFunction) {
  * @route  POST /api/user/create
  * @access Public
  */
-async function registerUser(req: Request, res: Response, next: NextFunction) {
+async function createUser(req: Request, res: Response, next: NextFunction) {
   await Promise.all([
     body(config.VALIDATION.USER.EMAIL)
       .isEmail()
@@ -57,7 +57,7 @@ async function registerUser(req: Request, res: Response, next: NextFunction) {
     return res.status(400).json({ errors: errors.array() });
   }
 
-  userService.registerUser(req, res, next);
+  userService.createUser(req, res, next);
 }
 
 /*
@@ -67,11 +67,14 @@ async function registerUser(req: Request, res: Response, next: NextFunction) {
  */
 async function updateUser(req: Request, res: Response, next: NextFunction) {
   await Promise.all([
+    body("_id").isMongoId().withMessage("Invalid user ID").run(req),
     body(config.VALIDATION.USER.EMAIL)
+      .optional()
       .isEmail()
       .withMessage(config.ERROR.USER.INVALID_EMAIL)
       .run(req),
-    body(config.VALIDATION.USER.EMAIL, config.VALIDATION.USER.PASSWORD)
+    body(config.VALIDATION.USER.PASSWORD)
+      .optional()
       .notEmpty()
       .withMessage(config.ERROR.USER.REQUIRED_FIELDS)
       .run(req),
