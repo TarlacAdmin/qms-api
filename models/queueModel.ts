@@ -1,4 +1,4 @@
-import mongoose, { Document, Schema } from "mongoose";
+import mongoose, { Document, mongo, Schema } from "mongoose";
 
 export interface IQueue extends Document {
   queueNumber: string;
@@ -7,17 +7,7 @@ export interface IQueue extends Document {
   timestamp: string | number;
   metadata: {
     patient?: mongoose.Types.ObjectId;
-    doctor?: string;
-    bhw?: {
-      profile: {
-        firstname: string;
-        lastname: string;
-        middlename?: string;
-        barangay: string;
-        city: string;
-      };
-      label: string;
-    }[];
+    doctor?: mongoose.Types.ObjectId;
   };
 }
 
@@ -44,21 +34,9 @@ const queueSchema: Schema = new Schema(
         ref: "Patient",
       },
       doctor: {
-        type: String,
-        index: true,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Doctor",
       },
-      bhw: [
-        {
-          profile: {
-            firstname: String,
-            lastname: String,
-            middlename: String,
-            barangay: String,
-            city: String,
-          },
-          label: String,
-        },
-      ],
     },
   },
   {

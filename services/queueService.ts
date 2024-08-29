@@ -62,7 +62,7 @@ async function getAllQueues(params: any): Promise<IQueue[]> {
     }
 
     if (params.populateArray) {
-      dbParams.options.populateArray = params.populateArray;
+      dbParams.options.populateArray = Array.isArray(params.populateArray) ? params.populateArray : [params.populateArray];
     }
 
     if (params.sort) {
