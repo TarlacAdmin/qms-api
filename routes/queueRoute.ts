@@ -25,7 +25,9 @@ async function getAllQueues(req: Request, res: Response) {
     query: req.query.query || {},
     queryArray: req.query.queryArray,
     queryArrayType: req.query.queryArrayType,
-    populateArray: req.query.populateArray || [],
+    populateArray: Array.isArray(req.query.populateArray)
+      ? req.query.populateArray
+      : [req.query.populateArray],
     sort: req.query.sort,
     limit: req.query.limit,
     select: req.query.select,

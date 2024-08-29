@@ -21,6 +21,18 @@ export interface PatientModel extends Document {
     pinHole?: string;
     cc?: string;
   };
+  metadata: {
+    bhw?: {
+      profile: {
+        firstname: string;
+        lastname: string;
+        middlename?: string;
+        barangay: string;
+        city: string;
+      };
+      label: string;
+    }[];
+  };
 }
 
 const patientSchema: Schema = new Schema(
@@ -57,6 +69,20 @@ const patientSchema: Schema = new Schema(
       left: String,
       pinHole: String,
       cc: String,
+    },
+    metadata: {
+      bhw: [
+        {
+          profile: {
+            firstname: String,
+            lastname: String,
+            middlename: String,
+            barangay: String,
+            city: String,
+          },
+          label: String,
+        },
+      ],
     },
   },
   {

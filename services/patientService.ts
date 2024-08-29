@@ -96,7 +96,6 @@ async function findOrCreate(patientQueryOrData: any): Promise<PatientModel> {
     ? { _id: patientQueryOrData._id }
     : {
         firstName: patientQueryOrData.firstName,
-        middleName: patientQueryOrData.middleName,
         lastName: patientQueryOrData.lastName,
       };
 
