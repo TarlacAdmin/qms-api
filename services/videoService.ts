@@ -1,22 +1,21 @@
 import { config } from "../config/config";
-import { PatientModel } from "../models/patientModel";
-import patientRepository from "../repository/patientRepository";
+import { VideoModel } from "../models/videoModel";
+import videoRepository from "../repository/videoRepository";
 
-const patientService = {
+const videoService = {
   getById,
-  getAllPatients,
+  getAllVideo,
   create,
   update,
   remove,
   search,
-  findOrCreate,
 };
 
-export default patientService;
+export default videoService;
 
-async function getById(id: string, params: any): Promise<PatientModel | null> {
+async function getById(id: string, params: any): Promise<VideoModel | null> {
   if (!id) {
-    throw new Error(config.RESPONSE.ERROR.PATIENT.INVALID_PARAMETER.GET);
+    throw new Error(config.RESPONSE.ERROR.VIDEO.INVALID_PARAMETER.GET);
   }
 
   try {
@@ -36,7 +35,7 @@ async function getById(id: string, params: any): Promise<PatientModel | null> {
       dbParams.options.lean = params.lean;
     }
 
-    return await patientRepository.getById(id, dbParams);
+    return await videoRepository.getById(id, dbParams);
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);
@@ -46,9 +45,9 @@ async function getById(id: string, params: any): Promise<PatientModel | null> {
   }
 }
 
-async function getAllPatients(params: any): Promise<PatientModel[]> {
+async function getAllVideo(params: any): Promise<VideoModel[]> {
   if (!params) {
-    throw new Error(config.RESPONSE.ERROR.PATIENT.INVALID_PARAMETER.GET_ALL);
+    throw new Error(config.RESPONSE.ERROR.VIDEO.INVALID_PARAMETER.GET_ALL);
   }
 
   try {
@@ -80,7 +79,7 @@ async function getAllPatients(params: any): Promise<PatientModel[]> {
       dbParams.options.lean = params.lean;
     }
 
-    return await patientRepository.getAllPatients(dbParams);
+    return await videoRepository.getAllVideo(dbParams);
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);
@@ -90,28 +89,13 @@ async function getAllPatients(params: any): Promise<PatientModel[]> {
   }
 }
 
-async function findOrCreate(patientQueryOrData: any): Promise<PatientModel> {
-  const query = patientQueryOrData._id
-    ? { _id: patientQueryOrData._id }
-    : {
-        firstName: patientQueryOrData.firstName,
-        lastName: patientQueryOrData.lastName,
-      };
-
-  let patient = await patientRepository.findOne(query);
-  if (!patient) {
-    patient = await patientRepository.create(patientQueryOrData as Partial<PatientModel>);
-  }
-  return patient;
-}
-
-async function create(data: Partial<PatientModel>): Promise<PatientModel> {
+async function create(data: Partial<VideoModel>): Promise<VideoModel> {
   if (!data) {
-    throw new Error(config.RESPONSE.ERROR.PATIENT.INVALID_PARAMETER.CREATE);
+    throw new Error(config.RESPONSE.ERROR.VIDEO.INVALID_PARAMETER.CREATE);
   }
 
   try {
-    return await patientRepository.create(data);
+    return await videoRepository.create(data);
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);
@@ -121,13 +105,13 @@ async function create(data: Partial<PatientModel>): Promise<PatientModel> {
   }
 }
 
-async function update(data: Partial<PatientModel>): Promise<PatientModel | null> {
+async function update(data: Partial<VideoModel>): Promise<VideoModel | null> {
   if (!data) {
-    throw new Error(config.RESPONSE.ERROR.PATIENT.INVALID_PARAMETER.UPDATE);
+    throw new Error(config.RESPONSE.ERROR.VIDEO.INVALID_PARAMETER.UPDATE);
   }
 
   try {
-    return await patientRepository.update(data);
+    return await videoRepository.update(data);
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);
@@ -137,13 +121,13 @@ async function update(data: Partial<PatientModel>): Promise<PatientModel | null>
   }
 }
 
-async function remove(id: string): Promise<PatientModel | null> {
+async function remove(id: string): Promise<VideoModel | null> {
   if (!id) {
-    throw new Error(config.RESPONSE.ERROR.PATIENT.INVALID_PARAMETER.REMOVE);
+    throw new Error(config.RESPONSE.ERROR.VIDEO.INVALID_PARAMETER.REMOVE);
   }
 
   try {
-    return await patientRepository.remove(id);
+    return await videoRepository.remove(id);
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);
@@ -153,15 +137,42 @@ async function remove(id: string): Promise<PatientModel | null> {
   }
 }
 
-async function search(params: any): Promise<PatientModel[] | null> {
+async function search(params: any): Promise<VideoModel[] | null> {
   try {
     let dbParams = {
-      search: params.search,
-      sort: params.sort || "-createdAt",
-      project: params.project,
-      limit: params.limit || 10,
+      query: {},
+      populateArray: [],
+      options: {},
+      lean: true,
+      match: {},
     };
-    return await patientRepository.search(dbParams);
+    dbParams.query = params.query;
+
+    //Build Populate Options
+    if (params.populateArray) {
+      dbParams["populateArray"] = params.populateArray;
+    }
+
+    //Build Query Options
+    let optionsObj = {
+      sort: "",
+      skip: 0,
+      select: "",
+      limit: 0,
+    };
+    optionsObj["sort"] = params.sort || "-createdAt";
+    optionsObj["skip"] = params.skip || 0;
+    optionsObj["select"] = params.select || "_id";
+    optionsObj["limit"] = params.limit || 10;
+    dbParams.options = optionsObj;
+
+    dbParams.lean = params.lean || true;
+
+    if (params.match) {
+      dbParams.match = params.match;
+    }
+
+    return await videoRepository.search(dbParams);
   } catch (error) {
     console.error(error);
     throw error;
