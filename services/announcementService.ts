@@ -148,6 +148,10 @@ async function search(params: any): Promise<AnnouncementModel[] | null> {
     };
     dbParams.query = params.query;
 
+    if (params.match) {
+      dbParams.query = { ...dbParams.query, ...params.match };
+    }
+
     //Build Populate Options
     if (params.populateArray) {
       dbParams["populateArray"] = params.populateArray;
@@ -167,10 +171,6 @@ async function search(params: any): Promise<AnnouncementModel[] | null> {
     dbParams.options = optionsObj;
 
     dbParams.lean = params.lean || true;
-
-    if (params.match) {
-      dbParams.match = params.match;
-    }
 
     return await announcementRepository.search(dbParams);
   } catch (error) {
