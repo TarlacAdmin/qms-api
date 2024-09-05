@@ -177,8 +177,8 @@ async function search(params: SearchParams): Promise<any> {
 
 async function getTotalAppointments(): Promise<{
   total: number;
-  appointments: { [key: string]: number };
-  currentAppointmentsByDate: { [key: string]: { [key: string]: number } };
+  appointmentsByDoctor: { [key: string]: number };
+  currentAppointmentsByDateWithDoctor: { [key: string]: { [key: string]: number } };
 }> {
   try {
     const total = await Appointment.countDocuments();
@@ -225,15 +225,15 @@ async function getTotalAppointments(): Promise<{
       appointmentsByDoctor[doc.doctor] = doc.count;
     });
 
-    const currentAppointmentsByDate: { [key: string]: { [key: string]: number } } = {};
+    const currentAppointmentsByDateWithDoctor: { [key: string]: { [key: string]: number } } = {};
     currentAppointments.forEach((doc) => {
-      if (!currentAppointmentsByDate[doc.doctor]) {
-        currentAppointmentsByDate[doc.doctor] = {};
+      if (!currentAppointmentsByDateWithDoctor[doc.doctor]) {
+        currentAppointmentsByDateWithDoctor[doc.doctor] = {};
       }
-      currentAppointmentsByDate[doc.doctor][doc.date] = doc.count;
+      currentAppointmentsByDateWithDoctor[doc.doctor][doc.date] = doc.count;
     });
 
-    return { total, appointments: appointmentsByDoctor, currentAppointmentsByDate };
+    return { total, appointmentsByDoctor, currentAppointmentsByDateWithDoctor };
   } catch (error) {
     throw error;
   }

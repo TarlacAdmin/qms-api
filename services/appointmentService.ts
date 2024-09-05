@@ -171,7 +171,8 @@ async function search(params: any): Promise<any[]> {
 
 async function getTotalAppointments(): Promise<{
   total: number;
-  appointments: { [key: string]: number };
+  appointmentsByDoctor: { [key: string]: number };
+  currentAppointmentsByDateWithDoctor: { [key: string]: { [key: string]: number } };
 }> {
   try {
     return await appointmentRepository.getTotalAppointments();
