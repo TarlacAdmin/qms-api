@@ -32,6 +32,10 @@ export interface PatientModel extends Document {
       };
       label: string;
     }[];
+    queue?: {
+      queueType: string;
+      date: Date;
+    }[];
   };
 }
 
@@ -81,6 +85,17 @@ const patientSchema: Schema = new Schema(
             city: String,
           },
           label: String,
+          date: Date,
+        },
+      ],
+      queue: [
+        {
+          queueType: {
+            type: String,
+            enum: ["walk in", "scheduled"],
+            default: "walk in",
+          },
+          date: Date,
         },
       ],
     },

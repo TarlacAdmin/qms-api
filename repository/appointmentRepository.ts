@@ -178,6 +178,7 @@ async function search(params: SearchParams): Promise<any> {
 async function getTotalAppointments(): Promise<{
   total: number;
   appointments: { [key: string]: number };
+  currentAppointmentsByDate: { [key: string]: { [key: string]: number } };
 }> {
   try {
     const total = await Appointment.countDocuments();
@@ -197,12 +198,42 @@ async function getTotalAppointments(): Promise<{
       },
     ]);
 
+    const currentAppointments = await Appointment.aggregate([
+      {
+        $match: {
+          date: { $gte: new Date().toISOString().split("T")[0] },
+        },
+      },
+      {
+        $group: {
+          _id: { doctor: "$doctor", date: "$date" },
+          count: { $sum: 1 },
+        },
+      },
+      {
+        $project: {
+          doctor: "$_id.doctor",
+          date: "$_id.date",
+          count: 1,
+          _id: 0,
+        },
+      },
+    ]);
+
     const appointmentsByDoctor: { [key: string]: number } = {};
     appointments.forEach((doc) => {
       appointmentsByDoctor[doc.doctor] = doc.count;
     });
 
-    return { total, appointments: appointmentsByDoctor };
+    const currentAppointmentsByDate: { [key: string]: { [key: string]: number } } = {};
+    currentAppointments.forEach((doc) => {
+      if (!currentAppointmentsByDate[doc.doctor]) {
+        currentAppointmentsByDate[doc.doctor] = {};
+      }
+      currentAppointmentsByDate[doc.doctor][doc.date] = doc.count;
+    });
+
+    return { total, appointments: appointmentsByDoctor, currentAppointmentsByDate };
   } catch (error) {
     throw error;
   }
