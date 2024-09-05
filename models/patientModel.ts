@@ -21,6 +21,10 @@ export interface PatientModel extends Document {
     pinHole?: string;
     cc?: string;
   };
+  chiefComplaint?: {
+    complaint: string;
+    date: Date;
+  }[];
   metadata: {
     bhw?: {
       profile: {
@@ -74,6 +78,12 @@ const patientSchema: Schema = new Schema(
       pinHole: String,
       cc: String,
     },
+    chiefComplaint: [
+      {
+        complaint: String,
+        date: Date,
+      },
+    ],
     metadata: {
       bhw: [
         {
