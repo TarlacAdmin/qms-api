@@ -25,6 +25,10 @@ export interface PatientModel extends Document {
     complaint: string;
     date: Date;
   }[];
+  diagnosis?: {
+    diagnosis: string;
+    date: Date;
+  }[];
   metadata: {
     bhw?: {
       profile: {
@@ -35,10 +39,6 @@ export interface PatientModel extends Document {
         city: string;
       };
       label: string;
-    }[];
-    queue?: {
-      queueType: string;
-      date: Date;
     }[];
   };
 }
@@ -84,6 +84,12 @@ const patientSchema: Schema = new Schema(
         date: Date,
       },
     ],
+    diagnosis: [
+      {
+        diagnosis: String,
+        date: Date,
+      },
+    ],
     metadata: {
       bhw: [
         {
@@ -95,16 +101,6 @@ const patientSchema: Schema = new Schema(
             city: String,
           },
           label: String,
-          date: Date,
-        },
-      ],
-      queue: [
-        {
-          queueType: {
-            type: String,
-            enum: ["walk in", "scheduled"],
-            default: "walk in",
-          },
           date: Date,
         },
       ],

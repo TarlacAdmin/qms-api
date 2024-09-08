@@ -123,7 +123,8 @@ export const config = {
       },
 
       BODY: {
-        QUEUE_NUMBER: "queueNumber",
+        PATIENT: "patient",
+        DOCTOR: "doctor",
         ID: "_id",
       },
 

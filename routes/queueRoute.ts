@@ -7,6 +7,7 @@ import { config } from "../config/config";
 const router = express.Router();
 
 router.get(API_ENDPOINTS.QUEUE.GET_ALL, getAllQueues);
+router.get(API_ENDPOINTS.QUEUE.GET_TOTAL, getTotalQueuesNumber);
 router.get(API_ENDPOINTS.QUEUE.GET_BY_ID, getById);
 router.post(API_ENDPOINTS.QUEUE.CREATE, create);
 router.post(API_ENDPOINTS.QUEUE.SEARCH, search);
@@ -43,6 +44,16 @@ async function getAllQueues(req: Request, res: Response) {
     } else {
       res.status(400).send({ error: "An unknown error occurred" });
     }
+  }
+}
+
+// nagprapractice lang po ako ng mga aggregation queries, dedelete ko rin po ito HAHAHAHHA
+async function getTotalQueuesNumber(req: Request, res: Response) {
+  try {
+    const total = await queueService.getTotalQueuesNumber();
+    res.status(200).send(total);
+  } catch (error) {
+    throw error;
   }
 }
 
@@ -86,15 +97,21 @@ async function getById(req: Request, res: Response) {
  * @access Private
  */
 async function create(req: Request, res: Response) {
-  //TODO: Require Patient/Doctor Metadata
-  // await body(config.VALIDATION.QUEUE.BODY.QUEUE_NUMBER)
-  //   .notEmpty()
-  //   .withMessage(config.VALIDATION.QUEUE.ERROR.REQUIRED_QUEUE)
-  //   .run(req);
-  // const errors = validationResult(req);
-  // if (!errors.isEmpty()) {
-  //   return res.status(400).send({ error: errors.array() });
-  // }
+  await Promise.all([
+    body(config.VALIDATION.QUEUE.BODY.PATIENT)
+      .notEmpty()
+      .withMessage(config.VALIDATION.QUEUE.ERROR.REQUIRED_QUEUE)
+      .run(req),
+    body(config.VALIDATION.QUEUE.BODY.DOCTOR)
+      .notEmpty()
+      .withMessage(config.VALIDATION.QUEUE.ERROR.REQUIRED_QUEUE)
+      .run(req),
+  ]);
+
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).send({ error: errors.array() });
+  }
 
   try {
     const newQueue = await queueService.create(req.body);
@@ -115,15 +132,21 @@ async function create(req: Request, res: Response) {
  * @access Private
  */
 async function update(req: Request, res: Response) {
-  // await body(config.VALIDATION.QUEUE.BODY.QUEUE_NUMBER)
-  //   .notEmpty()
-  //   .withMessage(config.VALIDATION.QUEUE.ERROR.REQUIRED_QUEUE)
-  //   .run(req);
+  await Promise.all([
+    body(config.VALIDATION.QUEUE.BODY.PATIENT)
+      .notEmpty()
+      .withMessage(config.VALIDATION.QUEUE.ERROR.REQUIRED_QUEUE)
+      .run(req),
+    body(config.VALIDATION.QUEUE.BODY.DOCTOR)
+      .notEmpty()
+      .withMessage(config.VALIDATION.QUEUE.ERROR.REQUIRED_QUEUE)
+      .run(req),
+  ]);
 
-  // const errors = validationResult(req);
-  // if (!errors.isEmpty()) {
-  //   return res.status(400).send({ error: errors.array() });
-  // }
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).send({ error: errors.array() });
+  }
 
   try {
     const updatedQueue = await queueService.update(req.body);
@@ -166,6 +189,11 @@ async function remove(req: Request, res: Response) {
   }
 }
 
+/*
+ * @desc   search queue
+ * @route  DELETE /api/queue/search
+ * @access Private
+ */
 async function search(req: Request, res: Response) {
   try {
     const searchedQueues = await queueService.search(req.body);

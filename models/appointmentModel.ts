@@ -4,6 +4,12 @@ export interface AppointmentModel extends Document {
   date: string;
   patient: mongoose.Schema.Types.ObjectId;
   doctor: mongoose.Schema.Types.ObjectId;
+  metadata: {
+    queue?: {
+      queueType: string;
+      date: Date;
+    }[];
+  };
 }
 
 const apointmentSchema: Schema = new Schema(
@@ -17,10 +23,17 @@ const apointmentSchema: Schema = new Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Patient",
     },
-
     doctor: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Doctor",
+    },
+    metadata: {
+      queue: [
+        {
+          queueType: String,
+          date: String,
+        },
+      ],
     },
   },
   {
