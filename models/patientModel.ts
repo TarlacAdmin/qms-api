@@ -21,6 +21,14 @@ export interface PatientModel extends Document {
     pinHole?: string;
     cc?: string;
   };
+  chiefComplaint?: {
+    complaint: string;
+    date: Date;
+  }[];
+  diagnosis?: {
+    diagnosis: string;
+    date: Date;
+  }[];
   metadata: {
     bhw?: {
       profile: {
@@ -32,6 +40,10 @@ export interface PatientModel extends Document {
       };
       label: string;
     }[];
+    queue?: {
+      queueType: string;
+      date: Date;
+    };
   };
 }
 
@@ -70,6 +82,18 @@ const patientSchema: Schema = new Schema(
       pinHole: String,
       cc: String,
     },
+    chiefComplaint: [
+      {
+        complaint: String,
+        date: Date,
+      },
+    ],
+    diagnosis: [
+      {
+        diagnosis: String,
+        date: Date,
+      },
+    ],
     metadata: {
       bhw: [
         {
@@ -81,8 +105,16 @@ const patientSchema: Schema = new Schema(
             city: String,
           },
           label: String,
+          date: Date,
         },
       ],
+      queue: {
+        queueType: {
+          type: String,
+          default: "walk-in",
+        },
+        date: String,
+      },
     },
   },
   {

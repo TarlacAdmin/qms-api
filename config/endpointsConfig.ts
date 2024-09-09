@@ -24,6 +24,7 @@ export const API_ENDPOINTS = {
     UPDATE: "/queue/update",
     SEARCH: "/queue/search",
     REMOVE_BY_ID: "/queue/remove/:id",
+    GET_TOTAL: "/queue/get/total",
   },
 
   PATIENT: {

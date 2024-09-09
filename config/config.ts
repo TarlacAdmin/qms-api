@@ -123,7 +123,8 @@ export const config = {
       },
 
       BODY: {
-        QUEUE_NUMBER: "queueNumber",
+        PATIENT: "metadata.patient",
+        DOCTOR: "metadata.doctor",
         ID: "_id",
       },
 
@@ -303,6 +304,7 @@ export const config = {
         NOT_FOUND_ID: "Appointment not found! with the provided _id",
         FAILED: "Failed to associate doctor with the appointment.",
         EXISTS: "Appointment already exists",
+        PATIENT_NOT_EXIST: "Patient does not exist",
         INVALID_PARAMETER: {
           GET: "appointmentService.get params is missing!",
           GET_ALL: "appointmentService.getAllField params is missing!",

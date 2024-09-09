@@ -2,7 +2,7 @@ import mongoose, { Schema, Document } from "mongoose";
 
 export interface SpecialDatesModel extends Document {
   name: string;
-  date: Date;
+  date: string;
   attachment?: string;
 }
 
@@ -12,7 +12,7 @@ const specialDatesSchema: Schema = new Schema({
     required: true,
   },
   date: {
-    type: Date,
+    type: String,
     required: true,
   },
   attachment: {
