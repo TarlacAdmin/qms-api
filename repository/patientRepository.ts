@@ -22,6 +22,7 @@ const patientRepository = {
   search,
   findOne,
   findOrCreate,
+  updateQueueType,
 };
 
 export default patientRepository;
@@ -111,6 +112,21 @@ async function update(data: Partial<PatientModel>): Promise<PatientModel | null>
   }
 }
 
+async function updateQueueType(
+  patientId: string | ObjectId,
+  queueType: string
+): Promise<PatientModel | null> {
+  try {
+    return await Patient.findByIdAndUpdate(
+      patientId,
+      { $set: { "metadata.queue.queueType": queueType } },
+      { new: true }
+    ).lean();
+  } catch (error) {
+    throw error;
+  }
+}
+
 async function findById(id: string | ObjectId): Promise<PatientModel | null> {
   try {
     return await Patient.findById(id).lean();
@@ -130,16 +146,16 @@ async function remove(id: string): Promise<PatientModel | null> {
 async function search(params: any = {}): Promise<PatientModel[]> {
   try {
     let aggregate = Patient.aggregate();
-    if(params.search){
-        aggregate.search(params.search)
+    if (params.search) {
+      aggregate.search(params.search);
     }
-    if(params.match){
-        aggregate.match(params.match)
+    if (params.match) {
+      aggregate.match(params.match);
     }
-    aggregate.project(params.project)
-    aggregate.sort(params.sort)
-    aggregate.limit(params.limit)
-    return await aggregate.exec()    
+    aggregate.project(params.project);
+    aggregate.sort(params.sort);
+    aggregate.limit(params.limit);
+    return await aggregate.exec();
   } catch (error) {
     throw error;
   }

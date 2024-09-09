@@ -11,6 +11,7 @@ const queueService = {
   update,
   remove,
   search,
+  getTotalQueuesNumber,
 };
 
 export default queueService;
@@ -62,7 +63,9 @@ async function getAllQueues(params: any): Promise<IQueue[]> {
     }
 
     if (params.populateArray) {
-      dbParams.options.populateArray = Array.isArray(params.populateArray) ? params.populateArray : [params.populateArray];
+      dbParams.options.populateArray = Array.isArray(params.populateArray)
+        ? params.populateArray
+        : [params.populateArray];
     }
 
     if (params.sort) {
@@ -97,8 +100,7 @@ async function create(data: Partial<IQueue>): Promise<IQueue> {
   }
 
   try {
-    
-    if(data.counter === "interview"){
+    if (data.counter === "interview") {
       data.queueNumber = await generateQueueNumber(data.counter);
     }
 
@@ -106,10 +108,10 @@ async function create(data: Partial<IQueue>): Promise<IQueue> {
       const patient = await patientService.findOrCreate(data.metadata.patient);
       data.metadata.patient = patient._id as ObjectId;
     }
-    
+
     let createdQueue = await queueRepository.create(data);
-    createdQueue = await createdQueue.populate('metadata.patient');
-    
+    createdQueue = await createdQueue.populate("metadata.patient");
+
     return createdQueue;
   } catch (error) {
     if (error instanceof Error) {
@@ -191,8 +193,7 @@ async function search(params: any): Promise<IQueue[] | null> {
   }
 }
 
-async function generateQueueNumber(counterName: string) : Promise<string> {
-
+async function generateQueueNumber(counterName: string): Promise<string> {
   const today = new Date();
   today.setUTCHours(0, 0, 0, 0);
 
@@ -210,8 +211,17 @@ async function generateQueueNumber(counterName: string) : Promise<string> {
   //TODO: Check if counter = interview. Generate new number. ELSE, use existing "data.queueNumber"
   if (queues && queues.length > 0) {
     const latestNumber = parseInt(queues[0].queueNumber, 10);
-    return queueNumber = String(latestNumber + 1).padStart(3, "0");
+    return (queueNumber = String(latestNumber + 1).padStart(3, "0"));
   } else {
-    return queueNumber = "001";
+    return (queueNumber = "001");
+  }
+}
+
+// nagprapractice lang po ako ng mga aggregation queries, dedelete ko rin po ito HAHAHAHHA
+async function getTotalQueuesNumber(): Promise<number[]> {
+  try {
+    return await queueRepository.getTotalQueuesNumber();
+  } catch (error) {
+    throw error;
   }
 }

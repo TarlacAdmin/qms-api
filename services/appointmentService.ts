@@ -102,6 +102,8 @@ async function create(
     const patient = await patientService.findOrCreate(data.patient);
     data.patient = patient._id;
 
+    await patientService.updateQueueType(patient._id as string, "scheduled");
+
     const appointment = await appointmentRepository.create(data);
 
     const addDoctorToAppointment = await appointmentRepository.addDoctorToAppointment(
@@ -171,7 +173,8 @@ async function search(params: any): Promise<any[]> {
 
 async function getTotalAppointments(): Promise<{
   total: number;
-  appointments: { [key: string]: number };
+  appointmentsByDoctor: { [key: string]: number };
+  currentAppointmentsByDateWithDoctor: { [key: string]: { [key: string]: number } };
 }> {
   try {
     return await appointmentRepository.getTotalAppointments();

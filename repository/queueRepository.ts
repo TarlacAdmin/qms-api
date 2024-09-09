@@ -20,6 +20,7 @@ const queueRepository = {
   findById,
   search,
   pushPatientToMetadata,
+  getTotalQueuesNumber,
 };
 
 export default queueRepository;
@@ -124,6 +125,30 @@ async function search(params: any = {}): Promise<IQueue[]> {
     query.setOptions(params.options);
     query.lean(params.lean);
     return query.exec();
+  } catch (error) {
+    throw error;
+  }
+}
+
+// nagprapractice lang po ako ng mga aggregation queries, dedelete ko rin po ito HAHAHAHHA
+async function getTotalQueuesNumber(): Promise<number[]> {
+  try {
+    const total = await Queue.aggregate([
+      {
+        $match: {
+          queueNumber: {
+            $eq: "001",
+          },
+        },
+      },
+      {
+        $count: "total queues",
+      },
+    ]);
+
+    console.log(total);
+
+    return total;
   } catch (error) {
     throw error;
   }
