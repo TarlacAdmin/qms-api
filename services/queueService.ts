@@ -1,5 +1,5 @@
 import { config } from "../config/config";
-import { IQueue } from "../models/queueModel";
+import { QueueModel } from "../models/queueModel";
 import { ObjectId } from "mongodb";
 import queueRepository from "../repository/queueRepository";
 import patientService from "./patientService";
@@ -16,7 +16,7 @@ const queueService = {
 
 export default queueService;
 
-async function getById(id: string, params: any): Promise<IQueue | null> {
+async function getById(id: string, params: any): Promise<QueueModel | null> {
   if (!id) {
     throw new Error(config.RESPONSE.ERROR.QUEUE.INVALID_PARAMETER.GET);
   }
@@ -48,7 +48,7 @@ async function getById(id: string, params: any): Promise<IQueue | null> {
   }
 }
 
-async function getAllQueues(params: any): Promise<IQueue[]> {
+async function getAllQueues(params: any): Promise<QueueModel[]> {
   if (!params) {
     throw new Error(config.RESPONSE.ERROR.QUEUE.INVALID_PARAMETER.GET_ALL);
   }
@@ -94,7 +94,7 @@ async function getAllQueues(params: any): Promise<IQueue[]> {
   }
 }
 
-async function create(data: Partial<IQueue>): Promise<IQueue> {
+async function create(data: Partial<QueueModel>): Promise<QueueModel> {
   if (!data) {
     throw new Error(config.RESPONSE.ERROR.QUEUE.INVALID_PARAMETER.CREATE);
   }
@@ -122,7 +122,7 @@ async function create(data: Partial<IQueue>): Promise<IQueue> {
   }
 }
 
-async function update(data: Partial<IQueue>): Promise<IQueue | null> {
+async function update(data: Partial<QueueModel>): Promise<QueueModel | null> {
   if (!data) {
     throw new Error(config.RESPONSE.ERROR.QUEUE.INVALID_PARAMETER.UPDATE);
   }
@@ -138,7 +138,7 @@ async function update(data: Partial<IQueue>): Promise<IQueue | null> {
   }
 }
 
-async function remove(id: string): Promise<IQueue | null> {
+async function remove(id: string): Promise<QueueModel | null> {
   if (!id) {
     throw new Error(config.RESPONSE.ERROR.QUEUE.INVALID_PARAMETER.REMOVE);
   }
@@ -154,7 +154,7 @@ async function remove(id: string): Promise<IQueue | null> {
   }
 }
 
-async function search(params: any): Promise<IQueue[] | null> {
+async function search(params: any): Promise<QueueModel[] | null> {
   //TODO: VAlidation
 
   try {

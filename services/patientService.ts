@@ -1,7 +1,6 @@
 import { config } from "../config/config";
 import { PatientModel } from "../models/patientModel";
 import patientRepository from "../repository/patientRepository";
-import { ObjectId } from "mongodb";
 
 const patientService = {
   getById,
@@ -11,7 +10,6 @@ const patientService = {
   remove,
   search,
   findOrCreate,
-  updateQueueType,
 };
 
 export default patientService;
@@ -130,21 +128,6 @@ async function update(data: Partial<PatientModel>): Promise<PatientModel | null>
 
   try {
     return await patientRepository.update(data);
-  } catch (error) {
-    if (error instanceof Error) {
-      throw new Error(error.message);
-    } else {
-      throw new Error(String(error));
-    }
-  }
-}
-
-async function updateQueueType(
-  patientId: string | ObjectId,
-  queueType: string
-): Promise<PatientModel | null> {
-  try {
-    return await patientRepository.updateQueueType(patientId, queueType);
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);

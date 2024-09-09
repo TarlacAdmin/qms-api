@@ -22,7 +22,6 @@ const patientRepository = {
   search,
   findOne,
   findOrCreate,
-  updateQueueType,
 };
 
 export default patientRepository;
@@ -107,21 +106,6 @@ async function findOne(query: any): Promise<PatientModel | null> {
 async function update(data: Partial<PatientModel>): Promise<PatientModel | null> {
   try {
     return await Patient.findByIdAndUpdate(data._id, data, { new: true }).lean();
-  } catch (error) {
-    throw error;
-  }
-}
-
-async function updateQueueType(
-  patientId: string | ObjectId,
-  queueType: string
-): Promise<PatientModel | null> {
-  try {
-    return await Patient.findByIdAndUpdate(
-      patientId,
-      { $set: { "metadata.queue.queueType": queueType } },
-      { new: true }
-    ).lean();
   } catch (error) {
     throw error;
   }

@@ -1,4 +1,5 @@
-import Queue, { IQueue } from "../models/queueModel";
+import Queue, { QueueModel } from "../models/queueModel";
+import { ObjectId } from "mongodb";
 
 interface DbParams {
   query?: any;
@@ -25,7 +26,7 @@ const queueRepository = {
 
 export default queueRepository;
 
-async function getById(id: string, dbParams: DbParams = {}): Promise<IQueue | null> {
+async function getById(id: string, dbParams: DbParams = {}): Promise<QueueModel | null> {
   try {
     let query = Queue.findById(id);
 
@@ -46,7 +47,7 @@ async function getById(id: string, dbParams: DbParams = {}): Promise<IQueue | nu
   }
 }
 
-async function getAllQueues(dbParams: DbParams = {}): Promise<IQueue[]> {
+async function getAllQueues(dbParams: DbParams = {}): Promise<QueueModel[]> {
   try {
     let query = Queue.find(dbParams.query);
 
@@ -69,7 +70,7 @@ async function getAllQueues(dbParams: DbParams = {}): Promise<IQueue[]> {
   }
 }
 
-async function create(data: Partial<IQueue>): Promise<IQueue> {
+async function create(data: Partial<QueueModel>): Promise<QueueModel> {
   try {
     return await Queue.create(data);
   } catch (error) {
@@ -77,7 +78,10 @@ async function create(data: Partial<IQueue>): Promise<IQueue> {
   }
 }
 
-async function pushPatientToMetadata(queueId: string, patientId: string): Promise<IQueue | null> {
+async function pushPatientToMetadata(
+  queueId: string,
+  patientId: string
+): Promise<QueueModel | null> {
   try {
     return await Queue.findByIdAndUpdate(
       queueId,
@@ -89,7 +93,7 @@ async function pushPatientToMetadata(queueId: string, patientId: string): Promis
   }
 }
 
-async function update(data: Partial<IQueue>): Promise<IQueue | null> {
+async function update(data: Partial<QueueModel>): Promise<QueueModel | null> {
   try {
     return await Queue.findByIdAndUpdate(data._id, data, { new: true })
       // .select("-metadata.patient.emr")
@@ -99,7 +103,7 @@ async function update(data: Partial<IQueue>): Promise<IQueue | null> {
   }
 }
 
-async function findById(id: string): Promise<IQueue | null> {
+async function findById(id: string): Promise<QueueModel | null> {
   try {
     return await Queue.findById(id).lean();
   } catch (error) {
@@ -107,7 +111,7 @@ async function findById(id: string): Promise<IQueue | null> {
   }
 }
 
-async function remove(id: string): Promise<IQueue | null> {
+async function remove(id: string): Promise<QueueModel | null> {
   try {
     return await Queue.findByIdAndDelete(id);
   } catch (error) {
@@ -115,7 +119,7 @@ async function remove(id: string): Promise<IQueue | null> {
   }
 }
 
-async function search(params: any = {}): Promise<IQueue[]> {
+async function search(params: any = {}): Promise<QueueModel[]> {
   try {
     // return await Queue.find(params).sort({ createdAt: -1 }).exec();;
     let query = Queue.find();
