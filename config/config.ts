@@ -239,6 +239,52 @@ export const config = {
         INVALID_ID: "Invalid video id",
       },
     },
+
+    CHIEFCOMPLAINT: {
+      ERROR: {
+        REQUIRED_CHIEFCOMPLAINT: "Fill all required chief complaint fields",
+        INVALID_ID: "Invalid Chief Complaint ID",
+      },
+
+      BODY: {
+        CHIEFCOMPLAINT_TEXT: "text",
+        CHIEFCOMPLAINT_ONSETDATETIME: "onsetDateTime",
+        CHIEFCOMPLAINT_ABATEMENTDATETIME: "abatementDateTime",
+        CHIEFCOMPLAINT_BODYSITE: "bodySite",
+        CHIEFCOMPLAINT_SEVERITY: "severity",
+        ID: "_id",
+      },
+
+      PARAMS: {
+        ID: "id",
+        INVALID_ID: "Invalid chief complaint id",
+      },
+    },
+
+    DIAGNOSIS: {
+      ERROR: {
+        REQUIRED_DIAGNOSIS: "Fill all required diagnosis fields",
+        INVALID_ID: "Invalid Diagnosis ID",
+      },
+
+      BODY: {
+        DIAGNOSIS_CODE: "code",
+        DIAGNOSIS_DESCRIPTION: "description",
+        DIAGNOSIS_CLINICALSTATUS: "clinicalStatus",
+        DIAGNOSIS_VERIFICATIONSTATUS: "verificationStatus",
+        DIAGNOSIS_CATEGORY: "category",
+        DIAGNOSIS_SEVERITY: "severity",
+        DIAGNOSIS_ONSETDATETIME: "onsetDateTime",
+        DIAGNOSIS_ABATEMENTDATETIME: "abatementDateTime",
+        DIAGNOSIS_BODYSITE: "bodySite",
+        ID: "_id",
+      },
+
+      PARAMS: {
+        ID: "id",
+        INVALID_ID: "Invalid diagnosis id",
+      },
+    },
   },
 
   RESPONSE: {
@@ -367,6 +413,42 @@ export const config = {
           ID: "videoService.update params._id is missing!",
           REMOVE: "videoService.remove params is missing!",
           SEARCH: "videoService.search params is missing!",
+        },
+      },
+
+      CHIEFCOMPLAINT: {
+        ID: "chiefComplaintId is missing!",
+        NOT_FOUND: "ChiefComplaint not found",
+        REMOVE: "Error removing field",
+        UPDATE: "Error updating field",
+        ALREADY_EXISTS: "ChiefComplaint already exists",
+        NOT_FOUND_ID: "ChiefComplaint not found! with the provided _id",
+        INVALID_PARAMETER: {
+          GET: "chiefComplaintService.get params is missing!",
+          GET_ALL: "chiefComplaintService.getAllField params is missing!",
+          CREATE: "chiefComplaintService.create params is missing!",
+          UPDATE: "chiefComplaintService.update params is missing!",
+          ID: "chiefComplaintService.update params._id is missing!",
+          REMOVE: "chiefComplaintService.remove params is missing!",
+          SEARCH: "chiefComplaintService.search params is missing!",
+        },
+      },
+
+      DIAGNOSIS: {
+        ID: "diagnosisId is missing!",
+        NOT_FOUND: "Diagnosis not found",
+        REMOVE: "Error removing field",
+        UPDATE: "Error updating field",
+        ALREADY_EXISTS: "Diagnosis already exists",
+        NOT_FOUND_ID: "Diagnosis not found! with the provided _id",
+        INVALID_PARAMETER: {
+          GET: "diagnosisService.get params is missing!",
+          GET_ALL: "diagnosisService.getAllField params is missing!",
+          CREATE: "diagnosisService.create params is missing!",
+          UPDATE: "diagnosisService.update params is missing!",
+          ID: "diagnosisService.update params._id is missing!",
+          REMOVE: "diagnosisService.remove params is missing!",
+          SEARCH: "diagnosisService.search params is missing!",
         },
       },
     },

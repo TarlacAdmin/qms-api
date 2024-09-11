@@ -1,5 +1,4 @@
 import Queue, { QueueModel } from "../models/queueModel";
-import { ObjectId } from "mongodb";
 
 interface DbParams {
   query?: any;
