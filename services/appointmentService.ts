@@ -102,8 +102,6 @@ async function create(
     const patient = await patientService.findOrCreate(data.patient);
     data.patient = patient._id;
 
-    await patientService.updateQueueType(patient._id as string, "scheduled");
-
     const appointment = await appointmentRepository.create(data);
 
     const addDoctorToAppointment = await appointmentRepository.addDoctorToAppointment(

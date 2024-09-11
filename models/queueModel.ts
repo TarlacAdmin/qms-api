@@ -1,10 +1,12 @@
 import mongoose, { Document, Schema } from "mongoose";
 
-export interface IQueue extends Document {
+export interface QueueModel extends Document {
   queueNumber: string;
+  queueType: string;
   counter?: string;
   status?: string;
   timestamp: string | number;
+  date: Date;
   metadata: {
     patient?: mongoose.Types.ObjectId;
     doctor?: mongoose.Types.ObjectId;
@@ -14,6 +16,11 @@ export interface IQueue extends Document {
 const queueSchema: Schema = new Schema(
   {
     queueNumber: { type: String, required: true },
+    queueType: {
+      type: String,
+      default: "walkin",
+      index: true,
+    },
     counter: {
       type: String,
       index: true,
@@ -45,4 +52,4 @@ const queueSchema: Schema = new Schema(
 );
 
 // queueSchema.set("autoIndex", false);
-export default mongoose.model<IQueue>("Queue", queueSchema);
+export default mongoose.model<QueueModel>("Queue", queueSchema);
