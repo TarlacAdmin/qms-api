@@ -19,6 +19,7 @@ interface DbParams {
 const appointmentRepository = {
   getById,
   getAllAppointments,
+  getTotalAppointments,
   create,
   update,
   remove,
@@ -26,7 +27,6 @@ const appointmentRepository = {
   search,
   findByDate,
   addDoctorToAppointment,
-  getTotalAppointments,
 };
 
 export default appointmentRepository;
@@ -175,65 +175,119 @@ async function search(params: SearchParams): Promise<any> {
   }
 }
 
-async function getTotalAppointments(): Promise<{
-  total: number;
-  appointmentsByDoctor: { [key: string]: number };
-  currentAppointmentsByDateWithDoctor: { [key: string]: { [key: string]: number } };
-}> {
+async function getTotalAppointments(): Promise<number[]> {
   try {
-    const total = await Appointment.countDocuments();
-    const appointments = await Appointment.aggregate([
+    return await Appointment.aggregate([
       {
-        $group: {
-          _id: "$doctor",
-          count: { $sum: 1 },
-        },
-      },
-      {
-        $project: {
-          doctor: "$_id",
-          count: 1,
-          _id: 0,
+        $facet: {
+          totalAppointments: [
+            {
+              $group: {
+                _id: null,
+                count: { $sum: 1 },
+              },
+            },
+            {
+              $project: {
+                count: 1,
+                _id: 0,
+              },
+            },
+          ],
+
+          totalAppointmentsByDoctor: [
+            {
+              $group: {
+                _id: "$doctor",
+                count: { $sum: 1 },
+              },
+            },
+            {
+              $project: {
+                doctor: "$_id",
+                count: 1,
+                _id: 0,
+              },
+            },
+            {
+              $sort: { count: -1 },
+            },
+            // Optional - Populate doctor details
+            {
+              $lookup: {
+                from: "doctors",
+                localField: "doctor",
+                foreignField: "_id",
+                as: "doctor",
+              },
+            },
+            {
+              $unwind: "$doctor",
+            },
+            {
+              $project: {
+                doctor: {
+                  firstname: "$doctor.firstname",
+                  lastname: "$doctor.lastname",
+                  prefix: "$doctor.prefix",
+                  degree: "$doctor.degree",
+                },
+                count: 1,
+              },
+            },
+          ],
+
+          totalCurrentAppointmentsByDateWithDoctor: [
+            {
+              $match: {
+                date: { $gte: new Date().toISOString().split("T")[0] },
+              },
+            },
+            {
+              $group: {
+                _id: { doctor: "$doctor", date: "$date" },
+                count: { $sum: 1 },
+              },
+            },
+            {
+              $project: {
+                doctor: "$_id.doctor",
+                date: "$_id.date",
+                count: 1,
+                _id: 0,
+              },
+            },
+            {
+              $sort: { date: 1 },
+            },
+            // Optional - Populate doctor details
+            {
+              $lookup: {
+                from: "doctors",
+                localField: "doctor",
+                foreignField: "_id",
+                as: "doctor",
+              },
+            },
+            {
+              $unwind: "$doctor",
+            },
+            {
+              $project: {
+                doctor: {
+                  firstname: "$doctor.firstname",
+                  lastname: "$doctor.lastname",
+                  prefix: "$doctor.prefix",
+                  degree: "$doctor.degree",
+                },
+                date: 1,
+                count: 1,
+              },
+            },
+          ],
         },
       },
     ]);
-
-    const currentAppointments = await Appointment.aggregate([
-      {
-        $match: {
-          date: { $gte: new Date().toISOString().split("T")[0] },
-        },
-      },
-      {
-        $group: {
-          _id: { doctor: "$doctor", date: "$date" },
-          count: { $sum: 1 },
-        },
-      },
-      {
-        $project: {
-          doctor: "$_id.doctor",
-          date: "$_id.date",
-          count: 1,
-          _id: 0,
-        },
-      },
-    ]);
-
-    const appointmentsByDoctor: { [key: string]: number } = {};
-    appointments.forEach((doc) => {
-      appointmentsByDoctor[doc.doctor] = doc.count;
-    });
-
-    const currentAppointmentsByDateWithDoctor: { [key: string]: { [key: string]: number } } = {};
-    currentAppointments.forEach((doc) => {
-      if (!currentAppointmentsByDateWithDoctor[doc.doctor]) {
-        currentAppointmentsByDateWithDoctor[doc.doctor] = {};
-      }
-      currentAppointmentsByDateWithDoctor[doc.doctor][doc.date] = doc.count;
-    });
-
-    return { total, appointmentsByDoctor, currentAppointmentsByDateWithDoctor };
   } catch (error) {
     throw error;
   }

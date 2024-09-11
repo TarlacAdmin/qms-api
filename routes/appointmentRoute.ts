@@ -18,24 +18,6 @@ router.delete(API_ENDPOINTS.APPOINTMENT.REMOVE_BY_ID, remove);
 export default router;
 
 /*
- * @desc   get total appointments and appointments per doctor
- * @route  GET /api/appointment/get/total
- * @access Private
- */
-async function getTotalAppointments(req: Request, res: Response) {
-  try {
-    const result = await appointmentService.getTotalAppointments();
-    res.status(200).send(result);
-  } catch (error) {
-    if (error instanceof Error) {
-      res.status(400).send({ error: error.message });
-    } else {
-      res.status(400).send({ error: "An unknown error occurred" });
-    }
-  }
-}
-
-/*
  * @desc   get all appointment
  * @route  GET /api/appointment/get/all
  * @access Private
@@ -89,6 +71,24 @@ async function getById(req: Request, res: Response) {
   try {
     const patient = await appointmentService.getById(req.params.id, params);
     res.status(200).send(patient);
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(400).send({ error: error.message });
+    } else {
+      res.status(400).send({ error: "An unknown error occurred" });
+    }
+  }
+}
+
+/*
+ * @desc   get total appointments and appointments per doctor
+ * @route  GET /api/appointment/get/total
+ * @access Private
+ */
+async function getTotalAppointments(req: Request, res: Response) {
+  try {
+    const result = await appointmentService.getTotalAppointments();
+    res.status(200).send(result);
   } catch (error) {
     if (error instanceof Error) {
       res.status(400).send({ error: error.message });

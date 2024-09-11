@@ -6,11 +6,11 @@ import patientService from "./patientService";
 const appointmentService = {
   getById,
   getAllAppointments,
+  getTotalAppointments,
   create,
   update,
   remove,
   search,
-  getTotalAppointments,
 };
 
 export default appointmentService;
@@ -82,6 +82,18 @@ async function getAllAppointments(params: any): Promise<AppointmentModel[]> {
     }
 
     return await appointmentRepository.getAllAppointments(dbParams);
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(error.message);
+    } else {
+      throw new Error(String(error));
+    }
+  }
+}
+
+async function getTotalAppointments(): Promise<number[]> {
+  try {
+    return await appointmentRepository.getTotalAppointments();
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);
@@ -166,21 +178,5 @@ async function search(params: any): Promise<any[]> {
   } catch (error) {
     console.error("Service search error:", error);
     throw error;
-  }
-}
-
-async function getTotalAppointments(): Promise<{
-  total: number;
-  appointmentsByDoctor: { [key: string]: number };
-  currentAppointmentsByDateWithDoctor: { [key: string]: { [key: string]: number } };
-}> {
-  try {
-    return await appointmentRepository.getTotalAppointments();
-  } catch (error) {
-    if (error instanceof Error) {
-      throw new Error(error.message);
-    } else {
-      throw new Error(String(error));
-    }
   }
 }
