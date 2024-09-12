@@ -6,50 +6,21 @@ import { config } from "../config/config";
 
 const router = express.Router();
 
-router.get(API_ENDPOINTS.DIAGNOSIS.GET_ALL, getAllDiagnosis);
-router.get(API_ENDPOINTS.DIAGNOSIS.GET_BY_ID, getById);
-router.post(API_ENDPOINTS.DIAGNOSIS.CREATE, create);
-router.post(API_ENDPOINTS.DIAGNOSIS.SEARCH, search);
-router.put(API_ENDPOINTS.DIAGNOSIS.UPDATE, update);
-router.delete(API_ENDPOINTS.DIAGNOSIS.REMOVE_BY_ID, remove);
+router.get(API_ENDPOINTS.DIAGNOSIS.GET_BY_ID, getDiagnosis);
+router.get(API_ENDPOINTS.DIAGNOSIS.GET_ALL, getDiagnoses);
+router.post(API_ENDPOINTS.DIAGNOSIS.CREATE, createDiagnosis);
+router.put(API_ENDPOINTS.DIAGNOSIS.UPDATE, updateDiagnosis);
+router.delete(API_ENDPOINTS.DIAGNOSIS.REMOVE_BY_ID, removeDiagnosis);
+router.post(API_ENDPOINTS.DIAGNOSIS.SEARCH, searchDiagnosis);
 
 export default router;
-
-/*
- * @desc   get all diagnosis
- * @route  GET /api/diagnosis/get/all
- * @access Private
- */
-async function getAllDiagnosis(req: Request, res: Response) {
-  const params = {
-    query: req.query.query || {},
-    queryArray: req.query.queryArray,
-    queryArrayType: req.query.queryArrayType,
-    populateArray: req.query.populateArray || [],
-    sort: req.query.sort,
-    limit: req.query.limit,
-    select: req.query.select,
-    lean: req.query.lean,
-  };
-
-  try {
-    const diagnosis = await diagnosisService.getAllDiagnosis(params);
-    res.status(200).send(diagnosis);
-  } catch (error) {
-    if (error instanceof Error) {
-      res.status(400).send({ error: error.message });
-    } else {
-      res.status(400).send({ error: "An unknown error occurred" });
-    }
-  }
-}
 
 /*
  * @desc   get diagnosis by id
  * @route  GET /api/diagnosis/get/:id
  * @access Private
  */
-async function getById(req: Request, res: Response) {
+async function getDiagnosis(req: Request, res: Response) {
   await param(config.VALIDATION.DIAGNOSIS.PARAMS.ID)
     .isMongoId()
     .withMessage(config.VALIDATION.DIAGNOSIS.PARAMS.INVALID_ID)
@@ -67,7 +38,7 @@ async function getById(req: Request, res: Response) {
   };
 
   try {
-    const diagnosis = await diagnosisService.getById(req.params.id, params);
+    const diagnosis = await diagnosisService.getDiagnosis(req.params.id, params);
     res.status(200).send(diagnosis);
   } catch (error) {
     if (error instanceof Error) {
@@ -79,11 +50,42 @@ async function getById(req: Request, res: Response) {
 }
 
 /*
+ * @desc   get all diagnosis
+ * @route  GET /api/diagnosis/get/all
+ * @access Private
+ */
+async function getDiagnoses(req: Request, res: Response) {
+  const params = {
+    query: req.query.query || {},
+    queryArray: req.query.queryArray,
+    queryArrayType: req.query.queryArrayType,
+    populateArray: req.query.populateArray || [],
+    sort: req.query.sort,
+    limit: req.query.limit,
+    select: req.query.select,
+    lean: req.query.lean,
+  };
+
+  try {
+    const diagnosis = await diagnosisService.getDiagnoses(params);
+    res.status(200).send(diagnosis);
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(400).send({ error: error.message });
+    } else {
+      res.status(400).send({ error: "An unknown error occurred" });
+    }
+  }
+}
+
+
+
+/*
  * @desc   create diagnosis
  * @route  POST /api/diagnosis/create
  * @access Private
  */
-async function create(req: Request, res: Response) {
+async function createDiagnosis(req: Request, res: Response) {
   await Promise.all([
     body(config.VALIDATION.DIAGNOSIS.BODY.DIAGNOSIS_VERIFICATIONSTATUS)
       .notEmpty()
@@ -129,7 +131,7 @@ async function create(req: Request, res: Response) {
   }
 
   try {
-    const newDiagnosis = await diagnosisService.create(req.body);
+    const newDiagnosis = await diagnosisService.createDiagnosis(req.body);
     res.status(200).send(newDiagnosis);
   } catch (error) {
     if (error instanceof Error) {
@@ -145,7 +147,7 @@ async function create(req: Request, res: Response) {
  * @route  PUT /api/diagnosis/update
  * @access Private
  */
-async function update(req: Request, res: Response) {
+async function updateDiagnosis(req: Request, res: Response) {
   await Promise.all([
     body(config.VALIDATION.DIAGNOSIS.BODY.DIAGNOSIS_VERIFICATIONSTATUS)
       .notEmpty()
@@ -191,7 +193,7 @@ async function update(req: Request, res: Response) {
   }
 
   try {
-    const updatedDiagnosis = await diagnosisService.update(req.body);
+    const updatedDiagnosis = await diagnosisService.updateDiagnosis(req.body);
     res.status(200).send(updatedDiagnosis);
   } catch (error) {
     if (error instanceof Error) {
@@ -207,7 +209,7 @@ async function update(req: Request, res: Response) {
  * @route  DELETE /api/diagnosis/remove/:id
  * @access Private
  */
-async function remove(req: Request, res: Response) {
+async function removeDiagnosis(req: Request, res: Response) {
   await param(config.VALIDATION.DIAGNOSIS.PARAMS.ID)
     .isMongoId()
     .withMessage(config.VALIDATION.DIAGNOSIS.PARAMS.INVALID_ID)
@@ -219,7 +221,7 @@ async function remove(req: Request, res: Response) {
   }
 
   try {
-    const removedDiagnosis = await diagnosisService.remove(req.params.id);
+    const removedDiagnosis = await diagnosisService.removeDiagnosis(req.params.id);
     res.status(200).send(removedDiagnosis);
   } catch (error) {
     if (error instanceof Error) {
@@ -231,13 +233,13 @@ async function remove(req: Request, res: Response) {
 }
 
 /*
- * @desc   search diagnosis
- * @route  POST /api/diagnosis/search
+ * @desc   searchs diagnosis
+ * @route  POST /api/diagnosis/searchs
  * @access Private
  */
-async function search(req: Request, res: Response) {
+async function searchDiagnosis(req: Request, res: Response) {
   try {
-    const searchedDiagnosis = await diagnosisService.search(req.body);
+    const searchedDiagnosis = await diagnosisService.searchDiagnosis(req.body);
     res.status(200).send(searchedDiagnosis);
   } catch (error) {
     if (error instanceof Error) {

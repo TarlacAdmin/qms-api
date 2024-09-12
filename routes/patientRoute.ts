@@ -6,50 +6,21 @@ import { config } from "../config/config";
 
 const router = express.Router();
 
-router.get(API_ENDPOINTS.PATIENT.GET_ALL, getAllPatients);
-router.get(API_ENDPOINTS.PATIENT.GET_BY_ID, getById);
-router.post(API_ENDPOINTS.PATIENT.CREATE, create);
-router.post(API_ENDPOINTS.PATIENT.SEARCH, search);
-router.put(API_ENDPOINTS.PATIENT.UPDATE, update);
-router.delete(API_ENDPOINTS.PATIENT.REMOVE_BY_ID, remove);
+router.get(API_ENDPOINTS.PATIENT.GET_BY_ID, getPatient);
+router.get(API_ENDPOINTS.PATIENT.GET_ALL, getPatients);
+router.post(API_ENDPOINTS.PATIENT.CREATE, createPatient);
+router.put(API_ENDPOINTS.PATIENT.UPDATE, updatePatient);
+router.delete(API_ENDPOINTS.PATIENT.REMOVE_BY_ID, removePatient);
+router.post(API_ENDPOINTS.PATIENT.SEARCH, searchPatient);
 
 export default router;
-
-/*
- * @desc   get all patient
- * @route  GET /api/patient/get/all
- * @access Private
- */
-async function getAllPatients(req: Request, res: Response) {
-  const params = {
-    query: req.query.query || {},
-    queryArray: req.query.queryArray,
-    queryArrayType: req.query.queryArrayType,
-    populateArray: req.query.populateArray || [],
-    sort: req.query.sort,
-    limit: req.query.limit,
-    select: req.query.select,
-    lean: req.query.lean,
-  };
-
-  try {
-    const patients = await patientService.getAllPatients(params);
-    res.status(200).send(patients);
-  } catch (error) {
-    if (error instanceof Error) {
-      res.status(400).send({ error: error.message });
-    } else {
-      res.status(400).send({ error: "An unknown error occurred" });
-    }
-  }
-}
 
 /*
  * @desc   get patient by id
  * @route  GET /api/patient/get/:id
  * @access Private
  */
-async function getById(req: Request, res: Response) {
+async function getPatient(req: Request, res: Response) {
   await param(config.VALIDATION.PATIENT.PARAMS.ID)
     .isMongoId()
     .withMessage(config.VALIDATION.PATIENT.PARAMS.INVALID_ID)
@@ -67,8 +38,37 @@ async function getById(req: Request, res: Response) {
   };
 
   try {
-    const patient = await patientService.getById(req.params.id, params);
+    const patient = await patientService.getPatient(req.params.id, params);
     res.status(200).send(patient);
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(400).send({ error: error.message });
+    } else {
+      res.status(400).send({ error: "An unknown error occurred" });
+    }
+  }
+}
+
+/*
+ * @desc   get all patient
+ * @route  GET /api/patient/get/all
+ * @access Private
+ */
+async function getPatients(req: Request, res: Response) {
+  const params = {
+    query: req.query.query || {},
+    queryArray: req.query.queryArray,
+    queryArrayType: req.query.queryArrayType,
+    populateArray: req.query.populateArray || [],
+    sort: req.query.sort,
+    limit: req.query.limit,
+    select: req.query.select,
+    lean: req.query.lean,
+  };
+
+  try {
+    const patients = await patientService.getPatients(params);
+    res.status(200).send(patients);
   } catch (error) {
     if (error instanceof Error) {
       res.status(400).send({ error: error.message });
@@ -83,7 +83,7 @@ async function getById(req: Request, res: Response) {
  * @route  POST /api/patient/create
  * @access Private
  */
-async function create(req: Request, res: Response) {
+async function createPatient(req: Request, res: Response) {
   await Promise.all([
     body(config.VALIDATION.PATIENT.BODY.PATIENT_FIRSTNAME)
       .notEmpty()
@@ -105,7 +105,7 @@ async function create(req: Request, res: Response) {
   }
 
   try {
-    const newPatient = await patientService.create(req.body);
+    const newPatient = await patientService.createPatient(req.body);
     (req as any).io.emit("patientCreated", newPatient);
     res.status(200).send(newPatient);
   } catch (error) {
@@ -122,9 +122,9 @@ async function create(req: Request, res: Response) {
  * @route  PUT /api/patient/update
  * @access Private
  */
-async function update(req: Request, res: Response) {
+async function updatePatient(req: Request, res: Response) {
   try {
-    const updatedPatient = await patientService.update(req.body);
+    const updatedPatient = await patientService.updatePatient(req.body);
     (req as any).io.emit("patientUpdated", updatedPatient);
     res.status(200).send(updatedPatient);
   } catch (error) {
@@ -141,7 +141,7 @@ async function update(req: Request, res: Response) {
  * @route  DELETE /api/patient/remove/:id
  * @access Private
  */
-async function remove(req: Request, res: Response) {
+async function removePatient(req: Request, res: Response) {
   await param(config.VALIDATION.PATIENT.PARAMS.ID)
     .isMongoId()
     .withMessage(config.VALIDATION.PATIENT.PARAMS.INVALID_ID)
@@ -153,7 +153,7 @@ async function remove(req: Request, res: Response) {
   }
 
   try {
-    const removedPatient = await patientService.remove(req.params.id);
+    const removedPatient = await patientService.removePatient(req.params.id);
     res.status(200).send(removedPatient);
   } catch (error) {
     if (error instanceof Error) {
@@ -165,13 +165,13 @@ async function remove(req: Request, res: Response) {
 }
 
 /*
- * @desc   remove patient
- * @route  DELETE /api/patient/search
+ * @desc   search patient
+ * @route  POST /api/patient/search
  * @access Private
  */
-async function search(req: Request, res: Response) {
+async function searchPatient(req: Request, res: Response) {
   try {
-    const searchedPatient = await patientService.search(req.body);
+    const searchedPatient = await patientService.searchPatient(req.body);
     res.status(200).send(searchedPatient);
   } catch (error) {
     if (error instanceof Error) {

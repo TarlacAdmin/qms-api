@@ -6,19 +6,20 @@ import { generateToken, sendResponseCookie } from "../utils/token";
 import bcrypt from "bcrypt";
 import validator from "validator";
 import { CustomRequest } from "../types/types";
+import { UserModel } from "../models/userModel";
 
 const saltFactor = 10;
 
 const userService = {
-  createUser,
+  getUsers,
   getUser,
+  createUser,
   updateUser,
   deleteUser,
-  getUsers,
   loginUser,
-  currentUser,
   logoutUser,
-  search,
+  currentUser,
+  searchUser,
 };
 
 export default userService;
@@ -126,7 +127,7 @@ async function createUser(req: Request, res: Response, next: NextFunction): Prom
       status,
     } = trimmedBody;
 
-    const userAvailable = await userRepository.findByEmail(email);
+    const userAvailable = await userRepository.searchAndUpdate({ email });
     if (userAvailable) {
       return res.status(400).json({ message: config.ERROR.USER.ALREADY_EXIST });
     }
@@ -230,10 +231,13 @@ async function loginUser(req: Request, res: Response, next: NextFunction): Promi
   try {
     const { email, password } = trimmedBody;
 
-    const user = await userRepository.findByEmail(email);
-    if (!user) {
+    const userResult = await userRepository.searchAndUpdate({ email });
+    if (!userResult) {
       return res.status(400).json({ message: config.ERROR.USER.NO_ACCOUNT });
     }
+
+    const user = userResult as UserModel;
+
     if (!(await bcrypt.compare(password, user.password))) {
       return res.status(400).json({ message: config.ERROR.USER.INVALID_CREDENTIALS });
     }
@@ -253,27 +257,7 @@ async function loginUser(req: Request, res: Response, next: NextFunction): Promi
     const token = generateToken(user);
     sendResponseCookie(res, token);
 
-    return res.status(200).json({ user: userResponse, token });
-  } catch (error) {
-    if (error instanceof Error) {
-      return res.status(500).json({ message: error.message });
-    } else {
-      return res.status(500).json({ message: "Unknown error" });
-    }
-  }
-}
-
-async function currentUser(
-  req: CustomRequest,
-  res: Response,
-  next: NextFunction
-): Promise<Response> {
-  try {
-    if (!req.user) {
-      return res.status(401).json({ message: config.ERROR.USER.NOT_AUTHORIZED });
-    }
-    const { password, ...userWithoutPassword } = req.user;
-    return res.status(200).json({ user: userWithoutPassword, token: (req as any).token });
+    return { user: userResponse, token };
   } catch (error) {
     if (error instanceof Error) {
       return res.status(500).json({ message: error.message });
@@ -303,10 +287,30 @@ async function logoutUser(req: CustomRequest, res: Response, next: NextFunction)
   }
 }
 
-async function search(req: Request, res: Response, next: NextFunction): Promise<Response> {
+async function currentUser(
+  req: CustomRequest,
+  res: Response,
+  next: NextFunction
+): Promise<Response> {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ message: config.ERROR.USER.NOT_AUTHORIZED });
+    }
+    const { password, ...userWithoutPassword } = req.user;
+    return res.status(200).json({ user: userWithoutPassword, token: (req as any).token });
+  } catch (error) {
+    if (error instanceof Error) {
+      return res.status(500).json({ message: error.message });
+    } else {
+      return res.status(500).json({ message: "Unknown error" });
+    }
+  }
+}
+
+async function searchUser(req: Request, res: Response, next: NextFunction): Promise<Response> {
   try {
     const query = req.query.search as string;
-    const users = await userRepository.search(query);
+    const users = await userRepository.searchUser(query);
     return res.status(200).json(users);
   } catch (error) {
     if (error instanceof Error) {

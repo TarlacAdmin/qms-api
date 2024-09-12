@@ -3,17 +3,17 @@ import { DiagnosisModel } from "../models/diagnosisModel";
 import diagnosisRepository from "../repository/diagnosisRepository";
 
 const diagnosisService = {
-  getById,
-  getAllDiagnosis,
-  create,
-  update,
-  remove,
-  search,
+  getDiagnosis,
+  getDiagnoses,
+  createDiagnosis,
+  updateDiagnosis,
+  removeDiagnosis,
+  searchDiagnosis,
 };
 
 export default diagnosisService;
 
-async function getById(id: string, params: any): Promise<DiagnosisModel | null> {
+async function getDiagnosis(id: string, params: any): Promise<DiagnosisModel | null> {
   if (!id) {
     throw new Error(config.RESPONSE.ERROR.DIAGNOSIS.INVALID_PARAMETER.GET);
   }
@@ -35,7 +35,7 @@ async function getById(id: string, params: any): Promise<DiagnosisModel | null> 
       dbParams.options.lean = params.lean;
     }
 
-    return await diagnosisRepository.getById(id, dbParams);
+    return await diagnosisRepository.getDiagnosis(id, dbParams);
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);
@@ -45,7 +45,7 @@ async function getById(id: string, params: any): Promise<DiagnosisModel | null> 
   }
 }
 
-async function getAllDiagnosis(params: any): Promise<DiagnosisModel[]> {
+async function getDiagnoses(params: any): Promise<DiagnosisModel[]> {
   if (!params) {
     throw new Error(config.RESPONSE.ERROR.DIAGNOSIS.INVALID_PARAMETER.GET_ALL);
   }
@@ -79,7 +79,7 @@ async function getAllDiagnosis(params: any): Promise<DiagnosisModel[]> {
       dbParams.options.lean = params.lean;
     }
 
-    return await diagnosisRepository.getAllDiagnosis(dbParams);
+    return await diagnosisRepository.getDiagnoses(dbParams);
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);
@@ -89,13 +89,13 @@ async function getAllDiagnosis(params: any): Promise<DiagnosisModel[]> {
   }
 }
 
-async function create(data: Partial<DiagnosisModel>): Promise<DiagnosisModel> {
+async function createDiagnosis(data: Partial<DiagnosisModel>): Promise<DiagnosisModel> {
   if (!data) {
     throw new Error(config.RESPONSE.ERROR.DIAGNOSIS.INVALID_PARAMETER.CREATE);
   }
 
   try {
-    return await diagnosisRepository.create(data);
+    return await diagnosisRepository.createDiagnosis(data);
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);
@@ -105,13 +105,13 @@ async function create(data: Partial<DiagnosisModel>): Promise<DiagnosisModel> {
   }
 }
 
-async function update(data: Partial<DiagnosisModel>): Promise<DiagnosisModel | null> {
+async function updateDiagnosis(data: Partial<DiagnosisModel>): Promise<DiagnosisModel | null> {
   if (!data) {
     throw new Error(config.RESPONSE.ERROR.DIAGNOSIS.INVALID_PARAMETER.UPDATE);
   }
 
   try {
-    return await diagnosisRepository.update(data);
+    return await diagnosisRepository.updateDiagnosis(data);
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);
@@ -121,13 +121,13 @@ async function update(data: Partial<DiagnosisModel>): Promise<DiagnosisModel | n
   }
 }
 
-async function remove(id: string): Promise<DiagnosisModel | null> {
+async function removeDiagnosis(id: string): Promise<DiagnosisModel | null> {
   if (!id) {
     throw new Error(config.RESPONSE.ERROR.DIAGNOSIS.INVALID_PARAMETER.REMOVE);
   }
 
   try {
-    return await diagnosisRepository.remove(id);
+    return await diagnosisRepository.removeDiagnosis(id);
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);
@@ -137,7 +137,7 @@ async function remove(id: string): Promise<DiagnosisModel | null> {
   }
 }
 
-async function search(params: any): Promise<DiagnosisModel[] | null> {
+async function searchDiagnosis(params: any): Promise<DiagnosisModel[] | null> {
   try {
     let dbParams = {
       query: {},
@@ -172,7 +172,7 @@ async function search(params: any): Promise<DiagnosisModel[] | null> {
 
     dbParams.lean = params.lean || true;
 
-    return await diagnosisRepository.search(dbParams);
+    return await diagnosisRepository.searchDiagnosis(dbParams);
   } catch (error) {
     console.error(error);
     throw error;

@@ -23,9 +23,7 @@ const appointmentRepository = {
   create,
   update,
   remove,
-  findById,
   search,
-  findByDate,
   addDoctorToAppointment,
 };
 
@@ -70,22 +68,6 @@ async function getAllAppointments(dbParams: DbParams = {}): Promise<AppointmentM
     query = query.sort(options.sort).limit(options.limit).select(options.select).lean(options.lean);
 
     return query.exec();
-  } catch (error) {
-    throw error;
-  }
-}
-
-async function findById(id: string | ObjectId): Promise<AppointmentModel | null> {
-  try {
-    return await Appointment.findById(id).lean();
-  } catch (error) {
-    throw error;
-  }
-}
-
-async function findByDate(date: Date): Promise<AppointmentModel | null> {
-  try {
-    return await Appointment.findOne({ date }).lean();
   } catch (error) {
     throw error;
   }
