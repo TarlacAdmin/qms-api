@@ -87,6 +87,7 @@ export const config = {
     MONGODB_NOT_DEFINE: "MONGODB_URI is not defined in the environment variables.",
     CONNECTION_FAILED: "Database connection failed:",
     UNEXPECTED: "An unexpected error occurred. Please try again later.",
+    RATELIMIT: "Too many requests from this IP, please try again after 15 minutes",
 
     USER: {
       NOT_AUTHORIZED: "User is not authorized",

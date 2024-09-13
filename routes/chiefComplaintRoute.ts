@@ -6,50 +6,21 @@ import { config } from "../config/config";
 
 const router = express.Router();
 
-router.get(API_ENDPOINTS.CHIEFCOMPLAINT.GET_ALL, getAllChiefComplaint);
-router.get(API_ENDPOINTS.CHIEFCOMPLAINT.GET_BY_ID, getById);
-router.post(API_ENDPOINTS.CHIEFCOMPLAINT.CREATE, create);
-router.post(API_ENDPOINTS.CHIEFCOMPLAINT.SEARCH, search);
-router.put(API_ENDPOINTS.CHIEFCOMPLAINT.UPDATE, update);
-router.delete(API_ENDPOINTS.CHIEFCOMPLAINT.REMOVE_BY_ID, remove);
+router.get(API_ENDPOINTS.CHIEFCOMPLAINT.GET_BY_ID, getChiefComplaint);
+router.get(API_ENDPOINTS.CHIEFCOMPLAINT.GET_ALL, getChiefComplaints);
+router.post(API_ENDPOINTS.CHIEFCOMPLAINT.CREATE, createChiefComplaint);
+router.put(API_ENDPOINTS.CHIEFCOMPLAINT.UPDATE, updateChiefComplaint);
+router.delete(API_ENDPOINTS.CHIEFCOMPLAINT.REMOVE_BY_ID, removeChiefComplaint);
+router.post(API_ENDPOINTS.CHIEFCOMPLAINT.SEARCH, searchChiefComplaint);
 
 export default router;
-
-/*
- * @desc   get all chiefcomplaint
- * @route  GET /api/chiefcomplaint/get/all
- * @access Private
- */
-async function getAllChiefComplaint(req: Request, res: Response) {
-  const params = {
-    query: req.query.query || {},
-    queryArray: req.query.queryArray,
-    queryArrayType: req.query.queryArrayType,
-    populateArray: req.query.populateArray || [],
-    sort: req.query.sort,
-    limit: req.query.limit,
-    select: req.query.select,
-    lean: req.query.lean,
-  };
-
-  try {
-    const chiefcomplaint = await chiefComplaintService.getAllChiefComplaint(params);
-    res.status(200).send(chiefcomplaint);
-  } catch (error) {
-    if (error instanceof Error) {
-      res.status(400).send({ error: error.message });
-    } else {
-      res.status(400).send({ error: "An unknown error occurred" });
-    }
-  }
-}
 
 /*
  * @desc   get chiefcomplaint by id
  * @route  GET /api/chiefcomplaint/get/:id
  * @access Private
  */
-async function getById(req: Request, res: Response) {
+async function getChiefComplaint(req: Request, res: Response) {
   await param(config.VALIDATION.CHIEFCOMPLAINT.PARAMS.ID)
     .isMongoId()
     .withMessage(config.VALIDATION.CHIEFCOMPLAINT.PARAMS.INVALID_ID)
@@ -67,7 +38,36 @@ async function getById(req: Request, res: Response) {
   };
 
   try {
-    const chiefcomplaint = await chiefComplaintService.getById(req.params.id, params);
+    const chiefcomplaint = await chiefComplaintService.getChiefComplaint(req.params.id, params);
+    res.status(200).send(chiefcomplaint);
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(400).send({ error: error.message });
+    } else {
+      res.status(400).send({ error: "An unknown error occurred" });
+    }
+  }
+}
+
+/*
+ * @desc   get all chiefcomplaint
+ * @route  GET /api/chiefcomplaint/get/all
+ * @access Private
+ */
+async function getChiefComplaints(req: Request, res: Response) {
+  const params = {
+    query: req.query.query || {},
+    queryArray: req.query.queryArray,
+    queryArrayType: req.query.queryArrayType,
+    populateArray: req.query.populateArray || [],
+    sort: req.query.sort,
+    limit: req.query.limit,
+    select: req.query.select,
+    lean: req.query.lean,
+  };
+
+  try {
+    const chiefcomplaint = await chiefComplaintService.getChiefComplaints(params);
     res.status(200).send(chiefcomplaint);
   } catch (error) {
     if (error instanceof Error) {
@@ -83,7 +83,7 @@ async function getById(req: Request, res: Response) {
  * @route  POST /api/chiefcomplaint/create
  * @access Private
  */
-async function create(req: Request, res: Response) {
+async function createChiefComplaint(req: Request, res: Response) {
   await Promise.all([
     body(config.VALIDATION.CHIEFCOMPLAINT.BODY.CHIEFCOMPLAINT_TEXT)
       .notEmpty()
@@ -113,7 +113,7 @@ async function create(req: Request, res: Response) {
   }
 
   try {
-    const newChiefComplaint = await chiefComplaintService.create(req.body);
+    const newChiefComplaint = await chiefComplaintService.createChiefComplaint(req.body);
     res.status(200).send(newChiefComplaint);
   } catch (error) {
     if (error instanceof Error) {
@@ -129,7 +129,7 @@ async function create(req: Request, res: Response) {
  * @route  PUT /api/chiefcomplaint/update
  * @access Private
  */
-async function update(req: Request, res: Response) {
+async function updateChiefComplaint(req: Request, res: Response) {
   await Promise.all([
     body(config.VALIDATION.CHIEFCOMPLAINT.BODY.CHIEFCOMPLAINT_TEXT)
       .notEmpty()
@@ -159,7 +159,7 @@ async function update(req: Request, res: Response) {
   }
 
   try {
-    const updatedChiefComplaint = await chiefComplaintService.update(req.body);
+    const updatedChiefComplaint = await chiefComplaintService.updateChiefComplaint(req.body);
     res.status(200).send(updatedChiefComplaint);
   } catch (error) {
     if (error instanceof Error) {
@@ -175,7 +175,7 @@ async function update(req: Request, res: Response) {
  * @route  DELETE /api/chiefcomplaint/remove/:id
  * @access Private
  */
-async function remove(req: Request, res: Response) {
+async function removeChiefComplaint(req: Request, res: Response) {
   await param(config.VALIDATION.CHIEFCOMPLAINT.PARAMS.ID)
     .isMongoId()
     .withMessage(config.VALIDATION.CHIEFCOMPLAINT.PARAMS.INVALID_ID)
@@ -187,7 +187,7 @@ async function remove(req: Request, res: Response) {
   }
 
   try {
-    const removedChiefComplaint = await chiefComplaintService.remove(req.params.id);
+    const removedChiefComplaint = await chiefComplaintService.removeChiefComplaint(req.params.id);
     res.status(200).send(removedChiefComplaint);
   } catch (error) {
     if (error instanceof Error) {
@@ -203,9 +203,9 @@ async function remove(req: Request, res: Response) {
  * @route  POST /api/chiefcomplaint/search
  * @access Private
  */
-async function search(req: Request, res: Response) {
+async function searchChiefComplaint(req: Request, res: Response) {
   try {
-    const searchedChiefComplaint = await chiefComplaintService.search(req.body);
+    const searchedChiefComplaint = await chiefComplaintService.searchChiefComplaint(req.body);
     res.status(200).send(searchedChiefComplaint);
   } catch (error) {
     if (error instanceof Error) {

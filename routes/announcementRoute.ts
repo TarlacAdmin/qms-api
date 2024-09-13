@@ -6,50 +6,21 @@ import { config } from "../config/config";
 
 const router = express.Router();
 
-router.get(API_ENDPOINTS.ANNOUNCEMENT.GET_ALL, getAllAnnouncement);
-router.get(API_ENDPOINTS.ANNOUNCEMENT.GET_BY_ID, getById);
-router.post(API_ENDPOINTS.ANNOUNCEMENT.CREATE, create);
-router.post(API_ENDPOINTS.ANNOUNCEMENT.SEARCH, search);
-router.put(API_ENDPOINTS.ANNOUNCEMENT.UPDATE, update);
-router.delete(API_ENDPOINTS.ANNOUNCEMENT.REMOVE_BY_ID, remove);
+router.get(API_ENDPOINTS.ANNOUNCEMENT.GET_BY_ID, getAnnouncement);
+router.get(API_ENDPOINTS.ANNOUNCEMENT.GET_ALL, getAnnouncements);
+router.post(API_ENDPOINTS.ANNOUNCEMENT.CREATE, createAnnouncement);
+router.put(API_ENDPOINTS.ANNOUNCEMENT.UPDATE, updateAnnouncement);
+router.delete(API_ENDPOINTS.ANNOUNCEMENT.REMOVE_BY_ID, removeAnnouncement);
+router.post(API_ENDPOINTS.ANNOUNCEMENT.SEARCH, searchAnnouncement);
 
 export default router;
-
-/*
- * @desc   get all announcement
- * @route  GET /api/announcement/get/all
- * @access Private
- */
-async function getAllAnnouncement(req: Request, res: Response) {
-  const params = {
-    query: req.query.query || {},
-    queryArray: req.query.queryArray,
-    queryArrayType: req.query.queryArrayType,
-    populateArray: req.query.populateArray || [],
-    sort: req.query.sort,
-    limit: req.query.limit,
-    select: req.query.select,
-    lean: req.query.lean,
-  };
-
-  try {
-    const announcements = await announcementService.getAllAnnouncement(params);
-    res.status(200).send(announcements);
-  } catch (error) {
-    if (error instanceof Error) {
-      res.status(400).send({ error: error.message });
-    } else {
-      res.status(400).send({ error: "An unknown error occurred" });
-    }
-  }
-}
 
 /*
  * @desc   get announcement by id
  * @route  GET /api/announcement/get/:id
  * @access Private
  */
-async function getById(req: Request, res: Response) {
+async function getAnnouncement(req: Request, res: Response) {
   await param(config.VALIDATION.ANNOUNCEMENT.PARAMS.ID)
     .isMongoId()
     .withMessage(config.VALIDATION.ANNOUNCEMENT.PARAMS.INVALID_ID)
@@ -67,7 +38,36 @@ async function getById(req: Request, res: Response) {
   };
 
   try {
-    const announcements = await announcementService.getById(req.params.id, params);
+    const announcements = await announcementService.getAnnouncement(req.params.id, params);
+    res.status(200).send(announcements);
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(400).send({ error: error.message });
+    } else {
+      res.status(400).send({ error: "An unknown error occurred" });
+    }
+  }
+}
+
+/*
+ * @desc   get all announcement
+ * @route  GET /api/announcement/get/all
+ * @access Private
+ */
+async function getAnnouncements(req: Request, res: Response) {
+  const params = {
+    query: req.query.query || {},
+    queryArray: req.query.queryArray,
+    queryArrayType: req.query.queryArrayType,
+    populateArray: req.query.populateArray || [],
+    sort: req.query.sort,
+    limit: req.query.limit,
+    select: req.query.select,
+    lean: req.query.lean,
+  };
+
+  try {
+    const announcements = await announcementService.getAnnouncements(params);
     res.status(200).send(announcements);
   } catch (error) {
     if (error instanceof Error) {
@@ -83,7 +83,7 @@ async function getById(req: Request, res: Response) {
  * @route  POST /api/announcement/create
  * @access Private
  */
-async function create(req: Request, res: Response) {
+async function createAnnouncement(req: Request, res: Response) {
   await Promise.all([
     body(config.VALIDATION.ANNOUNCEMENT.BODY.ANNOUNCEMENT_HEADLINE)
       .notEmpty()
@@ -97,7 +97,7 @@ async function create(req: Request, res: Response) {
   }
 
   try {
-    const newAnnouncement = await announcementService.create(req.body);
+    const newAnnouncement = await announcementService.createAnnouncement(req.body);
     (req as any).io.emit("announcementCreated", newAnnouncement);
     res.status(200).send(newAnnouncement);
   } catch (error) {
@@ -114,7 +114,7 @@ async function create(req: Request, res: Response) {
  * @route  PUT /api/announcement/update
  * @access Private
  */
-async function update(req: Request, res: Response) {
+async function updateAnnouncement(req: Request, res: Response) {
   await Promise.all([
     body(config.VALIDATION.ANNOUNCEMENT.BODY.ANNOUNCEMENT_HEADLINE)
       .notEmpty()
@@ -128,7 +128,7 @@ async function update(req: Request, res: Response) {
   }
 
   try {
-    const updatedAnnouncement = await announcementService.update(req.body);
+    const updatedAnnouncement = await announcementService.updateAnnouncement(req.body);
     (req as any).io.emit("announcementUpdated", updatedAnnouncement);
     res.status(200).send(updatedAnnouncement);
   } catch (error) {
@@ -145,7 +145,7 @@ async function update(req: Request, res: Response) {
  * @route  DELETE /api/announcement/remove/:id
  * @access Private
  */
-async function remove(req: Request, res: Response) {
+async function removeAnnouncement(req: Request, res: Response) {
   await param(config.VALIDATION.ANNOUNCEMENT.PARAMS.ID)
     .isMongoId()
     .withMessage(config.VALIDATION.ANNOUNCEMENT.PARAMS.INVALID_ID)
@@ -157,7 +157,7 @@ async function remove(req: Request, res: Response) {
   }
 
   try {
-    const removedAnnouncement = await announcementService.remove(req.params.id);
+    const removedAnnouncement = await announcementService.removeAnnouncement(req.params.id);
     res.status(200).send(removedAnnouncement);
   } catch (error) {
     if (error instanceof Error) {
@@ -173,9 +173,9 @@ async function remove(req: Request, res: Response) {
  * @route  DELETE /api/announcement/search
  * @access Private
  */
-async function search(req: Request, res: Response) {
+async function searchAnnouncement(req: Request, res: Response) {
   try {
-    const searchedAnnouncement = await announcementService.search(req.body);
+    const searchedAnnouncement = await announcementService.searchAnnouncement(req.body);
     res.status(200).send(searchedAnnouncement);
   } catch (error) {
     if (error instanceof Error) {

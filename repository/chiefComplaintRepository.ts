@@ -12,98 +12,81 @@ interface DbParams {
 }
 
 const chiefComplaintRepository = {
-  getById,
-  getAllChiefComplaint,
-  create,
-  update,
-  remove,
-  search,
+  getChiefComplaint,
+  getChiefComplaints,
+  createChiefComplaint,
+  updateChiefComplaint,
+  removeChiefComplaint,
+  searchChiefComplaint,
 };
 
 export default chiefComplaintRepository;
 
-async function getById(id: string, dbParams: DbParams = {}): Promise<ChiefComplaintModel | null> {
-  try {
-    let query = ChiefComplaint.findById(id);
+async function getChiefComplaint(
+  id: string,
+  dbParams: DbParams = {}
+): Promise<ChiefComplaintModel | null> {
+  let query = ChiefComplaint.findById(id);
 
-    (dbParams.options?.populateArray || []).forEach((populateOption) => {
-      query = query.populate(populateOption);
-    });
+  (dbParams.options?.populateArray || []).forEach((populateOption) => {
+    query = query.populate(populateOption);
+  });
 
-    const options = {
-      select: dbParams.options?.select || "_id",
-      lean: dbParams.options?.lean || true,
-    };
+  const options = {
+    select: dbParams.options?.select || "_id",
+    lean: dbParams.options?.lean || true,
+  };
 
-    query = query.select(options.select).lean(options.lean);
+  query = query.select(options.select).lean(options.lean);
 
-    return query.exec();
-  } catch (error) {
-    throw error;
-  }
+  return query.exec();
 }
 
-async function getAllChiefComplaint(dbParams: DbParams = {}): Promise<ChiefComplaintModel[]> {
-  try {
-    let query = ChiefComplaint.find(dbParams.query);
+async function getChiefComplaints(dbParams: DbParams = {}): Promise<ChiefComplaintModel[]> {
+  let query = ChiefComplaint.find(dbParams.query);
 
-    (dbParams.options?.populateArray || []).forEach((populateOption) => {
-      query = query.populate(populateOption);
-    });
+  (dbParams.options?.populateArray || []).forEach((populateOption) => {
+    query = query.populate(populateOption);
+  });
 
-    const options = {
-      sort: dbParams.options?.sort || {},
-      limit: dbParams.options?.limit || 10,
-      select: dbParams.options?.select || "_id",
-      lean: dbParams.options?.lean || true,
-    };
+  const options = {
+    sort: dbParams.options?.sort || {},
+    limit: dbParams.options?.limit || 10,
+    select: dbParams.options?.select || "_id",
+    lean: dbParams.options?.lean || true,
+  };
 
-    query = query.sort(options.sort).limit(options.limit).select(options.select).lean(options.lean);
+  query = query.sort(options.sort).limit(options.limit).select(options.select).lean(options.lean);
 
-    return query.exec();
-  } catch (error) {
-    throw error;
-  }
+  return query.exec();
 }
 
-async function create(data: Partial<ChiefComplaintModel>): Promise<ChiefComplaintModel> {
-  try {
-    return await ChiefComplaint.create(data);
-  } catch (error) {
-    throw error;
-  }
+async function createChiefComplaint(
+  data: Partial<ChiefComplaintModel>
+): Promise<ChiefComplaintModel> {
+  return await ChiefComplaint.create(data);
 }
 
-async function update(data: Partial<ChiefComplaintModel>): Promise<ChiefComplaintModel | null> {
-  try {
-    return await ChiefComplaint.findByIdAndUpdate(data._id, data, { new: true }).lean();
-  } catch (error) {
-    throw error;
-  }
+async function updateChiefComplaint(
+  data: Partial<ChiefComplaintModel>
+): Promise<ChiefComplaintModel | null> {
+  return await ChiefComplaint.findByIdAndUpdate(data._id, data, { new: true }).lean();
 }
 
-async function remove(id: string): Promise<ChiefComplaintModel | null> {
-  try {
-    return await ChiefComplaint.findByIdAndDelete(id).lean();
-  } catch (error) {
-    throw error;
-  }
+async function removeChiefComplaint(id: string): Promise<ChiefComplaintModel | null> {
+  return await ChiefComplaint.findByIdAndDelete(id).lean();
 }
 
-async function search(params: any = {}): Promise<ChiefComplaintModel[]> {
-  try {
-    let query = ChiefComplaint.find();
-    query.setQuery(params.query);
-    query.populate(params.populateArray);
-    query.projection(params.projection);
-    query.setOptions(params.options);
-    query.lean(params.lean);
+async function searchChiefComplaint(params: any = {}): Promise<ChiefComplaintModel[]> {
+  let query = ChiefComplaint.find();
+  query.setQuery(params.query);
+  query.populate(params.populateArray);
+  query.projection(params.projection);
+  query.setOptions(params.options);
+  query.lean(params.lean);
 
-    if (params.match) {
-      query.where(params.match);
-    }
-    return query.exec();
-  } catch (error) {
-    throw error;
+  if (params.match) {
+    query.where(params.match);
   }
+  return query.exec();
 }

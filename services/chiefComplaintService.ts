@@ -3,17 +3,17 @@ import { ChiefComplaintModel } from "../models/chiefComplaintModel";
 import chiefComplaintRepository from "../repository/chiefComplaintRepository";
 
 const chiefComplaintService = {
-  getById,
-  getAllChiefComplaint,
-  create,
-  update,
-  remove,
-  search,
+  getChiefComplaint,
+  getChiefComplaints,
+  createChiefComplaint,
+  updateChiefComplaint,
+  removeChiefComplaint,
+  searchChiefComplaint,
 };
 
 export default chiefComplaintService;
 
-async function getById(id: string, params: any): Promise<ChiefComplaintModel | null> {
+async function getChiefComplaint(id: string, params: any): Promise<ChiefComplaintModel | null> {
   if (!id) {
     throw new Error(config.RESPONSE.ERROR.CHIEFCOMPLAINT.INVALID_PARAMETER.GET);
   }
@@ -35,7 +35,7 @@ async function getById(id: string, params: any): Promise<ChiefComplaintModel | n
       dbParams.options.lean = params.lean;
     }
 
-    return await chiefComplaintRepository.getById(id, dbParams);
+    return await chiefComplaintRepository.getChiefComplaint(id, dbParams);
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);
@@ -45,7 +45,7 @@ async function getById(id: string, params: any): Promise<ChiefComplaintModel | n
   }
 }
 
-async function getAllChiefComplaint(params: any): Promise<ChiefComplaintModel[]> {
+async function getChiefComplaints(params: any): Promise<ChiefComplaintModel[]> {
   if (!params) {
     throw new Error(config.RESPONSE.ERROR.CHIEFCOMPLAINT.INVALID_PARAMETER.GET_ALL);
   }
@@ -79,7 +79,7 @@ async function getAllChiefComplaint(params: any): Promise<ChiefComplaintModel[]>
       dbParams.options.lean = params.lean;
     }
 
-    return await chiefComplaintRepository.getAllChiefComplaint(dbParams);
+    return await chiefComplaintRepository.getChiefComplaints(dbParams);
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);
@@ -89,13 +89,15 @@ async function getAllChiefComplaint(params: any): Promise<ChiefComplaintModel[]>
   }
 }
 
-async function create(data: Partial<ChiefComplaintModel>): Promise<ChiefComplaintModel> {
+async function createChiefComplaint(
+  data: Partial<ChiefComplaintModel>
+): Promise<ChiefComplaintModel> {
   if (!data) {
     throw new Error(config.RESPONSE.ERROR.CHIEFCOMPLAINT.INVALID_PARAMETER.CREATE);
   }
 
   try {
-    return await chiefComplaintRepository.create(data);
+    return await chiefComplaintRepository.createChiefComplaint(data);
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);
@@ -105,13 +107,15 @@ async function create(data: Partial<ChiefComplaintModel>): Promise<ChiefComplain
   }
 }
 
-async function update(data: Partial<ChiefComplaintModel>): Promise<ChiefComplaintModel | null> {
+async function updateChiefComplaint(
+  data: Partial<ChiefComplaintModel>
+): Promise<ChiefComplaintModel | null> {
   if (!data) {
     throw new Error(config.RESPONSE.ERROR.CHIEFCOMPLAINT.INVALID_PARAMETER.UPDATE);
   }
 
   try {
-    return await chiefComplaintRepository.update(data);
+    return await chiefComplaintRepository.updateChiefComplaint(data);
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);
@@ -121,13 +125,13 @@ async function update(data: Partial<ChiefComplaintModel>): Promise<ChiefComplain
   }
 }
 
-async function remove(id: string): Promise<ChiefComplaintModel | null> {
+async function removeChiefComplaint(id: string): Promise<ChiefComplaintModel | null> {
   if (!id) {
     throw new Error(config.RESPONSE.ERROR.CHIEFCOMPLAINT.INVALID_PARAMETER.REMOVE);
   }
 
   try {
-    return await chiefComplaintRepository.remove(id);
+    return await chiefComplaintRepository.removeChiefComplaint(id);
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);
@@ -137,7 +141,7 @@ async function remove(id: string): Promise<ChiefComplaintModel | null> {
   }
 }
 
-async function search(params: any): Promise<ChiefComplaintModel[] | null> {
+async function searchChiefComplaint(params: any): Promise<ChiefComplaintModel[] | null> {
   try {
     let dbParams = {
       query: {},
@@ -172,7 +176,7 @@ async function search(params: any): Promise<ChiefComplaintModel[] | null> {
 
     dbParams.lean = params.lean || true;
 
-    return await chiefComplaintRepository.search(dbParams);
+    return await chiefComplaintRepository.searchChiefComplaint(dbParams);
   } catch (error) {
     console.error(error);
     throw error;
