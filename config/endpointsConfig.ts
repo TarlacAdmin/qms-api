@@ -83,22 +83,4 @@ export const API_ENDPOINTS = {
     SEARCH: "/video/search",
     REMOVE_BY_ID: "/video/remove/:id",
   },
-
-  CHIEFCOMPLAINT: {
-    GET_ALL: "/chiefcomplaint/get/all",
-    GET_BY_ID: "/chiefcomplaint/get/:id",
-    CREATE: "/chiefcomplaint/create",
-    UPDATE: "/chiefcomplaint/update",
-    SEARCH: "/chiefcomplaint/search",
-    REMOVE_BY_ID: "/chiefcomplaint/remove/:id",
-  },
-
-  DIAGNOSIS: {
-    GET_ALL: "/diagnosis/get/all",
-    GET_BY_ID: "/diagnosis/get/:id",
-    CREATE: "/diagnosis/create",
-    UPDATE: "/diagnosis/update",
-    SEARCH: "/diagnosis/search",
-    REMOVE_BY_ID: "/diagnosis/remove/:id",
-  },
 };
