@@ -138,13 +138,18 @@ export const config = {
     PATIENT: {
       ERROR: {
         REQUIRED_PATIENT: "Fill all required patient fields",
+        REQUIRED_CHIEF_COMPLAINT: "Fill all required chief complaint fields",
+        REQUIRED_DIAGNOSIS: "Fill all required diagnosis fields",
         INVALID_ID: "Invalid Patient ID",
       },
 
       BODY: {
-        PATIENT_FIRSTNAME: "firstname",
-        PATIENT_LASTNAME: "lastname",
-        PATIENT_MIDDLENAME: "middlename",
+        PATIENT_FIRSTNAME: "firstName",
+        PATIENT_LASTNAME: "lastName",
+        PATIENT_MIDDLENAME: "middleName",
+        PATIENT_CHIEF_COMPLAINT: "chiefComplaint",
+        PATIENT_DIAGNOSIS: "diagnosis",
+        PATIENT_ID: "patientId",
         ID: "_id",
       },
 
@@ -322,6 +327,7 @@ export const config = {
           ID: "patientService.update params._id is missing!",
           REMOVE: "patientService.remove params is missing!",
           SEARCH: "patientService.search params is missing!",
+          ADD_TO_SET: "patientService.addToSetChiefComplaint params is missing!",
         },
       },
       DOCTOR: {

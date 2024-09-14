@@ -6,14 +6,43 @@ import { config } from "../config/config";
 
 const router = express.Router();
 
-router.get(API_ENDPOINTS.SPECIALDATE.GET_BY_ID, getSpecialDate);
 router.get(API_ENDPOINTS.SPECIALDATE.GET_ALL, getSpecialDates);
+router.get(API_ENDPOINTS.SPECIALDATE.GET_BY_ID, getSpecialDate);
 router.post(API_ENDPOINTS.SPECIALDATE.CREATE, createSpecialDate);
 router.put(API_ENDPOINTS.SPECIALDATE.UPDATE, updateSpecialDate);
 router.delete(API_ENDPOINTS.SPECIALDATE.REMOVE_BY_ID, removeSpecialDate);
 router.post(API_ENDPOINTS.SPECIALDATE.SEARCH, searchSpecialDate);
 
 export default router;
+
+/*
+ * @desc   get all specialdate
+ * @route  GET /api/specialdate/get/all
+ * @access Private
+ */
+async function getSpecialDates(req: Request, res: Response) {
+  const params = {
+    query: req.query.query || {},
+    queryArray: req.query.queryArray,
+    queryArrayType: req.query.queryArrayType,
+    populateArray: req.query.populateArray || [],
+    sort: req.query.sort,
+    limit: req.query.limit,
+    select: req.query.select,
+    lean: req.query.lean,
+  };
+
+  try {
+    const specialDates = await specialDatesService.getSpecialDates(params);
+    res.status(200).send(specialDates);
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(400).send({ error: error.message });
+    } else {
+      res.status(400).send({ error: "An unknown error occurred" });
+    }
+  }
+}
 
 /*
  * @desc   get specialdate by id
@@ -39,35 +68,6 @@ async function getSpecialDate(req: Request, res: Response) {
 
   try {
     const specialDates = await specialDatesService.getSpecialDate(req.params.id, params);
-    res.status(200).send(specialDates);
-  } catch (error) {
-    if (error instanceof Error) {
-      res.status(400).send({ error: error.message });
-    } else {
-      res.status(400).send({ error: "An unknown error occurred" });
-    }
-  }
-}
-
-/*
- * @desc   get all specialdate
- * @route  GET /api/specialdate/get/all
- * @access Private
- */
-async function getSpecialDates(req: Request, res: Response) {
-  const params = {
-    query: req.query.query || {},
-    queryArray: req.query.queryArray,
-    queryArrayType: req.query.queryArrayType,
-    populateArray: req.query.populateArray || [],
-    sort: req.query.sort,
-    limit: req.query.limit,
-    select: req.query.select,
-    lean: req.query.lean,
-  };
-
-  try {
-    const specialDates = await specialDatesService.getSpecialDates(params);
     res.status(200).send(specialDates);
   } catch (error) {
     if (error instanceof Error) {

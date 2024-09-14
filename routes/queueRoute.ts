@@ -6,14 +6,45 @@ import { config } from "../config/config";
 
 const router = express.Router();
 
-router.get(API_ENDPOINTS.QUEUE.GET_BY_ID, getQueue);
 router.get(API_ENDPOINTS.QUEUE.GET_ALL, getQueues);
+router.get(API_ENDPOINTS.QUEUE.GET_BY_ID, getQueue);
 router.post(API_ENDPOINTS.QUEUE.CREATE, createQueue);
 router.put(API_ENDPOINTS.QUEUE.UPDATE, updateQueue);
 router.delete(API_ENDPOINTS.QUEUE.REMOVE_BY_ID, removeQueue);
 router.post(API_ENDPOINTS.QUEUE.SEARCH, searchQueue);
 
 export default router;
+
+/*
+ * @desc   get all queues
+ * @route  GET /api/queue/get/all
+ * @access Private
+ */
+async function getQueues(req: Request, res: Response) {
+  const params = {
+    query: req.query.query || {},
+    queryArray: req.query.queryArray,
+    queryArrayType: req.query.queryArrayType,
+    populateArray: Array.isArray(req.query.populateArray)
+      ? req.query.populateArray
+      : [req.query.populateArray],
+    sort: req.query.sort,
+    limit: req.query.limit,
+    select: req.query.select,
+    lean: req.query.lean,
+  };
+
+  try {
+    const queues = await queueService.getQueues(params);
+    res.status(200).send(queues);
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(400).send({ error: error.message });
+    } else {
+      res.status(400).send({ error: "An unknown error occurred" });
+    }
+  }
+}
 
 /*
  * @desc   get queue by id
@@ -48,39 +79,6 @@ async function getQueue(req: Request, res: Response) {
     }
   }
 }
-
-/*
- * @desc   get all queues
- * @route  GET /api/queue/get/all
- * @access Private
- */
-async function getQueues(req: Request, res: Response) {
-  const params = {
-    query: req.query.query || {},
-    queryArray: req.query.queryArray,
-    queryArrayType: req.query.queryArrayType,
-    populateArray: Array.isArray(req.query.populateArray)
-      ? req.query.populateArray
-      : [req.query.populateArray],
-    sort: req.query.sort,
-    limit: req.query.limit,
-    select: req.query.select,
-    lean: req.query.lean,
-  };
-
-  try {
-    const queues = await queueService.getQueues(params);
-    res.status(200).send(queues);
-  } catch (error) {
-    if (error instanceof Error) {
-      res.status(400).send({ error: error.message });
-    } else {
-      res.status(400).send({ error: "An unknown error occurred" });
-    }
-  }
-}
-
-
 
 /*
  * @desc   create queue

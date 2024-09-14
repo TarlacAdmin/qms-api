@@ -1,5 +1,4 @@
 import Patient, { PatientModel } from "../models/patientModel";
-import { ObjectId } from "mongodb";
 
 interface DbParams {
   query?: any;
@@ -20,6 +19,7 @@ const patientRepository = {
   removePatient,
   searchPatient,
   findOrCreate,
+  addToSet,
 };
 
 export default patientRepository;
@@ -88,4 +88,13 @@ async function searchPatient(params: any = {}): Promise<PatientModel[]> {
 
 async function findOrCreate(query: any): Promise<PatientModel | null> {
   return await Patient.findOne(query).lean();
+}
+
+async function addToSet(data: any): Promise<PatientModel | null> {
+  const { _id, ...updateData } = data;
+  return await Patient.findOneAndUpdate(
+    { _id: data._id },
+    { $addToSet: updateData },
+    { new: true }
+  ).lean();
 }

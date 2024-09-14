@@ -6,14 +6,45 @@ import { config } from "../config/config";
 
 const router = express.Router();
 
-router.get(API_ENDPOINTS.PATIENT.GET_BY_ID, getPatient);
 router.get(API_ENDPOINTS.PATIENT.GET_ALL, getPatients);
+router.get(API_ENDPOINTS.PATIENT.GET_BY_ID, getPatient);
 router.post(API_ENDPOINTS.PATIENT.CREATE, createPatient);
 router.put(API_ENDPOINTS.PATIENT.UPDATE, updatePatient);
 router.delete(API_ENDPOINTS.PATIENT.REMOVE_BY_ID, removePatient);
 router.post(API_ENDPOINTS.PATIENT.SEARCH, searchPatient);
+router.put(API_ENDPOINTS.PATIENT.ADD_TO_SET_CHIEF_COMPLAINT, addToSetChiefComplaint);
+router.put(API_ENDPOINTS.PATIENT.ADD_TO_SET_DIAGNOSIS, addToSetDiagnosis);
 
 export default router;
+
+/*
+ * @desc   get all patient
+ * @route  GET /api/patient/get/all
+ * @access Private
+ */
+async function getPatients(req: Request, res: Response) {
+  const params = {
+    query: req.query.query || {},
+    queryArray: req.query.queryArray,
+    queryArrayType: req.query.queryArrayType,
+    populateArray: req.query.populateArray || [],
+    sort: req.query.sort,
+    limit: req.query.limit,
+    select: req.query.select,
+    lean: req.query.lean,
+  };
+
+  try {
+    const patients = await patientService.getPatients(params);
+    res.status(200).send(patients);
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(400).send({ error: error.message });
+    } else {
+      res.status(400).send({ error: "An unknown error occurred" });
+    }
+  }
+}
 
 /*
  * @desc   get patient by id
@@ -40,35 +71,6 @@ async function getPatient(req: Request, res: Response) {
   try {
     const patient = await patientService.getPatient(req.params.id, params);
     res.status(200).send(patient);
-  } catch (error) {
-    if (error instanceof Error) {
-      res.status(400).send({ error: error.message });
-    } else {
-      res.status(400).send({ error: "An unknown error occurred" });
-    }
-  }
-}
-
-/*
- * @desc   get all patient
- * @route  GET /api/patient/get/all
- * @access Private
- */
-async function getPatients(req: Request, res: Response) {
-  const params = {
-    query: req.query.query || {},
-    queryArray: req.query.queryArray,
-    queryArrayType: req.query.queryArrayType,
-    populateArray: req.query.populateArray || [],
-    sort: req.query.sort,
-    limit: req.query.limit,
-    select: req.query.select,
-    lean: req.query.lean,
-  };
-
-  try {
-    const patients = await patientService.getPatients(params);
-    res.status(200).send(patients);
   } catch (error) {
     if (error instanceof Error) {
       res.status(400).send({ error: error.message });
@@ -173,6 +175,76 @@ async function searchPatient(req: Request, res: Response) {
   try {
     const searchedPatient = await patientService.searchPatient(req.body);
     res.status(200).send(searchedPatient);
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(400).send({ error: error.message });
+    } else {
+      res.status(400).send({ error: "An unknown error occurred" });
+    }
+  }
+}
+
+/*
+ * @desc   add chief complaint to patient
+ * @route  POST /api/patient/chiefcomplaint
+ * @access Private
+ */
+
+async function addToSetChiefComplaint(req: Request, res: Response) {
+  await Promise.all([
+    body(config.VALIDATION.PATIENT.BODY.ID)
+      .notEmpty()
+      .withMessage(config.VALIDATION.PATIENT.ERROR.REQUIRED_PATIENT)
+      .run(req),
+    body(config.VALIDATION.PATIENT.BODY.PATIENT_CHIEF_COMPLAINT)
+      .notEmpty()
+      .withMessage(config.VALIDATION.PATIENT.ERROR.REQUIRED_CHIEF_COMPLAINT)
+      .run(req),
+  ]);
+
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).send({ error: errors.array() });
+  }
+
+  try {
+    const updatedPatient = await patientService.addToSetChiefComplaint(req.body);
+    res.status(200).send(updatedPatient);
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(400).send({ error: error.message });
+    } else {
+      res.status(400).send({ error: "An unknown error occurred" });
+    }
+  }
+}
+
+/*
+ * @desc   add diagnosis to patient
+ * @route  POST /api/patient/diagnosis
+ * @access Private
+ */
+
+async function addToSetDiagnosis(req: Request, res: Response) {
+  await Promise.all([
+    body(config.VALIDATION.PATIENT.BODY.PATIENT_ID)
+      .notEmpty()
+      .withMessage(config.VALIDATION.PATIENT.ERROR.REQUIRED_PATIENT)
+      .run(req),
+    body(config.VALIDATION.PATIENT.BODY.PATIENT_DIAGNOSIS)
+      .notEmpty()
+      .withMessage(config.VALIDATION.PATIENT.ERROR.REQUIRED_DIAGNOSIS)
+      .run(req),
+  ]);
+
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).send({ error: errors.array() });
+  }
+
+  try {
+    const updatedPatient = await patientService.addToSetDiagnosis(req.body);
+    res.status(200).send(updatedPatient);
   } catch (error) {
     if (error instanceof Error) {
       res.status(400).send({ error: error.message });

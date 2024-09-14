@@ -22,12 +22,21 @@ export interface PatientModel extends Document {
     cc?: string;
   };
   chiefComplaint?: {
-    complaint: string;
-    date: Date;
+    text: string;
+    onsetDateTime: Date;
+    abatementDateTime?: Date;
+    bodySite?: string[];
+    severity: string;
   }[];
   diagnosis?: {
-    diagnosis: string;
-    date: Date;
+    code: string;
+    description: string;
+    verificationStatus: string;
+    category?: string[];
+    severity: string;
+    onsetDateTime: Date;
+    abatementDateTime?: Date;
+    bodySite?: string[];
   }[];
   metadata: {
     bhw?: {
@@ -80,14 +89,23 @@ const patientSchema: Schema = new Schema(
     },
     chiefComplaint: [
       {
-        complaint: String,
-        date: Date,
+        text: String,
+        onsetDateTime: Date,
+        abatementDateTime: Date,
+        bodySite: [String],
+        severity: String,
       },
     ],
     diagnosis: [
       {
-        diagnosis: String,
-        date: Date,
+        code: String,
+        description: String,
+        verificationStatus: String,
+        category: [String],
+        severity: String,
+        onsetDateTime: Date,
+        abatementDateTime: Date,
+        bodySite: [String],
       },
     ],
     metadata: {

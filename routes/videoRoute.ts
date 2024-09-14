@@ -6,8 +6,8 @@ import { config } from "../config/config";
 
 const router = express.Router();
 
-router.get(API_ENDPOINTS.VIDEO.GET_BY_ID, getVideo);
 router.get(API_ENDPOINTS.VIDEO.GET_ALL, getVideos);
+router.get(API_ENDPOINTS.VIDEO.GET_BY_ID, getVideo);
 router.post(API_ENDPOINTS.VIDEO.CREATE, createVideo);
 router.put(API_ENDPOINTS.VIDEO.UPDATE, updateVideo);
 router.delete(API_ENDPOINTS.VIDEO.REMOVE_BY_ID, removeVideo);

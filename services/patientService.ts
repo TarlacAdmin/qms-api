@@ -10,6 +10,8 @@ const patientService = {
   removePatient,
   searchPatient,
   findOrCreate,
+  addToSetChiefComplaint,
+  addToSetDiagnosis,
 };
 
 export default patientService;
@@ -166,4 +168,40 @@ async function findOrCreate(patientQueryOrData: any): Promise<PatientModel> {
     patient = await patientRepository.createPatient(patientQueryOrData as Partial<PatientModel>);
   }
   return patient;
+}
+
+async function addToSetChiefComplaint(params: {
+  _id: string;
+  chiefComplaint: any;
+}): Promise<PatientModel | null> {
+  try {
+    if (!params._id || !params.chiefComplaint) {
+      throw new Error(config.RESPONSE.ERROR.PATIENT.INVALID_PARAMETER.ADD_TO_SET);
+    }
+
+    return await patientRepository.addToSet({
+      _id: params._id,
+      chiefComplaint: params.chiefComplaint,
+    });
+  } catch (error) {
+    throw error;
+  }
+}
+
+async function addToSetDiagnosis(params: {
+  _id: string;
+  diagnosis: any;
+}): Promise<PatientModel | null> {
+  try {
+    if (!params._id || !params.diagnosis) {
+      throw new Error(config.RESPONSE.ERROR.PATIENT.INVALID_PARAMETER.ADD_TO_SET);
+    }
+
+    return await patientRepository.addToSet({
+      _id: params._id,
+      diagnosis: params.diagnosis,
+    });
+  } catch (error) {
+    throw error;
+  }
 }

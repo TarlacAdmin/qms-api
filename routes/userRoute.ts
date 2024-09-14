@@ -6,8 +6,8 @@ import { API_ENDPOINTS } from "../config/endpointsConfig";
 
 const router = express.Router();
 
-router.route(API_ENDPOINTS.USER.GET_BY_ID).get(getUser);
 router.route(API_ENDPOINTS.USER.GET_ALL).get(getUsers);
+router.route(API_ENDPOINTS.USER.GET_BY_ID).get(getUser);
 router.route(API_ENDPOINTS.USER.CREATE).post(createUser);
 router.route(API_ENDPOINTS.USER.UPDATE).put(updateUser);
 router.route(API_ENDPOINTS.USER.REMOVE).delete(deleteUser);
@@ -15,6 +15,17 @@ router.route(API_ENDPOINTS.USER.LOGIN).post(loginUser);
 router.route(API_ENDPOINTS.USER.LOGOUT).get(logoutUser);
 router.route(API_ENDPOINTS.USER.CHECKLOGIN).get(currentUser);
 router.route(API_ENDPOINTS.USER.SEARCH).get(searchUser);
+
+export default router;
+
+/*
+ * @desc   Get all users
+ * @route  GET /api/user/get/all
+ * @access Public
+ */
+async function getUsers(req: Request, res: Response, next: NextFunction) {
+  await userService.getUsers(req, res, next);
+}
 
 /*
  * @desc   Get user
@@ -33,15 +44,6 @@ async function getUser(req: Request, res: Response, next: NextFunction) {
   }
 
   userService.getUser(req, res, next);
-}
-
-/*
- * @desc   Get all users
- * @route  GET /api/user/get/all
- * @access Public
- */
-async function getUsers(req: Request, res: Response, next: NextFunction) {
-  await userService.getUsers(req, res, next);
 }
 
 /*
@@ -200,5 +202,3 @@ async function currentUser(req: Request, res: Response, next: NextFunction) {
 async function searchUser(req: Request, res: Response, next: NextFunction) {
   await userService.searchUser(req, res, next);
 }
-
-export default router;

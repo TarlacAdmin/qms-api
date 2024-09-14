@@ -6,8 +6,6 @@ import appointmentRoute from "../routes/appointmentRoute";
 import announcementRoute from "../routes/announcementRoute";
 import specialDatesRoute from "../routes/specialDatesRoute";
 import videoRoute from "../routes/videoRoute";
-import chiefComplaintRoute from "../routes/chiefComplaintRoute";
-import diagnosisRoute from "../routes/diagnosisRoute";
 
 export default {
   userRoute,
@@ -18,6 +16,4 @@ export default {
   announcementRoute,
   specialDatesRoute,
   videoRoute,
-  chiefComplaintRoute,
-  diagnosisRoute,
 };

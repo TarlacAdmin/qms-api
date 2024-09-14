@@ -8,8 +8,8 @@ import { SearchParams } from "../types/searchTypes";
 const router = express.Router();
 
 router.get(API_ENDPOINTS.APPOINTMENT.GET_TOTAL, getTotalAppointments);
-router.get(API_ENDPOINTS.APPOINTMENT.GET_BY_ID, getAppointment);
 router.get(API_ENDPOINTS.APPOINTMENT.GET_ALL, getAppointments);
+router.get(API_ENDPOINTS.APPOINTMENT.GET_BY_ID, getAppointment);
 router.post(API_ENDPOINTS.APPOINTMENT.CREATE, createAppointment);
 router.put(API_ENDPOINTS.APPOINTMENT.UPDATE, updateAppointment);
 router.delete(API_ENDPOINTS.APPOINTMENT.REMOVE_BY_ID, removeAppointment);
@@ -26,6 +26,35 @@ async function getTotalAppointments(req: Request, res: Response) {
   try {
     const result = await appointmentService.getTotalAppointments();
     res.status(200).send(result);
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(400).send({ error: error.message });
+    } else {
+      res.status(400).send({ error: "An unknown error occurred" });
+    }
+  }
+}
+
+/*
+ * @desc   get all appointment
+ * @route  GET /api/appointment/get/all
+ * @access Private
+ */
+async function getAppointments(req: Request, res: Response) {
+  const params = {
+    query: req.query.query || {},
+    queryArray: req.query.queryArray,
+    queryArrayType: req.query.queryArrayType,
+    populateArray: req.query.populateArray || [],
+    sort: req.query.sort,
+    limit: req.query.limit,
+    select: req.query.select,
+    lean: req.query.lean,
+  };
+
+  try {
+    const patients = await appointmentService.getAppointments(params);
+    res.status(200).send(patients);
   } catch (error) {
     if (error instanceof Error) {
       res.status(400).send({ error: error.message });
@@ -60,35 +89,6 @@ async function getAppointment(req: Request, res: Response) {
   try {
     const patient = await appointmentService.getAppointment(req.params.id, params);
     res.status(200).send(patient);
-  } catch (error) {
-    if (error instanceof Error) {
-      res.status(400).send({ error: error.message });
-    } else {
-      res.status(400).send({ error: "An unknown error occurred" });
-    }
-  }
-}
-
-/*
- * @desc   get all appointment
- * @route  GET /api/appointment/get/all
- * @access Private
- */
-async function getAppointments(req: Request, res: Response) {
-  const params = {
-    query: req.query.query || {},
-    queryArray: req.query.queryArray,
-    queryArrayType: req.query.queryArrayType,
-    populateArray: req.query.populateArray || [],
-    sort: req.query.sort,
-    limit: req.query.limit,
-    select: req.query.select,
-    lean: req.query.lean,
-  };
-
-  try {
-    const patients = await appointmentService.getAppointments(params);
-    res.status(200).send(patients);
   } catch (error) {
     if (error instanceof Error) {
       res.status(400).send({ error: error.message });

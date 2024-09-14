@@ -6,14 +6,43 @@ import { config } from "../config/config";
 
 const router = express.Router();
 
-router.get(API_ENDPOINTS.DOCTOR.GET_BY_ID, getDoctor);
 router.get(API_ENDPOINTS.DOCTOR.GET_ALL, getDoctors);
+router.get(API_ENDPOINTS.DOCTOR.GET_BY_ID, getDoctor);
 router.post(API_ENDPOINTS.DOCTOR.CREATE, createDoctor);
 router.put(API_ENDPOINTS.DOCTOR.UPDATE, updateDoctor);
 router.delete(API_ENDPOINTS.DOCTOR.REMOVE_BY_ID, removeDoctor);
 router.post(API_ENDPOINTS.DOCTOR.SEARCH, searchDoctor);
 
 export default router;
+
+/*
+ * @desc   get all doctor
+ * @route  GET /api/doctor/get/all
+ * @access Private
+ */
+async function getDoctors(req: Request, res: Response) {
+  const params = {
+    query: req.query.query || {},
+    queryArray: req.query.queryArray,
+    queryArrayType: req.query.queryArrayType,
+    populateArray: req.query.populateArray || [],
+    sort: req.query.sort,
+    limit: req.query.limit,
+    select: req.query.select,
+    lean: req.query.lean,
+  };
+
+  try {
+    const patients = await doctorService.getDoctors(params);
+    res.status(200).send(patients);
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(400).send({ error: error.message });
+    } else {
+      res.status(400).send({ error: "An unknown error occurred" });
+    }
+  }
+}
 
 /*
  * @desc   get doctor by id
@@ -40,35 +69,6 @@ async function getDoctor(req: Request, res: Response) {
   try {
     const patient = await doctorService.getDoctor(req.params.id, params);
     res.status(200).send(patient);
-  } catch (error) {
-    if (error instanceof Error) {
-      res.status(400).send({ error: error.message });
-    } else {
-      res.status(400).send({ error: "An unknown error occurred" });
-    }
-  }
-}
-
-/*
- * @desc   get all doctor
- * @route  GET /api/doctor/get/all
- * @access Private
- */
-async function getDoctors(req: Request, res: Response) {
-  const params = {
-    query: req.query.query || {},
-    queryArray: req.query.queryArray,
-    queryArrayType: req.query.queryArrayType,
-    populateArray: req.query.populateArray || [],
-    sort: req.query.sort,
-    limit: req.query.limit,
-    select: req.query.select,
-    lean: req.query.lean,
-  };
-
-  try {
-    const patients = await doctorService.getDoctors(params);
-    res.status(200).send(patients);
   } catch (error) {
     if (error instanceof Error) {
       res.status(400).send({ error: error.message });

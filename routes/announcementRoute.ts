@@ -6,14 +6,43 @@ import { config } from "../config/config";
 
 const router = express.Router();
 
-router.get(API_ENDPOINTS.ANNOUNCEMENT.GET_BY_ID, getAnnouncement);
 router.get(API_ENDPOINTS.ANNOUNCEMENT.GET_ALL, getAnnouncements);
+router.get(API_ENDPOINTS.ANNOUNCEMENT.GET_BY_ID, getAnnouncement);
 router.post(API_ENDPOINTS.ANNOUNCEMENT.CREATE, createAnnouncement);
 router.put(API_ENDPOINTS.ANNOUNCEMENT.UPDATE, updateAnnouncement);
 router.delete(API_ENDPOINTS.ANNOUNCEMENT.REMOVE_BY_ID, removeAnnouncement);
 router.post(API_ENDPOINTS.ANNOUNCEMENT.SEARCH, searchAnnouncement);
 
 export default router;
+
+/*
+ * @desc   get all announcement
+ * @route  GET /api/announcement/get/all
+ * @access Private
+ */
+async function getAnnouncements(req: Request, res: Response) {
+  const params = {
+    query: req.query.query || {},
+    queryArray: req.query.queryArray,
+    queryArrayType: req.query.queryArrayType,
+    populateArray: req.query.populateArray || [],
+    sort: req.query.sort,
+    limit: req.query.limit,
+    select: req.query.select,
+    lean: req.query.lean,
+  };
+
+  try {
+    const announcements = await announcementService.getAnnouncements(params);
+    res.status(200).send(announcements);
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(400).send({ error: error.message });
+    } else {
+      res.status(400).send({ error: "An unknown error occurred" });
+    }
+  }
+}
 
 /*
  * @desc   get announcement by id
@@ -39,35 +68,6 @@ async function getAnnouncement(req: Request, res: Response) {
 
   try {
     const announcements = await announcementService.getAnnouncement(req.params.id, params);
-    res.status(200).send(announcements);
-  } catch (error) {
-    if (error instanceof Error) {
-      res.status(400).send({ error: error.message });
-    } else {
-      res.status(400).send({ error: "An unknown error occurred" });
-    }
-  }
-}
-
-/*
- * @desc   get all announcement
- * @route  GET /api/announcement/get/all
- * @access Private
- */
-async function getAnnouncements(req: Request, res: Response) {
-  const params = {
-    query: req.query.query || {},
-    queryArray: req.query.queryArray,
-    queryArrayType: req.query.queryArrayType,
-    populateArray: req.query.populateArray || [],
-    sort: req.query.sort,
-    limit: req.query.limit,
-    select: req.query.select,
-    lean: req.query.lean,
-  };
-
-  try {
-    const announcements = await announcementService.getAnnouncements(params);
     res.status(200).send(announcements);
   } catch (error) {
     if (error instanceof Error) {

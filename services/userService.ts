@@ -11,8 +11,8 @@ import { UserModel } from "../models/userModel";
 const saltFactor = 10;
 
 const userService = {
-  getUsers,
   getUser,
+  getUsers,
   createUser,
   updateUser,
   deleteUser,
