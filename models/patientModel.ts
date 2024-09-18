@@ -2,6 +2,7 @@ import mongoose, { Document, Schema } from "mongoose";
 import { CIVIL_STATUS } from "../config/config";
 
 export interface PatientModel extends Document {
+  patientType?: "new" | "existing";
   firstName: string;
   lastName: string;
   middleName?: string;
@@ -18,8 +19,18 @@ export interface PatientModel extends Document {
   visualAcuity?: {
     right?: string;
     left?: string;
-    pinHole?: string;
-    cc?: string;
+    pinhole?: {
+      right: string;
+      left: string;
+    };
+    cc?: {
+      right: string;
+      left: string;
+    };
+    near?: {
+      withCorrection: string;
+      withoutCorrection: string;
+    };
   };
   chiefComplaint?: {
     complaint: string;
@@ -28,6 +39,7 @@ export interface PatientModel extends Document {
   diagnosis?: {
     diagnosis: string;
     date: Date;
+    doctor?: string;
   }[];
   metadata: {
     bhw?: {
@@ -45,6 +57,7 @@ export interface PatientModel extends Document {
 
 const patientSchema: Schema = new Schema(
   {
+    patientType: String,
     firstName: {
       type: String,
       required: true,
@@ -75,8 +88,18 @@ const patientSchema: Schema = new Schema(
     visualAcuity: {
       right: String,
       left: String,
-      pinHole: String,
-      cc: String,
+      pinhole: {
+        right: String,
+        left: String,
+      },
+      cc: {
+        right: String,
+        left: String,
+      },
+      near: {
+        withCorrection: String,
+        withoutCorrection: String,
+      },
     },
     chiefComplaint: [
       {
@@ -88,6 +111,7 @@ const patientSchema: Schema = new Schema(
       {
         diagnosis: String,
         date: Date,
+        doctor: String,
       },
     ],
     metadata: {

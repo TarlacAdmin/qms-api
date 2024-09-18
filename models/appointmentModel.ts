@@ -4,6 +4,7 @@ export interface AppointmentModel extends Document {
   date: string;
   patient: mongoose.Schema.Types.ObjectId;
   doctor: mongoose.Schema.Types.ObjectId;
+  status: "pending" | "done";
 }
 
 const apointmentSchema: Schema = new Schema(
@@ -21,10 +22,14 @@ const apointmentSchema: Schema = new Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Doctor",
     },
+    status: String,
   },
   {
     timestamps: true,
   }
 );
 
-export default mongoose.model<AppointmentModel>("Appointment", apointmentSchema);
+export default mongoose.model<AppointmentModel>(
+  "Appointment",
+  apointmentSchema
+);
