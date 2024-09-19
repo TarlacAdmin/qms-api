@@ -13,7 +13,7 @@ router.get(API_ENDPOINTS.APPOINTMENT.GET_BY_ID, getAppointment);
 router.post(API_ENDPOINTS.APPOINTMENT.CREATE, createAppointment);
 router.put(API_ENDPOINTS.APPOINTMENT.UPDATE, updateAppointment);
 router.delete(API_ENDPOINTS.APPOINTMENT.REMOVE_BY_ID, removeAppointment);
-router.post(API_ENDPOINTS.APPOINTMENT.SEARCH, searchAppointment);
+router.post(API_ENDPOINTS.APPOINTMENT.SEARCH, searchAppointments);
 
 export default router;
 
@@ -217,6 +217,24 @@ async function searchAppointment(req: Request, res: Response) {
       res.status(400).json({ error: error.message });
     } else {
       res.status(400).json({ error: "An unknown error occurred during the searchAppointment" });
+    }
+  }
+}
+
+/*
+ * @desc   search appointment
+ * @route  POST /api/appointment/search
+ * @access Private
+ */
+async function searchAppointments(req: Request, res: Response) {
+  try {
+    const searchedAppointments = await appointmentService.searchAppointments(req.body);
+    res.status(200).send(searchedAppointments);
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(400).send({ error: error.message });
+    } else {
+      res.status(400).send({ error: "An unknown error occurred" });
     }
   }
 }

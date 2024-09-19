@@ -140,6 +140,7 @@ export const config = {
         REQUIRED_PATIENT: "Fill all required patient fields",
         REQUIRED_CHIEF_COMPLAINT: "Fill all required chief complaint fields",
         REQUIRED_DIAGNOSIS: "Fill all required diagnosis fields",
+        REQUIRED_BHW: "Fill all required BHW fields",
         INVALID_ID: "Invalid Patient ID",
       },
 
@@ -149,6 +150,7 @@ export const config = {
         PATIENT_MIDDLENAME: "middleName",
         PATIENT_CHIEF_COMPLAINT: "chiefComplaint",
         PATIENT_DIAGNOSIS: "diagnosis",
+        PATIENT_BHW: "metadata.bhw",
         PATIENT_ID: "patientId",
         ID: "_id",
       },

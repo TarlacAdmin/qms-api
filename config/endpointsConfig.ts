@@ -36,6 +36,7 @@ export const API_ENDPOINTS = {
     REMOVE_BY_ID: "/patient/remove/:id",
     ADD_TO_SET_CHIEF_COMPLAINT: "/patient/chiefcomplaint",
     ADD_TO_SET_DIAGNOSIS: "/patient/diagnosis",
+    ADD_TO_SET_BHW: "/patient/bhw",
   },
 
   DOCTOR: {

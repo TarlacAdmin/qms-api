@@ -11,6 +11,7 @@ const appointmentService = {
   updateAppointment,
   removeAppointment,
   searchAppointment,
+  searchAppointments,
 };
 
 export default appointmentService;
@@ -178,6 +179,68 @@ async function searchAppointment(params: any): Promise<any[]> {
     const results = await appointmentRepository.searchAppointment(params);
     return results;
   } catch (error) {
+    throw error;
+  }
+}
+
+async function searchAppointments(params: any): Promise<AppointmentModel[] | null> {
+  try {
+    let dbParams: {
+      query: Record<string, any>;
+      populateArray: any[];
+      options: Record<string, any>;
+      lean: boolean;
+      match: Record<string, any>;
+      lookup: string | null;
+      firstName?: string;
+      lastName?: string;
+      date?: string;
+    } = {
+      query: {},
+      populateArray: [],
+      options: {},
+      lean: true,
+      match: {},
+      lookup: null,
+    };
+    dbParams.query = params.query || {};
+
+    if (params.match) {
+      dbParams.match = { ...dbParams.match, ...params.match };
+    }
+
+    if (params.firstName) {
+      dbParams.match["patient.firstName"] = params.firstName;
+    }
+    if (params.lastName) {
+      dbParams.match["patient.lastName"] = params.lastName;
+    }
+    if (params.date) {
+      dbParams.match["date"] = params.date;
+    }
+
+    //Build Populate Options
+    if (params.populateArray) {
+      dbParams.populateArray = params.populateArray;
+    }
+
+    //Build Query Options
+    dbParams.options = {
+      sort: params.sort || "-createdAt",
+      skip: params.skip || 0,
+      select: params.select || "_id",
+      limit: params.limit || 10,
+    };
+
+    dbParams.lean = params.lean !== undefined ? params.lean : true;
+
+    if (params.lookup && (params.lookup === "patient" || params.lookup === "doctor")) {
+      dbParams.lookup = params.lookup;
+    }
+
+    return await appointmentRepository.searchAppointments(dbParams);
+  } catch (error) {
+    console.error(error);
     throw error;
   }
 }

@@ -4,6 +4,7 @@ export interface AppointmentModel extends Document {
   date: string;
   patient: mongoose.Schema.Types.ObjectId;
   doctor: mongoose.Schema.Types.ObjectId;
+  status: "pending" | "done";
 }
 
 const apointmentSchema: Schema = new Schema(
@@ -20,6 +21,10 @@ const apointmentSchema: Schema = new Schema(
     doctor: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Doctor",
+    },
+    status: {
+      type: String,
+      enum: ["pending", "done"],
     },
   },
   {

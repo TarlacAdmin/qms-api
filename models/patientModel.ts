@@ -2,6 +2,7 @@ import mongoose, { Document, Schema } from "mongoose";
 import { CIVIL_STATUS } from "../config/config";
 
 export interface PatientModel extends Document {
+  patientType?: "new" | "existing";
   firstName: string;
   lastName: string;
   middleName?: string;
@@ -18,8 +19,18 @@ export interface PatientModel extends Document {
   visualAcuity?: {
     right?: string;
     left?: string;
-    pinHole?: string;
-    cc?: string;
+    pinHole?: {
+      right?: string;
+      left?: string;
+    };
+    cc?: {
+      right?: string;
+      left?: string;
+    };
+    near?: {
+      withCorrection?: string;
+      withoutCorrection?: string;
+    };
   };
   chiefComplaint?: {
     text: string;
@@ -27,6 +38,7 @@ export interface PatientModel extends Document {
     abatementDateTime?: Date;
     bodySite?: string[];
     severity: string;
+    doctor?: string;
   }[];
   diagnosis?: {
     code: string;
@@ -54,6 +66,10 @@ export interface PatientModel extends Document {
 
 const patientSchema: Schema = new Schema(
   {
+    patientType: {
+      type: String,
+      enum: ["new", "existing"],
+    },
     firstName: {
       type: String,
       required: true,
@@ -84,8 +100,18 @@ const patientSchema: Schema = new Schema(
     visualAcuity: {
       right: String,
       left: String,
-      pinHole: String,
-      cc: String,
+      pinHole: {
+        right: String,
+        left: String,
+      },
+      cc: {
+        right: String,
+        left: String,
+      },
+      near: {
+        withCorrection: String,
+        withoutCorrection: String,
+      },
     },
     chiefComplaint: [
       {
@@ -94,6 +120,7 @@ const patientSchema: Schema = new Schema(
         abatementDateTime: Date,
         bodySite: [String],
         severity: String,
+        doctor: String,
       },
     ],
     diagnosis: [

@@ -12,6 +12,7 @@ const patientService = {
   findOrCreate,
   addToSetChiefComplaint,
   addToSetDiagnosis,
+  addToSetBhw,
 };
 
 export default patientService;
@@ -200,6 +201,34 @@ async function addToSetDiagnosis(params: {
     return await patientRepository.addToSet({
       _id: params._id,
       diagnosis: params.diagnosis,
+    });
+  } catch (error) {
+    throw error;
+  }
+}
+
+async function addToSetBhw(params: {
+  _id: string;
+  bhw: {
+    profile: {
+      firstname: string;
+      lastname: string;
+      middlename?: string;
+      barangay: string;
+      city: string;
+    };
+    label: string;
+    date?: Date;
+  };
+}): Promise<PatientModel | null> {
+  try {
+    if (!params._id || !params.bhw) {
+      throw new Error(config.RESPONSE.ERROR.PATIENT.INVALID_PARAMETER.ADD_TO_SET);
+    }
+
+    return await patientRepository.addToSet({
+      _id: params._id,
+      "metadata.bhw": params.bhw,
     });
   } catch (error) {
     throw error;

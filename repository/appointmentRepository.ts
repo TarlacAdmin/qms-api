@@ -4,6 +4,8 @@ import Doctor from "../models/doctorModel";
 import { SearchParams } from "../types/searchTypes";
 import { buildSearchQuery, formatResults } from "../helper/searchHelpers";
 
+import { PipelineStage } from "mongoose";
+
 interface DbParams {
   query?: any;
   options?: {
@@ -23,6 +25,7 @@ const appointmentRepository = {
   updateAppointment,
   removeAppointment,
   searchAppointment,
+  searchAppointments,
   setDoctorForAppointment,
 };
 
@@ -224,6 +227,63 @@ async function searchAppointment(params: SearchParams): Promise<any> {
   const searchResults = await Promise.all(searchPromises);
 
   return formatResults(searchResults, params.searchType);
+}
+
+async function searchAppointments(params: any = {}): Promise<AppointmentModel[]> {
+  const pipeline: PipelineStage[] = [];
+
+  // Add lookup and unwind for patient or doctor
+  if (params.lookup) {
+    pipeline.push({
+      $lookup: {
+        from: params.lookup === "patient" ? "patients" : "doctors",
+        localField: params.lookup,
+        foreignField: "_id",
+        as: params.lookup,
+      },
+    } as PipelineStage);
+    pipeline.push({ $unwind: `$${params.lookup}` } as PipelineStage);
+  }
+
+  // Add match stage
+  const matchStage: Record<string, any> = { ...params.match };
+
+  // Add status filter, default to "pending" if not specified
+  if (!matchStage.status) {
+    matchStage.status = "pending";
+  }
+
+  pipeline.push({ $match: matchStage } as PipelineStage);
+
+  // Add sort stage
+  if (params.options.sort) {
+    const sortField = params.options.sort.replace("-", "");
+    const sortOrder = params.options.sort.startsWith("-") ? -1 : 1;
+    pipeline.push({ $sort: { [sortField]: sortOrder } } as PipelineStage);
+  }
+
+  // Add skip stage
+  if (params.options.skip) {
+    pipeline.push({ $skip: params.options.skip } as PipelineStage);
+  }
+
+  // Add limit stage
+  if (params.options.limit) {
+    pipeline.push({ $limit: params.options.limit } as PipelineStage);
+  }
+
+  // Add project stage for select
+  if (params.options.select) {
+    const selectFields = params.options.select
+      .split(" ")
+      .reduce((acc: Record<string, 1>, field: string) => {
+        acc[field] = 1;
+        return acc;
+      }, {});
+    pipeline.push({ $project: selectFields } as PipelineStage);
+  }
+
+  return Appointment.aggregate(pipeline);
 }
 
 async function setDoctorForAppointment(
