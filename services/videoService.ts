@@ -3,17 +3,17 @@ import { VideoModel } from "../models/videoModel";
 import videoRepository from "../repository/videoRepository";
 
 const videoService = {
-  getById,
-  getAllVideo,
-  create,
-  update,
-  remove,
-  search,
+  getVideo,
+  getVideos,
+  createVideo,
+  updateVideo,
+  removeVideo,
+  searchVideo,
 };
 
 export default videoService;
 
-async function getById(id: string, params: any): Promise<VideoModel | null> {
+async function getVideo(id: string, params: any): Promise<VideoModel | null> {
   if (!id) {
     throw new Error(config.RESPONSE.ERROR.VIDEO.INVALID_PARAMETER.GET);
   }
@@ -35,7 +35,7 @@ async function getById(id: string, params: any): Promise<VideoModel | null> {
       dbParams.options.lean = params.lean;
     }
 
-    return await videoRepository.getById(id, dbParams);
+    return await videoRepository.getVideo(id, dbParams);
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);
@@ -45,7 +45,7 @@ async function getById(id: string, params: any): Promise<VideoModel | null> {
   }
 }
 
-async function getAllVideo(params: any): Promise<VideoModel[]> {
+async function getVideos(params: any): Promise<VideoModel[]> {
   if (!params) {
     throw new Error(config.RESPONSE.ERROR.VIDEO.INVALID_PARAMETER.GET_ALL);
   }
@@ -79,7 +79,7 @@ async function getAllVideo(params: any): Promise<VideoModel[]> {
       dbParams.options.lean = params.lean;
     }
 
-    return await videoRepository.getAllVideo(dbParams);
+    return await videoRepository.getVideos(dbParams);
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);
@@ -89,13 +89,13 @@ async function getAllVideo(params: any): Promise<VideoModel[]> {
   }
 }
 
-async function create(data: Partial<VideoModel>): Promise<VideoModel> {
+async function createVideo(data: Partial<VideoModel>): Promise<VideoModel> {
   if (!data) {
     throw new Error(config.RESPONSE.ERROR.VIDEO.INVALID_PARAMETER.CREATE);
   }
 
   try {
-    return await videoRepository.create(data);
+    return await videoRepository.createVideo(data);
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);
@@ -105,13 +105,13 @@ async function create(data: Partial<VideoModel>): Promise<VideoModel> {
   }
 }
 
-async function update(data: Partial<VideoModel>): Promise<VideoModel | null> {
+async function updateVideo(data: Partial<VideoModel>): Promise<VideoModel | null> {
   if (!data) {
     throw new Error(config.RESPONSE.ERROR.VIDEO.INVALID_PARAMETER.UPDATE);
   }
 
   try {
-    return await videoRepository.update(data);
+    return await videoRepository.updateVideo(data);
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);
@@ -121,13 +121,13 @@ async function update(data: Partial<VideoModel>): Promise<VideoModel | null> {
   }
 }
 
-async function remove(id: string): Promise<VideoModel | null> {
+async function removeVideo(id: string): Promise<VideoModel | null> {
   if (!id) {
     throw new Error(config.RESPONSE.ERROR.VIDEO.INVALID_PARAMETER.REMOVE);
   }
 
   try {
-    return await videoRepository.remove(id);
+    return await videoRepository.removeVideo(id);
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);
@@ -137,7 +137,7 @@ async function remove(id: string): Promise<VideoModel | null> {
   }
 }
 
-async function search(params: any): Promise<VideoModel[] | null> {
+async function searchVideo(params: any): Promise<VideoModel[] | null> {
   try {
     let dbParams = {
       query: {},
@@ -172,7 +172,7 @@ async function search(params: any): Promise<VideoModel[] | null> {
 
     dbParams.lean = params.lean || true;
 
-    return await videoRepository.search(dbParams);
+    return await videoRepository.searchVideo(dbParams);
   } catch (error) {
     console.error(error);
     throw error;

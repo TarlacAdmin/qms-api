@@ -1,4 +1,4 @@
-import Queue, { IQueue } from "../models/queueModel";
+import Queue, { QueueModel } from "../models/queueModel";
 
 interface DbParams {
   query?: any;
@@ -12,144 +12,70 @@ interface DbParams {
 }
 
 const queueRepository = {
-  getById,
-  getAllQueues,
-  create,
-  update,
-  remove,
-  findById,
-  search,
-  pushPatientToMetadata,
-  getTotalQueuesNumber,
+  getQueue,
+  getQueues,
+  createQueue,
+  updateQueue,
+  removeQueue,
+  searchQueue,
 };
 
 export default queueRepository;
 
-async function getById(id: string, dbParams: DbParams = {}): Promise<IQueue | null> {
-  try {
-    let query = Queue.findById(id);
+async function getQueue(id: string, dbParams: DbParams = {}): Promise<QueueModel | null> {
+  let query = Queue.findById(id);
 
-    (dbParams.options?.populateArray || []).forEach((populateOption) => {
-      query = query.populate(populateOption);
-    });
+  (dbParams.options?.populateArray || []).forEach((populateOption) => {
+    query = query.populate(populateOption);
+  });
 
-    const options = {
-      select: dbParams.options?.select || "_id",
-      lean: dbParams.options?.lean || true,
-    };
+  const options = {
+    select: dbParams.options?.select || "_id",
+    lean: dbParams.options?.lean || true,
+  };
 
-    query = query.select(options.select).lean(options.lean);
+  query = query.select(options.select).lean(options.lean);
 
-    return query.exec();
-  } catch (error) {
-    throw error;
-  }
+  return query.exec();
 }
 
-async function getAllQueues(dbParams: DbParams = {}): Promise<IQueue[]> {
-  try {
-    let query = Queue.find(dbParams.query);
+async function getQueues(dbParams: DbParams = {}): Promise<QueueModel[]> {
+  let query = Queue.find(dbParams.query);
 
-    (dbParams.options?.populateArray || []).forEach((populateOption) => {
-      query = query.populate(populateOption);
-    });
+  (dbParams.options?.populateArray || []).forEach((populateOption) => {
+    query = query.populate(populateOption);
+  });
 
-    const options = {
-      sort: dbParams.options?.sort || {},
-      limit: dbParams.options?.limit || 10,
-      select: dbParams.options?.select || "_id",
-      lean: dbParams.options?.lean || true,
-    };
+  const options = {
+    sort: dbParams.options?.sort || {},
+    limit: dbParams.options?.limit || 10,
+    select: dbParams.options?.select || "_id",
+    lean: dbParams.options?.lean || true,
+  };
 
-    query = query.sort(options.sort).limit(options.limit).select(options.select).lean(options.lean);
+  query = query.sort(options.sort).limit(options.limit).select(options.select).lean(options.lean);
 
-    return query.exec();
-  } catch (error) {
-    throw error;
-  }
+  return query.exec();
 }
 
-async function create(data: Partial<IQueue>): Promise<IQueue> {
-  try {
-    return await Queue.create(data);
-  } catch (error) {
-    throw error;
-  }
+async function createQueue(data: Partial<QueueModel>): Promise<QueueModel> {
+  return await Queue.create(data);
 }
 
-async function pushPatientToMetadata(queueId: string, patientId: string): Promise<IQueue | null> {
-  try {
-    return await Queue.findByIdAndUpdate(
-      queueId,
-      { $set: { "metadata.patient": patientId } },
-      { new: true }
-    ).lean();
-  } catch (error) {
-    throw error;
-  }
+async function updateQueue(data: Partial<QueueModel>): Promise<QueueModel | null> {
+  return await Queue.findByIdAndUpdate(data._id, data, { new: true }).lean();
 }
 
-async function update(data: Partial<IQueue>): Promise<IQueue | null> {
-  try {
-    return await Queue.findByIdAndUpdate(data._id, data, { new: true })
-      // .select("-metadata.patient.emr")
-      .lean();
-  } catch (error) {
-    throw error;
-  }
+async function removeQueue(id: string): Promise<QueueModel | null> {
+  return await Queue.findByIdAndDelete(id);
 }
 
-async function findById(id: string): Promise<IQueue | null> {
-  try {
-    return await Queue.findById(id).lean();
-  } catch (error) {
-    throw error;
-  }
-}
-
-async function remove(id: string): Promise<IQueue | null> {
-  try {
-    return await Queue.findByIdAndDelete(id);
-  } catch (error) {
-    throw error;
-  }
-}
-
-async function search(params: any = {}): Promise<IQueue[]> {
-  try {
-    // return await Queue.find(params).sort({ createdAt: -1 }).exec();;
-    let query = Queue.find();
-    query.setQuery(params.query);
-    query.populate(params.populateArray);
-    query.projection(params.projection);
-    query.setOptions(params.options);
-    query.lean(params.lean);
-    return query.exec();
-  } catch (error) {
-    throw error;
-  }
-}
-
-// nagprapractice lang po ako ng mga aggregation queries, dedelete ko rin po ito HAHAHAHHA
-async function getTotalQueuesNumber(): Promise<number[]> {
-  try {
-    const total = await Queue.aggregate([
-      {
-        $match: {
-          queueNumber: {
-            $eq: "001",
-          },
-        },
-      },
-      {
-        $count: "total queues",
-      },
-    ]);
-
-    console.log(total);
-
-    return total;
-  } catch (error) {
-    throw error;
-  }
+async function searchQueue(params: any = {}): Promise<QueueModel[]> {
+  let query = Queue.find();
+  query.setQuery(params.query);
+  query.populate(params.populateArray);
+  query.projection(params.projection);
+  query.setOptions(params.options);
+  query.lean(params.lean);
+  return query.exec();
 }

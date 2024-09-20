@@ -6,12 +6,12 @@ import { config } from "../config/config";
 
 const router = express.Router();
 
-router.get(API_ENDPOINTS.SPECIALDATE.GET_ALL, getAllSpecialDates);
-router.get(API_ENDPOINTS.SPECIALDATE.GET_BY_ID, getById);
-router.post(API_ENDPOINTS.SPECIALDATE.CREATE, create);
-router.post(API_ENDPOINTS.SPECIALDATE.SEARCH, search);
-router.put(API_ENDPOINTS.SPECIALDATE.UPDATE, update);
-router.delete(API_ENDPOINTS.SPECIALDATE.REMOVE_BY_ID, remove);
+router.get(API_ENDPOINTS.SPECIALDATE.GET_ALL, getSpecialDates);
+router.get(API_ENDPOINTS.SPECIALDATE.GET_BY_ID, getSpecialDate);
+router.post(API_ENDPOINTS.SPECIALDATE.CREATE, createSpecialDate);
+router.put(API_ENDPOINTS.SPECIALDATE.UPDATE, updateSpecialDate);
+router.delete(API_ENDPOINTS.SPECIALDATE.REMOVE_BY_ID, removeSpecialDate);
+router.post(API_ENDPOINTS.SPECIALDATE.SEARCH, searchSpecialDate);
 
 export default router;
 
@@ -20,7 +20,7 @@ export default router;
  * @route  GET /api/specialdate/get/all
  * @access Private
  */
-async function getAllSpecialDates(req: Request, res: Response) {
+async function getSpecialDates(req: Request, res: Response) {
   const params = {
     query: req.query.query || {},
     queryArray: req.query.queryArray,
@@ -33,7 +33,7 @@ async function getAllSpecialDates(req: Request, res: Response) {
   };
 
   try {
-    const specialDates = await specialDatesService.getAllSpecialDates(params);
+    const specialDates = await specialDatesService.getSpecialDates(params);
     res.status(200).send(specialDates);
   } catch (error) {
     if (error instanceof Error) {
@@ -49,7 +49,7 @@ async function getAllSpecialDates(req: Request, res: Response) {
  * @route  GET /api/specialdate/get/:id
  * @access Private
  */
-async function getById(req: Request, res: Response) {
+async function getSpecialDate(req: Request, res: Response) {
   await param(config.VALIDATION.SPECIALDATE.PARAMS.ID)
     .isMongoId()
     .withMessage(config.VALIDATION.SPECIALDATE.PARAMS.INVALID_ID)
@@ -67,7 +67,7 @@ async function getById(req: Request, res: Response) {
   };
 
   try {
-    const specialDates = await specialDatesService.getById(req.params.id, params);
+    const specialDates = await specialDatesService.getSpecialDate(req.params.id, params);
     res.status(200).send(specialDates);
   } catch (error) {
     if (error instanceof Error) {
@@ -83,7 +83,7 @@ async function getById(req: Request, res: Response) {
  * @route  POST /api/specialdate/create
  * @access Private
  */
-async function create(req: Request, res: Response) {
+async function createSpecialDate(req: Request, res: Response) {
   await Promise.all([
     body(config.VALIDATION.SPECIALDATE.BODY.SPECIALDATE_DATE)
       .notEmpty()
@@ -97,7 +97,7 @@ async function create(req: Request, res: Response) {
   }
 
   try {
-    const newSpecialDates = await specialDatesService.create(req.body);
+    const newSpecialDates = await specialDatesService.createSpecialDate(req.body);
     (req as any).io.emit("specialDatesCreated", newSpecialDates);
     res.status(200).send(newSpecialDates);
   } catch (error) {
@@ -114,7 +114,7 @@ async function create(req: Request, res: Response) {
  * @route  PUT /api/specialdate/update
  * @access Private
  */
-async function update(req: Request, res: Response) {
+async function updateSpecialDate(req: Request, res: Response) {
   await Promise.all([
     body(config.VALIDATION.SPECIALDATE.BODY.SPECIALDATE_DATE)
       .notEmpty()
@@ -128,7 +128,7 @@ async function update(req: Request, res: Response) {
   }
 
   try {
-    const updatedSpecialDates = await specialDatesService.update(req.body);
+    const updatedSpecialDates = await specialDatesService.updateSpecialDate(req.body);
     (req as any).io.emit("specialDatesUpdated", updatedSpecialDates);
     res.status(200).send(updatedSpecialDates);
   } catch (error) {
@@ -145,7 +145,7 @@ async function update(req: Request, res: Response) {
  * @route  DELETE /api/specialdate/remove/:id
  * @access Private
  */
-async function remove(req: Request, res: Response) {
+async function removeSpecialDate(req: Request, res: Response) {
   await param(config.VALIDATION.SPECIALDATE.PARAMS.ID)
     .isMongoId()
     .withMessage(config.VALIDATION.SPECIALDATE.PARAMS.INVALID_ID)
@@ -157,7 +157,7 @@ async function remove(req: Request, res: Response) {
   }
 
   try {
-    const removedSpecialDates = await specialDatesService.remove(req.params.id);
+    const removedSpecialDates = await specialDatesService.removeSpecialDate(req.params.id);
     res.status(200).send(removedSpecialDates);
   } catch (error) {
     if (error instanceof Error) {
@@ -170,12 +170,12 @@ async function remove(req: Request, res: Response) {
 
 /*
  * @desc   search specialdate
- * @route  DELETE /api/specialdate/search
+ * @route  POST /api/specialdate/search
  * @access Private
  */
-async function search(req: Request, res: Response) {
+async function searchSpecialDate(req: Request, res: Response) {
   try {
-    const searchedSpecialDates = await specialDatesService.search(req.body);
+    const searchedSpecialDates = await specialDatesService.searchSpecialDate(req.body);
     res.status(200).send(searchedSpecialDates);
   } catch (error) {
     if (error instanceof Error) {

@@ -6,12 +6,12 @@ import { config } from "../config/config";
 
 const router = express.Router();
 
-router.get(API_ENDPOINTS.VIDEO.GET_ALL, getAllVideo);
-router.get(API_ENDPOINTS.VIDEO.GET_BY_ID, getById);
-router.post(API_ENDPOINTS.VIDEO.CREATE, create);
-router.post(API_ENDPOINTS.VIDEO.SEARCH, search);
-router.put(API_ENDPOINTS.VIDEO.UPDATE, update);
-router.delete(API_ENDPOINTS.VIDEO.REMOVE_BY_ID, remove);
+router.get(API_ENDPOINTS.VIDEO.GET_ALL, getVideos);
+router.get(API_ENDPOINTS.VIDEO.GET_BY_ID, getVideo);
+router.post(API_ENDPOINTS.VIDEO.CREATE, createVideo);
+router.put(API_ENDPOINTS.VIDEO.UPDATE, updateVideo);
+router.delete(API_ENDPOINTS.VIDEO.REMOVE_BY_ID, removeVideo);
+router.post(API_ENDPOINTS.VIDEO.SEARCH, searchVideo);
 
 export default router;
 
@@ -20,7 +20,7 @@ export default router;
  * @route  GET /api/video/get/all
  * @access Private
  */
-async function getAllVideo(req: Request, res: Response) {
+async function getVideos(req: Request, res: Response) {
   const params = {
     query: req.query.query || {},
     queryArray: req.query.queryArray,
@@ -33,7 +33,7 @@ async function getAllVideo(req: Request, res: Response) {
   };
 
   try {
-    const video = await videoService.getAllVideo(params);
+    const video = await videoService.getVideos(params);
     res.status(200).send(video);
   } catch (error) {
     if (error instanceof Error) {
@@ -49,7 +49,7 @@ async function getAllVideo(req: Request, res: Response) {
  * @route  GET /api/video/get/:id
  * @access Private
  */
-async function getById(req: Request, res: Response) {
+async function getVideo(req: Request, res: Response) {
   await param(config.VALIDATION.VIDEO.PARAMS.ID)
     .isMongoId()
     .withMessage(config.VALIDATION.VIDEO.PARAMS.INVALID_ID)
@@ -67,7 +67,7 @@ async function getById(req: Request, res: Response) {
   };
 
   try {
-    const video = await videoService.getById(req.params.id, params);
+    const video = await videoService.getVideo(req.params.id, params);
     res.status(200).send(video);
   } catch (error) {
     if (error instanceof Error) {
@@ -83,7 +83,7 @@ async function getById(req: Request, res: Response) {
  * @route  POST /api/video/create
  * @access Private
  */
-async function create(req: Request, res: Response) {
+async function createVideo(req: Request, res: Response) {
   await Promise.all([
     body(config.VALIDATION.VIDEO.BODY.VIDEO_URL)
       .notEmpty()
@@ -97,7 +97,7 @@ async function create(req: Request, res: Response) {
   }
 
   try {
-    const newVideo = await videoService.create(req.body);
+    const newVideo = await videoService.createVideo(req.body);
     (req as any).io.emit("videoCreated", newVideo);
     res.status(200).send(newVideo);
   } catch (error) {
@@ -114,7 +114,7 @@ async function create(req: Request, res: Response) {
  * @route  PUT /api/video/update
  * @access Private
  */
-async function update(req: Request, res: Response) {
+async function updateVideo(req: Request, res: Response) {
   await Promise.all([
     body(config.VALIDATION.VIDEO.BODY.VIDEO_URL)
       .notEmpty()
@@ -128,7 +128,7 @@ async function update(req: Request, res: Response) {
   }
 
   try {
-    const updatedVideo = await videoService.update(req.body);
+    const updatedVideo = await videoService.updateVideo(req.body);
     (req as any).io.emit("videoUpdated", updatedVideo);
     res.status(200).send(updatedVideo);
   } catch (error) {
@@ -145,7 +145,7 @@ async function update(req: Request, res: Response) {
  * @route  DELETE /api/video/remove/:id
  * @access Private
  */
-async function remove(req: Request, res: Response) {
+async function removeVideo(req: Request, res: Response) {
   await param(config.VALIDATION.VIDEO.PARAMS.ID)
     .isMongoId()
     .withMessage(config.VALIDATION.VIDEO.PARAMS.INVALID_ID)
@@ -157,7 +157,7 @@ async function remove(req: Request, res: Response) {
   }
 
   try {
-    const removedVideo = await videoService.remove(req.params.id);
+    const removedVideo = await videoService.removeVideo(req.params.id);
     res.status(200).send(removedVideo);
   } catch (error) {
     if (error instanceof Error) {
@@ -170,12 +170,12 @@ async function remove(req: Request, res: Response) {
 
 /*
  * @desc   search video
- * @route  DELETE /api/video/search
+ * @route  POST /api/video/search
  * @access Private
  */
-async function search(req: Request, res: Response) {
+async function searchVideo(req: Request, res: Response) {
   try {
-    const searchedVideo = await videoService.search(req.body);
+    const searchedVideo = await videoService.searchVideo(req.body);
     res.status(200).send(searchedVideo);
   } catch (error) {
     if (error instanceof Error) {

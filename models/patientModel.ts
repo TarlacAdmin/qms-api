@@ -2,6 +2,7 @@ import mongoose, { Document, Schema } from "mongoose";
 import { CIVIL_STATUS } from "../config/config";
 
 export interface PatientModel extends Document {
+  patientType?: "new" | "existing";
   firstName: string;
   lastName: string;
   middleName?: string;
@@ -18,16 +19,36 @@ export interface PatientModel extends Document {
   visualAcuity?: {
     right?: string;
     left?: string;
-    pinHole?: string;
-    cc?: string;
+    pinHole?: {
+      right?: string;
+      left?: string;
+    };
+    cc?: {
+      right?: string;
+      left?: string;
+    };
+    near?: {
+      withCorrection?: string;
+      withoutCorrection?: string;
+    };
   };
   chiefComplaint?: {
-    complaint: string;
-    date: Date;
+    text: string;
+    onsetDateTime: Date;
+    abatementDateTime?: Date;
+    bodySite?: string[];
+    severity: string;
   }[];
   diagnosis?: {
-    diagnosis: string;
-    date: Date;
+    code: string;
+    description: string;
+    verificationStatus: string;
+    category?: string[];
+    severity: string;
+    onsetDateTime: Date;
+    abatementDateTime?: Date;
+    bodySite?: string[];
+    doctor?: string;
   }[];
   metadata: {
     bhw?: {
@@ -40,15 +61,15 @@ export interface PatientModel extends Document {
       };
       label: string;
     }[];
-    queue?: {
-      queueType: string;
-      date: Date;
-    };
   };
 }
 
 const patientSchema: Schema = new Schema(
   {
+    patientType: {
+      type: String,
+      enum: ["new", "existing"],
+    },
     firstName: {
       type: String,
       required: true,
@@ -79,19 +100,39 @@ const patientSchema: Schema = new Schema(
     visualAcuity: {
       right: String,
       left: String,
-      pinHole: String,
-      cc: String,
+      pinHole: {
+        right: String,
+        left: String,
+      },
+      cc: {
+        right: String,
+        left: String,
+      },
+      near: {
+        withCorrection: String,
+        withoutCorrection: String,
+      },
     },
     chiefComplaint: [
       {
-        complaint: String,
-        date: Date,
+        text: String,
+        onsetDateTime: Date,
+        abatementDateTime: Date,
+        bodySite: [String],
+        severity: String,
       },
     ],
     diagnosis: [
       {
-        diagnosis: String,
-        date: Date,
+        code: String,
+        description: String,
+        verificationStatus: String,
+        category: [String],
+        severity: String,
+        onsetDateTime: Date,
+        abatementDateTime: Date,
+        bodySite: [String],
+        doctor: String,
       },
     ],
     metadata: {
@@ -108,13 +149,6 @@ const patientSchema: Schema = new Schema(
           date: Date,
         },
       ],
-      queue: {
-        queueType: {
-          type: String,
-          default: "walk-in",
-        },
-        date: String,
-      },
     },
   },
   {

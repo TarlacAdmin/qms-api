@@ -1,3 +1,4 @@
+import { FilterQuery, UpdateQuery } from "mongoose";
 import User, { UserModel } from "../models/userModel";
 
 interface DbParams {
@@ -14,121 +15,91 @@ interface DbParams {
 const userRepository = {
   getUser,
   getUsers,
-  findByEmail,
   createUser,
   updateUser,
   deleteUser,
-  search,
-  findOrCreate,
+  searchUser,
+  searchAndUpdate,
 };
 
 export default userRepository;
 
 async function getUser(id: string, dbParams: DbParams = {}): Promise<UserModel | null> {
-  try {
-    let query = User.findById(id);
+  let query = User.findById(id);
 
-    (dbParams.options?.populateArray || []).forEach((populateOption) => {
-      query = query.populate(populateOption);
-    });
+  (dbParams.options?.populateArray || []).forEach((populateOption) => {
+    query = query.populate(populateOption);
+  });
 
-    const options = {
-      select: dbParams.options?.select || "_id",
-      lean: dbParams.options?.lean || true,
-    };
+  const options = {
+    select: dbParams.options?.select || "_id",
+    lean: dbParams.options?.lean || true,
+  };
 
-    query = query.select(options.select).lean(options.lean);
+  query = query.select(options.select).lean(options.lean);
 
-    return query.exec();
-  } catch (error) {
-    throw error;
-  }
+  return query.exec();
 }
 
 async function getUsers(dbParams: DbParams): Promise<UserModel[]> {
-  try {
-    let query = User.find(dbParams.query);
+  let query = User.find(dbParams.query);
 
-    (dbParams.options?.populateArray || []).forEach((populateOption) => {
-      query = query.populate(populateOption);
-    });
+  (dbParams.options?.populateArray || []).forEach((populateOption) => {
+    query = query.populate(populateOption);
+  });
 
-    const options = {
-      sort: dbParams.options?.sort || {},
-      limit: dbParams.options?.limit || 10,
-      select: dbParams.options?.select || "_id",
-      lean: dbParams.options?.lean || true,
-    };
+  const options = {
+    sort: dbParams.options?.sort || {},
+    limit: dbParams.options?.limit || 10,
+    select: dbParams.options?.select || "_id",
+    lean: dbParams.options?.lean || true,
+  };
 
-    query = query.sort(options.sort).limit(options.limit).select(options.select).lean(options.lean);
+  query = query.sort(options.sort).limit(options.limit).select(options.select).lean(options.lean);
 
-    return query.exec();
-  } catch (error) {
-    throw error;
-  }
-}
-
-async function findByEmail(email: string): Promise<UserModel | null> {
-  try {
-    return await User.findOne({ email });
-  } catch (error) {
-    throw error;
-  }
+  return query.exec();
 }
 
 async function createUser(data: Partial<UserModel>): Promise<UserModel | null> {
-  try {
-    let user = await User.create(data);
-    const userWithoutPassword = await User.findById(user.id).select("-password").lean();
-    return userWithoutPassword as UserModel | null;
-  } catch (error) {
-    throw error;
-  }
+  let user = await User.create(data);
+  const userWithoutPassword = await User.findById(user.id).select("-password").lean();
+  return userWithoutPassword as UserModel | null;
 }
 
 async function updateUser(id: string, data: Partial<UserModel>): Promise<UserModel | null> {
-  try {
-    return await User.findByIdAndUpdate(id, data, { new: true });
-  } catch (error) {
-    throw error;
-  }
+  return await User.findByIdAndUpdate(id, data, { new: true });
 }
 
 async function deleteUser(id: string): Promise<UserModel | null> {
-  try {
-    return await User.findByIdAndDelete(id);
-  } catch (error) {
-    throw error;
-  }
+  return await User.findByIdAndDelete(id);
 }
 
-async function search(query: string): Promise<UserModel[]> {
-  try {
-    return User.find(
-      {
-        $text: { $search: query },
-      },
-      {
-        score: { $meta: "textScore" },
-      }
-    )
-      .sort({ score: { $meta: "textScore" } })
-      .limit(20);
-  } catch (error) {
-    throw error;
-  }
+async function searchUser(query: string): Promise<UserModel[]> {
+  return User.find(
+    {
+      $text: { $search: query },
+    },
+    {
+      score: { $meta: "textScore" },
+    }
+  )
+    .sort({ score: { $meta: "textScore" } })
+    .limit(20);
 }
 
-async function findOrCreate(params: any) {
-  //TODO: Add one more checker
-  // let user = await User.findOne({
-  //   firstName: params.firstName,
-  //   lastName: params.lastName,
-  //   middleName: params.middleName,
-  // });
-  // if (!user) {
-  //   const newUser = await User.create(params);
-  //   return newUser._id;
-  // }
-  // return user._id;
+async function searchAndUpdate(
+  query: FilterQuery<UserModel>,
+  update?: UpdateQuery<UserModel>,
+  options?: { multi?: boolean }
+): Promise<UserModel | null | { modifiedCount: number }> {
+  if (update) {
+    if (options?.multi) {
+      const result = await User.updateMany(query, update);
+      return { modifiedCount: result.modifiedCount };
+    } else {
+      return await User.findOneAndUpdate(query, update, { new: true });
+    }
+  } else {
+    return await User.findOne(query);
+  }
 }

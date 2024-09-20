@@ -3,17 +3,17 @@ import { AnnouncementModel } from "../models/announcementModel";
 import announcementRepository from "../repository/announcementRepository";
 
 const announcementService = {
-  getById,
-  getAllAnnouncement,
-  create,
-  update,
-  remove,
-  search,
+  getAnnouncement,
+  getAnnouncements,
+  createAnnouncement,
+  updateAnnouncement,
+  removeAnnouncement,
+  searchAnnouncement,
 };
 
 export default announcementService;
 
-async function getById(id: string, params: any): Promise<AnnouncementModel | null> {
+async function getAnnouncement(id: string, params: any): Promise<AnnouncementModel | null> {
   if (!id) {
     throw new Error(config.RESPONSE.ERROR.ANNOUNCEMENT.INVALID_PARAMETER.GET);
   }
@@ -35,7 +35,7 @@ async function getById(id: string, params: any): Promise<AnnouncementModel | nul
       dbParams.options.lean = params.lean;
     }
 
-    return await announcementRepository.getById(id, dbParams);
+    return await announcementRepository.getAnnouncement(id, dbParams);
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);
@@ -45,7 +45,7 @@ async function getById(id: string, params: any): Promise<AnnouncementModel | nul
   }
 }
 
-async function getAllAnnouncement(params: any): Promise<AnnouncementModel[]> {
+async function getAnnouncements(params: any): Promise<AnnouncementModel[]> {
   if (!params) {
     throw new Error(config.RESPONSE.ERROR.ANNOUNCEMENT.INVALID_PARAMETER.GET_ALL);
   }
@@ -79,7 +79,7 @@ async function getAllAnnouncement(params: any): Promise<AnnouncementModel[]> {
       dbParams.options.lean = params.lean;
     }
 
-    return await announcementRepository.getAllAnnouncement(dbParams);
+    return await announcementRepository.getAnnouncements(dbParams);
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);
@@ -89,13 +89,13 @@ async function getAllAnnouncement(params: any): Promise<AnnouncementModel[]> {
   }
 }
 
-async function create(data: Partial<AnnouncementModel>): Promise<AnnouncementModel> {
+async function createAnnouncement(data: Partial<AnnouncementModel>): Promise<AnnouncementModel> {
   if (!data) {
     throw new Error(config.RESPONSE.ERROR.ANNOUNCEMENT.INVALID_PARAMETER.CREATE);
   }
 
   try {
-    return await announcementRepository.create(data);
+    return await announcementRepository.createAnnouncement(data);
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);
@@ -105,13 +105,15 @@ async function create(data: Partial<AnnouncementModel>): Promise<AnnouncementMod
   }
 }
 
-async function update(data: Partial<AnnouncementModel>): Promise<AnnouncementModel | null> {
+async function updateAnnouncement(
+  data: Partial<AnnouncementModel>
+): Promise<AnnouncementModel | null> {
   if (!data) {
     throw new Error(config.RESPONSE.ERROR.ANNOUNCEMENT.INVALID_PARAMETER.UPDATE);
   }
 
   try {
-    return await announcementRepository.update(data);
+    return await announcementRepository.updateAnnouncement(data);
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);
@@ -121,13 +123,13 @@ async function update(data: Partial<AnnouncementModel>): Promise<AnnouncementMod
   }
 }
 
-async function remove(id: string): Promise<AnnouncementModel | null> {
+async function removeAnnouncement(id: string): Promise<AnnouncementModel | null> {
   if (!id) {
     throw new Error(config.RESPONSE.ERROR.ANNOUNCEMENT.INVALID_PARAMETER.REMOVE);
   }
 
   try {
-    return await announcementRepository.remove(id);
+    return await announcementRepository.removeAnnouncement(id);
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);
@@ -137,7 +139,7 @@ async function remove(id: string): Promise<AnnouncementModel | null> {
   }
 }
 
-async function search(params: any): Promise<AnnouncementModel[] | null> {
+async function searchAnnouncement(params: any): Promise<AnnouncementModel[] | null> {
   try {
     let dbParams = {
       query: {},
@@ -172,7 +174,7 @@ async function search(params: any): Promise<AnnouncementModel[] | null> {
 
     dbParams.lean = params.lean || true;
 
-    return await announcementRepository.search(dbParams);
+    return await announcementRepository.searchAnnouncement(dbParams);
   } catch (error) {
     console.error(error);
     throw error;
