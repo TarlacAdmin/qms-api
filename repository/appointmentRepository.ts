@@ -1,9 +1,10 @@
 import Appointment, { AppointmentModel } from "../models/appointmentModel";
 import Patient from "../models/patientModel";
 import Doctor from "../models/doctorModel";
-import { ObjectId } from "mongodb";
 import { SearchParams } from "../types/searchTypes";
 import { buildSearchQuery, formatResults } from "../helper/searchHelpers";
+
+import { PipelineStage } from "mongoose";
 
 interface DbParams {
   query?: any;
@@ -17,224 +18,290 @@ interface DbParams {
 }
 
 const appointmentRepository = {
-  getById,
-  getAllAppointments,
-  create,
-  update,
-  remove,
-  findById,
-  search,
-  findByDate,
-  addDoctorToAppointment,
+  getAppointment,
+  getAppointments,
   getTotalAppointments,
+  createAppointment,
+  updateAppointment,
+  removeAppointment,
+  searchAppointment,
+  searchAppointments,
+  setDoctorForAppointment,
 };
 
 export default appointmentRepository;
 
-async function getById(id: string, dbParams: DbParams = {}): Promise<AppointmentModel | null> {
-  try {
-    let query = Appointment.findById(id);
+async function getAppointment(
+  id: string,
+  dbParams: DbParams = {}
+): Promise<AppointmentModel | null> {
+  let query = Appointment.findById(id);
 
-    (dbParams.options?.populateArray || []).forEach((populateOption) => {
-      query = query.populate(populateOption);
-    });
+  (dbParams.options?.populateArray || []).forEach((populateOption) => {
+    query = query.populate(populateOption);
+  });
 
-    const options = {
-      select: dbParams.options?.select || "_id",
-      lean: dbParams.options?.lean || true,
-    };
+  const options = {
+    select: dbParams.options?.select || "_id",
+    lean: dbParams.options?.lean || true,
+  };
 
-    query = query.select(options.select).lean(options.lean);
+  query = query.select(options.select).lean(options.lean);
 
-    return query.exec();
-  } catch (error) {
-    throw error;
-  }
+  return query.exec();
 }
 
-async function getAllAppointments(dbParams: DbParams = {}): Promise<AppointmentModel[]> {
-  try {
-    let query = Appointment.find(dbParams.query);
+async function getAppointments(dbParams: DbParams = {}): Promise<AppointmentModel[]> {
+  let query = Appointment.find(dbParams.query);
 
-    (dbParams.options?.populateArray || []).forEach((populateOption) => {
-      query = query.populate(populateOption);
-    });
+  (dbParams.options?.populateArray || []).forEach((populateOption) => {
+    query = query.populate(populateOption);
+  });
 
-    const options = {
-      sort: dbParams.options?.sort || {},
-      limit: dbParams.options?.limit || 10,
-      select: dbParams.options?.select || "_id",
-      lean: dbParams.options?.lean || true,
-    };
+  const options = {
+    sort: dbParams.options?.sort || {},
+    limit: dbParams.options?.limit || 10,
+    select: dbParams.options?.select || "_id",
+    lean: dbParams.options?.lean || true,
+  };
 
-    query = query.sort(options.sort).limit(options.limit).select(options.select).lean(options.lean);
+  query = query.sort(options.sort).limit(options.limit).select(options.select).lean(options.lean);
 
-    return query.exec();
-  } catch (error) {
-    throw error;
-  }
+  return query.exec();
 }
 
-async function findById(id: string | ObjectId): Promise<AppointmentModel | null> {
-  try {
-    return await Appointment.findById(id).lean();
-  } catch (error) {
-    throw error;
-  }
+async function getTotalAppointments(): Promise<number[]> {
+  return await Appointment.aggregate([
+    {
+      $facet: {
+        totalAppointments: [
+          {
+            $group: {
+              _id: null,
+              count: { $sum: 1 },
+            },
+          },
+          {
+            $project: {
+              count: 1,
+              _id: 0,
+            },
+          },
+        ],
+
+        totalAppointmentsByDoctor: [
+          {
+            $group: {
+              _id: "$doctor",
+              count: { $sum: 1 },
+            },
+          },
+          {
+            $project: {
+              doctor: "$_id",
+              count: 1,
+              _id: 0,
+            },
+          },
+          {
+            $sort: { count: -1 },
+          },
+          // Optional - Populate doctor details
+          {
+            $lookup: {
+              from: "doctors",
+              localField: "doctor",
+              foreignField: "_id",
+              as: "doctor",
+            },
+          },
+          {
+            $unwind: "$doctor",
+          },
+          {
+            $project: {
+              doctor: {
+                firstname: "$doctor.firstname",
+                lastname: "$doctor.lastname",
+                prefix: "$doctor.prefix",
+                degree: "$doctor.degree",
+              },
+              count: 1,
+            },
+          },
+        ],
+
+        totalCurrentAppointmentsByDateWithDoctor: [
+          {
+            $match: {
+              date: { $gte: new Date().toISOString().split("T")[0] },
+            },
+          },
+          {
+            $group: {
+              _id: { doctor: "$doctor", date: "$date" },
+              count: { $sum: 1 },
+            },
+          },
+          {
+            $project: {
+              doctor: "$_id.doctor",
+              date: "$_id.date",
+              count: 1,
+              _id: 0,
+            },
+          },
+          {
+            $sort: { date: 1 },
+          },
+          // Optional - Populate doctor details
+          {
+            $lookup: {
+              from: "doctors",
+              localField: "doctor",
+              foreignField: "_id",
+              as: "doctor",
+            },
+          },
+          {
+            $unwind: "$doctor",
+          },
+          {
+            $project: {
+              doctor: {
+                firstname: "$doctor.firstname",
+                lastname: "$doctor.lastname",
+                prefix: "$doctor.prefix",
+                degree: "$doctor.degree",
+              },
+              date: 1,
+              count: 1,
+            },
+          },
+        ],
+      },
+    },
+  ]);
 }
 
-async function findByDate(date: Date): Promise<AppointmentModel | null> {
-  try {
-    return await Appointment.findOne({ date }).lean();
-  } catch (error) {
-    throw error;
-  }
+async function createAppointment(data: Partial<AppointmentModel>): Promise<AppointmentModel> {
+  return await Appointment.create(data);
 }
 
-async function create(data: Partial<AppointmentModel>): Promise<AppointmentModel> {
-  try {
-    return await Appointment.create(data);
-  } catch (error) {
-    throw error;
-  }
+async function updateAppointment(
+  data: Partial<AppointmentModel>
+): Promise<AppointmentModel | null> {
+  return await Appointment.findByIdAndUpdate(data._id, data, { new: true }).lean();
 }
 
-async function addDoctorToAppointment(
+async function removeAppointment(id: string): Promise<AppointmentModel | null> {
+  return await Appointment.findByIdAndDelete(id).lean();
+}
+
+async function searchAppointment(params: SearchParams): Promise<any> {
+  const searchTypes =
+    params.searchType === "all" || !params.searchType
+      ? ["patient", "doctor", "appointment"]
+      : [params.searchType];
+
+  const searchPromises = searchTypes.map(async (type) => {
+    let query;
+    switch (type) {
+      case "patient":
+        query = buildSearchQuery(Patient, { ...params, populateArray: undefined });
+        break;
+      case "doctor":
+        query = buildSearchQuery(Doctor, { ...params, populateArray: undefined });
+        break;
+      case "appointment":
+        query = buildSearchQuery(Appointment, params);
+        break;
+      default:
+        return { type, results: [] };
+    }
+
+    const results = await query.exec();
+    return { type, results };
+  });
+
+  const searchResults = await Promise.all(searchPromises);
+
+  return formatResults(searchResults, params.searchType);
+}
+
+async function searchAppointments(params: any = {}): Promise<AppointmentModel[]> {
+  const pipeline: PipelineStage[] = [];
+
+  // Add lookup and unwind for patient or doctor
+  if (params.lookup) {
+    pipeline.push({
+      $lookup: {
+        from: params.lookup === "patient" ? "patients" : "doctors",
+        localField: params.lookup,
+        foreignField: "_id",
+        as: params.lookup,
+      },
+    } as PipelineStage);
+    pipeline.push({ $unwind: `$${params.lookup}` } as PipelineStage);
+  }
+
+  // Add match stage
+  const matchStage: Record<string, any> = { ...params.match };
+
+  // Only add status filter if it's provided in the params
+  if (params.status) {
+    matchStage.status = params.status;
+  }
+
+  // Only add the match stage if there are any conditions
+  if (Object.keys(matchStage).length > 0) {
+    pipeline.push({ $match: matchStage } as PipelineStage);
+  }
+
+  // Add sort stage
+  if (params.options.sort) {
+    const sortField = params.options.sort.replace("-", "");
+    const sortOrder = params.options.sort.startsWith("-") ? -1 : 1;
+    pipeline.push({ $sort: { [sortField]: sortOrder } } as PipelineStage);
+  }
+
+  // Add skip stage
+  if (params.options.skip) {
+    pipeline.push({ $skip: params.options.skip } as PipelineStage);
+  }
+
+  // Add limit stage
+  if (params.options.limit) {
+    pipeline.push({ $limit: params.options.limit } as PipelineStage);
+  }
+
+  // Add project stage for select
+  if (params.options.select) {
+    const selectFields = params.options.select
+      .split(" ")
+      .reduce((acc: Record<string, 1>, field: string) => {
+        acc[field] = 1;
+        return acc;
+      }, {});
+    pipeline.push({ $project: selectFields } as PipelineStage);
+  }
+
+  return Appointment.aggregate(pipeline);
+}
+
+async function setDoctorForAppointment(
   appointmentId: string,
   doctorId: string
 ): Promise<AppointmentModel | null> {
-  try {
-    return await Appointment.findByIdAndUpdate(
-      {
-        _id: appointmentId,
+  return await Appointment.findByIdAndUpdate(
+    appointmentId,
+    {
+      $set: {
+        doctor: doctorId,
       },
-      {
-        $set: {
-          doctor: doctorId,
-        },
-      },
-      {
-        new: true,
-      }
-    ).lean();
-  } catch (error) {
-    throw error;
-  }
-}
-
-async function update(data: Partial<AppointmentModel>): Promise<AppointmentModel | null> {
-  try {
-    return await Appointment.findByIdAndUpdate(data._id, data, { new: true }).lean();
-  } catch (error) {
-    throw error;
-  }
-}
-
-async function remove(id: string): Promise<AppointmentModel | null> {
-  try {
-    return await Appointment.findByIdAndDelete(id).lean();
-  } catch (error) {
-    throw error;
-  }
-}
-
-// Purpose: Search for patients, doctors, and appointments
-async function search(params: SearchParams): Promise<any> {
-  try {
-    const searchTypes =
-      params.searchType === "all" || !params.searchType
-        ? ["patient", "doctor", "appointment"]
-        : [params.searchType];
-
-    const searchPromises = searchTypes.map(async (type) => {
-      let query;
-      switch (type) {
-        case "patient":
-          query = buildSearchQuery(Patient, { ...params, populateArray: undefined });
-          break;
-        case "doctor":
-          query = buildSearchQuery(Doctor, { ...params, populateArray: undefined });
-          break;
-        case "appointment":
-          query = buildSearchQuery(Appointment, params);
-          break;
-        default:
-          return { type, results: [] };
-      }
-
-      const results = await query.exec();
-      return { type, results };
-    });
-
-    const searchResults = await Promise.all(searchPromises);
-
-    return formatResults(searchResults, params.searchType);
-  } catch (error) {
-    console.error("Repository search error:", error);
-    throw error;
-  }
-}
-
-async function getTotalAppointments(): Promise<{
-  total: number;
-  appointmentsByDoctor: { [key: string]: number };
-  currentAppointmentsByDateWithDoctor: { [key: string]: { [key: string]: number } };
-}> {
-  try {
-    const total = await Appointment.countDocuments();
-    const appointments = await Appointment.aggregate([
-      {
-        $group: {
-          _id: "$doctor",
-          count: { $sum: 1 },
-        },
-      },
-      {
-        $project: {
-          doctor: "$_id",
-          count: 1,
-          _id: 0,
-        },
-      },
-    ]);
-
-    const currentAppointments = await Appointment.aggregate([
-      {
-        $match: {
-          date: { $gte: new Date().toISOString().split("T")[0] },
-        },
-      },
-      {
-        $group: {
-          _id: { doctor: "$doctor", date: "$date" },
-          count: { $sum: 1 },
-        },
-      },
-      {
-        $project: {
-          doctor: "$_id.doctor",
-          date: "$_id.date",
-          count: 1,
-          _id: 0,
-        },
-      },
-    ]);
-
-    const appointmentsByDoctor: { [key: string]: number } = {};
-    appointments.forEach((doc) => {
-      appointmentsByDoctor[doc.doctor] = doc.count;
-    });
-
-    const currentAppointmentsByDateWithDoctor: { [key: string]: { [key: string]: number } } = {};
-    currentAppointments.forEach((doc) => {
-      if (!currentAppointmentsByDateWithDoctor[doc.doctor]) {
-        currentAppointmentsByDateWithDoctor[doc.doctor] = {};
-      }
-      currentAppointmentsByDateWithDoctor[doc.doctor][doc.date] = doc.count;
-    });
-
-    return { total, appointmentsByDoctor, currentAppointmentsByDateWithDoctor };
-  } catch (error) {
-    throw error;
-  }
+    },
+    {
+      new: true,
+    }
+  ).lean();
 }

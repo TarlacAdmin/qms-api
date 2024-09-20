@@ -1,5 +1,4 @@
 import Doctor, { DoctorModel } from "../models/doctorModel";
-import { ObjectId } from "mongodb";
 
 interface DbParams {
   query?: any;
@@ -13,116 +12,74 @@ interface DbParams {
 }
 
 const doctorRepository = {
-  getById,
-  getAllDoctors,
-  create,
-  update,
-  remove,
-  findById,
-  search,
-  findOne,
+  getDoctor,
+  getDoctors,
+  createDoctor,
+  updateDoctor,
+  removeDoctor,
+  searchDoctor,
 };
 
 export default doctorRepository;
 
-async function getById(id: string, dbParams: DbParams = {}): Promise<DoctorModel | null> {
-  try {
-    let query = Doctor.findById(id);
+async function getDoctor(id: string, dbParams: DbParams = {}): Promise<DoctorModel | null> {
+  let query = Doctor.findById(id);
 
-    (dbParams.options?.populateArray || []).forEach((populateOption) => {
-      query = query.populate(populateOption);
-    });
+  (dbParams.options?.populateArray || []).forEach((populateOption) => {
+    query = query.populate(populateOption);
+  });
 
-    const options = {
-      select: dbParams.options?.select || "_id",
-      lean: dbParams.options?.lean || true,
-    };
+  const options = {
+    select: dbParams.options?.select || "_id",
+    lean: dbParams.options?.lean || true,
+  };
 
-    query = query.select(options.select).lean(options.lean);
+  query = query.select(options.select).lean(options.lean);
 
-    return query.exec();
-  } catch (error) {
-    throw error;
-  }
+  return query.exec();
 }
 
-async function getAllDoctors(dbParams: DbParams = {}): Promise<DoctorModel[]> {
-  try {
-    let query = Doctor.find(dbParams.query);
+async function getDoctors(dbParams: DbParams = {}): Promise<DoctorModel[]> {
+  let query = Doctor.find(dbParams.query);
 
-    (dbParams.options?.populateArray || []).forEach((populateOption) => {
-      query = query.populate(populateOption);
-    });
+  (dbParams.options?.populateArray || []).forEach((populateOption) => {
+    query = query.populate(populateOption);
+  });
 
-    const options = {
-      sort: dbParams.options?.sort || {},
-      limit: dbParams.options?.limit || 10,
-      select: dbParams.options?.select || "_id",
-      lean: dbParams.options?.lean || true,
-    };
+  const options = {
+    sort: dbParams.options?.sort || {},
+    limit: dbParams.options?.limit || 10,
+    select: dbParams.options?.select || "_id",
+    lean: dbParams.options?.lean || true,
+  };
 
-    query = query.sort(options.sort).limit(options.limit).select(options.select).lean(options.lean);
+  query = query.sort(options.sort).limit(options.limit).select(options.select).lean(options.lean);
 
-    return query.exec();
-  } catch (error) {
-    throw error;
-  }
+  return query.exec();
 }
 
-async function findById(id: string | ObjectId): Promise<DoctorModel | null> {
-  try {
-    return await Doctor.findById(id).lean();
-  } catch (error) {
-    throw error;
-  }
+async function createDoctor(data: Partial<DoctorModel>): Promise<DoctorModel> {
+  return await Doctor.create(data);
 }
 
-async function findOne(query: any): Promise<DoctorModel | null> {
-  try {
-    return await Doctor.findOne(query).lean();
-  } catch (error) {
-    throw error;
-  }
+async function updateDoctor(data: Partial<DoctorModel>): Promise<DoctorModel | null> {
+  return await Doctor.findByIdAndUpdate(data._id, data, { new: true }).lean();
 }
 
-async function create(data: Partial<DoctorModel>): Promise<DoctorModel> {
-  try {
-    return await Doctor.create(data);
-  } catch (error) {
-    throw error;
-  }
+async function removeDoctor(id: string): Promise<DoctorModel | null> {
+  return await Doctor.findByIdAndDelete(id).lean();
 }
 
-async function update(data: Partial<DoctorModel>): Promise<DoctorModel | null> {
-  try {
-    return await Doctor.findByIdAndUpdate(data._id, data, { new: true }).lean();
-  } catch (error) {
-    throw error;
-  }
-}
+async function searchDoctor(params: any = {}): Promise<DoctorModel[]> {
+  let query = Doctor.find();
+  query.setQuery(params.query);
+  query.populate(params.populateArray);
+  query.projection(params.projection);
+  query.setOptions(params.options);
+  query.lean(params.lean);
 
-async function remove(id: string): Promise<DoctorModel | null> {
-  try {
-    return await Doctor.findByIdAndDelete(id).lean();
-  } catch (error) {
-    throw error;
+  if (params.match) {
+    query.where(params.match);
   }
-}
-
-async function search(params: any = {}): Promise<DoctorModel[]> {
-  try {
-    let query = Doctor.find();
-    query.setQuery(params.query);
-    query.populate(params.populateArray);
-    query.projection(params.projection);
-    query.setOptions(params.options);
-    query.lean(params.lean);
-
-    if (params.match) {
-      query.where(params.match);
-    }
-    return query.exec();
-  } catch (error) {
-    throw error;
-  }
+  return query.exec();
 }

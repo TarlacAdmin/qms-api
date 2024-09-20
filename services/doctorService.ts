@@ -3,17 +3,17 @@ import { DoctorModel } from "../models/doctorModel";
 import doctorRepository from "../repository/doctorRepository";
 
 const doctorService = {
-  getById,
-  getAllDoctors,
-  create,
-  update,
-  remove,
-  search,
+  getDoctor,
+  getDoctors,
+  createDoctor,
+  updateDoctor,
+  removeDoctor,
+  searchDoctor,
 };
 
 export default doctorService;
 
-async function getById(id: string, params: any): Promise<DoctorModel | null> {
+async function getDoctor(id: string, params: any): Promise<DoctorModel | null> {
   if (!id) {
     throw new Error(config.RESPONSE.ERROR.DOCTOR.INVALID_PARAMETER.GET);
   }
@@ -35,7 +35,7 @@ async function getById(id: string, params: any): Promise<DoctorModel | null> {
       dbParams.options.lean = params.lean;
     }
 
-    return await doctorRepository.getById(id, dbParams);
+    return await doctorRepository.getDoctor(id, dbParams);
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);
@@ -45,7 +45,7 @@ async function getById(id: string, params: any): Promise<DoctorModel | null> {
   }
 }
 
-async function getAllDoctors(params: any): Promise<DoctorModel[]> {
+async function getDoctors(params: any): Promise<DoctorModel[]> {
   if (!params) {
     throw new Error(config.RESPONSE.ERROR.DOCTOR.INVALID_PARAMETER.GET_ALL);
   }
@@ -79,7 +79,7 @@ async function getAllDoctors(params: any): Promise<DoctorModel[]> {
       dbParams.options.lean = params.lean;
     }
 
-    return await doctorRepository.getAllDoctors(dbParams);
+    return await doctorRepository.getDoctors(dbParams);
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);
@@ -89,16 +89,13 @@ async function getAllDoctors(params: any): Promise<DoctorModel[]> {
   }
 }
 
-async function create(data: Partial<DoctorModel>): Promise<DoctorModel> {
+async function createDoctor(data: Partial<DoctorModel>): Promise<DoctorModel> {
   if (!data) {
     throw new Error(config.RESPONSE.ERROR.DOCTOR.INVALID_PARAMETER.CREATE);
   }
 
   try {
-    // if (data.metadata && data.metadata.schedule) {
-    //   data.metadata.schedule = parseSchedule(data.metadata.schedule);
-    // }
-    return await doctorRepository.create(data);
+    return await doctorRepository.createDoctor(data);
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);
@@ -108,13 +105,13 @@ async function create(data: Partial<DoctorModel>): Promise<DoctorModel> {
   }
 }
 
-async function update(data: Partial<DoctorModel>): Promise<DoctorModel | null> {
+async function updateDoctor(data: Partial<DoctorModel>): Promise<DoctorModel | null> {
   if (!data) {
     throw new Error(config.RESPONSE.ERROR.DOCTOR.INVALID_PARAMETER.UPDATE);
   }
 
   try {
-    return await doctorRepository.update(data);
+    return await doctorRepository.updateDoctor(data);
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);
@@ -124,13 +121,13 @@ async function update(data: Partial<DoctorModel>): Promise<DoctorModel | null> {
   }
 }
 
-async function remove(id: string): Promise<DoctorModel | null> {
+async function removeDoctor(id: string): Promise<DoctorModel | null> {
   if (!id) {
     throw new Error(config.RESPONSE.ERROR.DOCTOR.INVALID_PARAMETER.REMOVE);
   }
 
   try {
-    return await doctorRepository.remove(id);
+    return await doctorRepository.removeDoctor(id);
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);
@@ -140,7 +137,7 @@ async function remove(id: string): Promise<DoctorModel | null> {
   }
 }
 
-async function search(params: any): Promise<DoctorModel[] | null> {
+async function searchDoctor(params: any): Promise<DoctorModel[] | null> {
   try {
     let dbParams = {
       query: {},
@@ -175,30 +172,9 @@ async function search(params: any): Promise<DoctorModel[] | null> {
 
     dbParams.lean = params.lean || true;
 
-    return await doctorRepository.search(dbParams);
+    return await doctorRepository.searchDoctor(dbParams);
   } catch (error) {
     console.error(error);
     throw error;
   }
 }
-
-// function parseSchedule(schedule: any): any {
-//   const days = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
-//   const parsedSchedule: any = {};
-
-//   days.forEach((day) => {
-//     if (schedule[day]) {
-//       parsedSchedule[day] = {
-//         am: schedule[day].am ? schedule[day].am : false,
-//         pm: schedule[day].pm ? schedule[day].pm : false,
-//       };
-//     } else {
-//       parsedSchedule[day] = {
-//         am: false,
-//         pm: false,
-//       };
-//     }
-//   });
-
-//   return parsedSchedule;
-// }

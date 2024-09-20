@@ -6,13 +6,12 @@ import { config } from "../config/config";
 
 const router = express.Router();
 
-router.get(API_ENDPOINTS.QUEUE.GET_ALL, getAllQueues);
-router.get(API_ENDPOINTS.QUEUE.GET_TOTAL, getTotalQueuesNumber);
-router.get(API_ENDPOINTS.QUEUE.GET_BY_ID, getById);
-router.post(API_ENDPOINTS.QUEUE.CREATE, create);
-router.post(API_ENDPOINTS.QUEUE.SEARCH, search);
-router.put(API_ENDPOINTS.QUEUE.UPDATE, update);
-router.delete(API_ENDPOINTS.QUEUE.REMOVE_BY_ID, remove);
+router.get(API_ENDPOINTS.QUEUE.GET_ALL, getQueues);
+router.get(API_ENDPOINTS.QUEUE.GET_BY_ID, getQueue);
+router.post(API_ENDPOINTS.QUEUE.CREATE, createQueue);
+router.put(API_ENDPOINTS.QUEUE.UPDATE, updateQueue);
+router.delete(API_ENDPOINTS.QUEUE.REMOVE_BY_ID, removeQueue);
+router.post(API_ENDPOINTS.QUEUE.SEARCH, searchQueue);
 
 export default router;
 
@@ -21,7 +20,7 @@ export default router;
  * @route  GET /api/queue/get/all
  * @access Private
  */
-async function getAllQueues(req: Request, res: Response) {
+async function getQueues(req: Request, res: Response) {
   const params = {
     query: req.query.query || {},
     queryArray: req.query.queryArray,
@@ -36,7 +35,7 @@ async function getAllQueues(req: Request, res: Response) {
   };
 
   try {
-    const queues = await queueService.getAllQueues(params);
+    const queues = await queueService.getQueues(params);
     res.status(200).send(queues);
   } catch (error) {
     if (error instanceof Error) {
@@ -47,22 +46,12 @@ async function getAllQueues(req: Request, res: Response) {
   }
 }
 
-// nagprapractice lang po ako ng mga aggregation queries, dedelete ko rin po ito HAHAHAHHA
-async function getTotalQueuesNumber(req: Request, res: Response) {
-  try {
-    const total = await queueService.getTotalQueuesNumber();
-    res.status(200).send(total);
-  } catch (error) {
-    throw error;
-  }
-}
-
 /*
  * @desc   get queue by id
  * @route  GET /api/queue/get/:id
  * @access Private
  */
-async function getById(req: Request, res: Response) {
+async function getQueue(req: Request, res: Response) {
   await param(config.VALIDATION.QUEUE.PARAMS.ID)
     .isMongoId()
     .withMessage(config.VALIDATION.QUEUE.PARAMS.INVALID_ID)
@@ -80,7 +69,7 @@ async function getById(req: Request, res: Response) {
   };
 
   try {
-    const queue = await queueService.getById(req.params.id, params);
+    const queue = await queueService.getQueue(req.params.id, params);
     res.status(200).send(queue);
   } catch (error) {
     if (error instanceof Error) {
@@ -96,7 +85,7 @@ async function getById(req: Request, res: Response) {
  * @route  POST /api/queue/create
  * @access Private
  */
-async function create(req: Request, res: Response) {
+async function createQueue(req: Request, res: Response) {
   await Promise.all([
     body(config.VALIDATION.QUEUE.BODY.PATIENT)
       .notEmpty()
@@ -114,7 +103,7 @@ async function create(req: Request, res: Response) {
   }
 
   try {
-    const newQueue = await queueService.create(req.body);
+    const newQueue = await queueService.createQueue(req.body);
     (req as any).io.emit("queueCreated", newQueue);
     res.status(200).send(newQueue);
   } catch (error) {
@@ -131,7 +120,7 @@ async function create(req: Request, res: Response) {
  * @route  PUT /api/queue/update
  * @access Private
  */
-async function update(req: Request, res: Response) {
+async function updateQueue(req: Request, res: Response) {
   await Promise.all([
     body(config.VALIDATION.QUEUE.BODY.PATIENT)
       .notEmpty()
@@ -149,7 +138,7 @@ async function update(req: Request, res: Response) {
   }
 
   try {
-    const updatedQueue = await queueService.update(req.body);
+    const updatedQueue = await queueService.updateQueue(req.body);
     (req as any).io.emit("queueUpdated", updatedQueue);
     res.status(200).send(updatedQueue);
   } catch (error) {
@@ -166,7 +155,7 @@ async function update(req: Request, res: Response) {
  * @route  DELETE /api/queue/remove/:id
  * @access Private
  */
-async function remove(req: Request, res: Response) {
+async function removeQueue(req: Request, res: Response) {
   await param(config.VALIDATION.QUEUE.PARAMS.ID)
     .isMongoId()
     .withMessage(config.VALIDATION.QUEUE.PARAMS.INVALID_ID)
@@ -178,7 +167,7 @@ async function remove(req: Request, res: Response) {
   }
 
   try {
-    const removedQueue = await queueService.remove(req.params.id);
+    const removedQueue = await queueService.removeQueue(req.params.id);
     res.status(200).send(removedQueue);
   } catch (error) {
     if (error instanceof Error) {
@@ -191,12 +180,12 @@ async function remove(req: Request, res: Response) {
 
 /*
  * @desc   search queue
- * @route  DELETE /api/queue/search
+ * @route  POST /api/queue/search
  * @access Private
  */
-async function search(req: Request, res: Response) {
+async function searchQueue(req: Request, res: Response) {
   try {
-    const searchedQueues = await queueService.search(req.body);
+    const searchedQueues = await queueService.searchQueue(req.body);
     res.status(200).send(searchedQueues);
   } catch (error) {
     if (error instanceof Error) {

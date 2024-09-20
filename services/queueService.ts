@@ -5,18 +5,17 @@ import queueRepository from "../repository/queueRepository";
 import patientService from "./patientService";
 
 const queueService = {
-  getById,
-  getAllQueues,
-  create,
-  update,
-  remove,
-  search,
-  getTotalQueuesNumber,
+  getQueue,
+  getQueues,
+  createQueue,
+  updateQueue,
+  removeQueue,
+  searchQueue,
 };
 
 export default queueService;
 
-async function getById(id: string, params: any): Promise<QueueModel | null> {
+async function getQueue(id: string, params: any): Promise<QueueModel | null> {
   if (!id) {
     throw new Error(config.RESPONSE.ERROR.QUEUE.INVALID_PARAMETER.GET);
   }
@@ -38,7 +37,7 @@ async function getById(id: string, params: any): Promise<QueueModel | null> {
       dbParams.options.lean = params.lean;
     }
 
-    return await queueRepository.getById(id, dbParams);
+    return await queueRepository.getQueue(id, dbParams);
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);
@@ -48,7 +47,7 @@ async function getById(id: string, params: any): Promise<QueueModel | null> {
   }
 }
 
-async function getAllQueues(params: any): Promise<QueueModel[]> {
+async function getQueues(params: any): Promise<QueueModel[]> {
   if (!params) {
     throw new Error(config.RESPONSE.ERROR.QUEUE.INVALID_PARAMETER.GET_ALL);
   }
@@ -84,7 +83,7 @@ async function getAllQueues(params: any): Promise<QueueModel[]> {
       dbParams.options.lean = params.lean;
     }
 
-    return await queueRepository.getAllQueues(dbParams);
+    return await queueRepository.getQueues(dbParams);
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);
@@ -94,7 +93,7 @@ async function getAllQueues(params: any): Promise<QueueModel[]> {
   }
 }
 
-async function create(data: Partial<QueueModel>): Promise<QueueModel> {
+async function createQueue(data: Partial<QueueModel>): Promise<QueueModel> {
   if (!data) {
     throw new Error(config.RESPONSE.ERROR.QUEUE.INVALID_PARAMETER.CREATE);
   }
@@ -109,7 +108,7 @@ async function create(data: Partial<QueueModel>): Promise<QueueModel> {
       data.metadata.patient = patient._id as ObjectId;
     }
 
-    let createdQueue = await queueRepository.create(data);
+    let createdQueue = await queueRepository.createQueue(data);
     createdQueue = await createdQueue.populate("metadata.patient");
 
     return createdQueue;
@@ -122,13 +121,13 @@ async function create(data: Partial<QueueModel>): Promise<QueueModel> {
   }
 }
 
-async function update(data: Partial<QueueModel>): Promise<QueueModel | null> {
+async function updateQueue(data: Partial<QueueModel>): Promise<QueueModel | null> {
   if (!data) {
     throw new Error(config.RESPONSE.ERROR.QUEUE.INVALID_PARAMETER.UPDATE);
   }
 
   try {
-    return await queueRepository.update(data);
+    return await queueRepository.updateQueue(data);
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);
@@ -138,13 +137,13 @@ async function update(data: Partial<QueueModel>): Promise<QueueModel | null> {
   }
 }
 
-async function remove(id: string): Promise<QueueModel | null> {
+async function removeQueue(id: string): Promise<QueueModel | null> {
   if (!id) {
     throw new Error(config.RESPONSE.ERROR.QUEUE.INVALID_PARAMETER.REMOVE);
   }
 
   try {
-    return await queueRepository.remove(id);
+    return await queueRepository.removeQueue(id);
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);
@@ -154,7 +153,7 @@ async function remove(id: string): Promise<QueueModel | null> {
   }
 }
 
-async function search(params: any): Promise<QueueModel[] | null> {
+async function searchQueue(params: any): Promise<QueueModel[] | null> {
   //TODO: VAlidation
 
   try {
@@ -186,7 +185,7 @@ async function search(params: any): Promise<QueueModel[] | null> {
 
     dbParams.lean = params.lean || true;
 
-    return await queueRepository.search(dbParams);
+    return await queueRepository.searchQueue(dbParams);
   } catch (error) {
     console.error(error);
     throw error;
@@ -197,7 +196,7 @@ async function generateQueueNumber(counterName: string): Promise<string> {
   const today = new Date();
   today.setUTCHours(0, 0, 0, 0);
 
-  const queues = await search({
+  const queues = await searchQueue({
     query: {
       counter: counterName,
       createdAt: { $gte: today },
@@ -214,14 +213,5 @@ async function generateQueueNumber(counterName: string): Promise<string> {
     return (queueNumber = String(latestNumber + 1).padStart(3, "0"));
   } else {
     return (queueNumber = "001");
-  }
-}
-
-// nagprapractice lang po ako ng mga aggregation queries, dedelete ko rin po ito HAHAHAHHA
-async function getTotalQueuesNumber(): Promise<number[]> {
-  try {
-    return await queueRepository.getTotalQueuesNumber();
-  } catch (error) {
-    throw error;
   }
 }

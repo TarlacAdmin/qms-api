@@ -3,17 +3,17 @@ import { SpecialDatesModel } from "../models/specialDatesModel";
 import specialDatesRepository from "../repository/specialDatesRepository";
 
 const specialDatesService = {
-  getById,
-  getAllSpecialDates,
-  create,
-  update,
-  remove,
-  search,
+  getSpecialDate,
+  getSpecialDates,
+  createSpecialDate,
+  updateSpecialDate,
+  removeSpecialDate,
+  searchSpecialDate,
 };
 
 export default specialDatesService;
 
-async function getById(id: string, params: any): Promise<SpecialDatesModel | null> {
+async function getSpecialDate(id: string, params: any): Promise<SpecialDatesModel | null> {
   if (!id) {
     throw new Error(config.RESPONSE.ERROR.SPECIALDATE.INVALID_PARAMETER.GET);
   }
@@ -35,7 +35,7 @@ async function getById(id: string, params: any): Promise<SpecialDatesModel | nul
       dbParams.options.lean = params.lean;
     }
 
-    return await specialDatesRepository.getById(id, dbParams);
+    return await specialDatesRepository.getSpecialDate(id, dbParams);
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);
@@ -45,7 +45,7 @@ async function getById(id: string, params: any): Promise<SpecialDatesModel | nul
   }
 }
 
-async function getAllSpecialDates(params: any): Promise<SpecialDatesModel[]> {
+async function getSpecialDates(params: any): Promise<SpecialDatesModel[]> {
   if (!params) {
     throw new Error(config.RESPONSE.ERROR.SPECIALDATE.INVALID_PARAMETER.GET_ALL);
   }
@@ -79,7 +79,7 @@ async function getAllSpecialDates(params: any): Promise<SpecialDatesModel[]> {
       dbParams.options.lean = params.lean;
     }
 
-    return await specialDatesRepository.getAllSpecialDates(dbParams);
+    return await specialDatesRepository.getSpecialDates(dbParams);
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);
@@ -89,13 +89,13 @@ async function getAllSpecialDates(params: any): Promise<SpecialDatesModel[]> {
   }
 }
 
-async function create(data: Partial<SpecialDatesModel>): Promise<SpecialDatesModel> {
+async function createSpecialDate(data: Partial<SpecialDatesModel>): Promise<SpecialDatesModel> {
   if (!data) {
     throw new Error(config.RESPONSE.ERROR.SPECIALDATE.INVALID_PARAMETER.CREATE);
   }
 
   try {
-    return await specialDatesRepository.create(data);
+    return await specialDatesRepository.createSpecialDate(data);
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);
@@ -105,13 +105,15 @@ async function create(data: Partial<SpecialDatesModel>): Promise<SpecialDatesMod
   }
 }
 
-async function update(data: Partial<SpecialDatesModel>): Promise<SpecialDatesModel | null> {
+async function updateSpecialDate(
+  data: Partial<SpecialDatesModel>
+): Promise<SpecialDatesModel | null> {
   if (!data) {
     throw new Error(config.RESPONSE.ERROR.SPECIALDATE.INVALID_PARAMETER.UPDATE);
   }
 
   try {
-    return await specialDatesRepository.update(data);
+    return await specialDatesRepository.updateSpecialDate(data);
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);
@@ -121,13 +123,13 @@ async function update(data: Partial<SpecialDatesModel>): Promise<SpecialDatesMod
   }
 }
 
-async function remove(id: string): Promise<SpecialDatesModel | null> {
+async function removeSpecialDate(id: string): Promise<SpecialDatesModel | null> {
   if (!id) {
     throw new Error(config.RESPONSE.ERROR.SPECIALDATE.INVALID_PARAMETER.REMOVE);
   }
 
   try {
-    return await specialDatesRepository.remove(id);
+    return await specialDatesRepository.removeSpecialDate(id);
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);
@@ -137,7 +139,7 @@ async function remove(id: string): Promise<SpecialDatesModel | null> {
   }
 }
 
-async function search(params: any): Promise<SpecialDatesModel[] | null> {
+async function searchSpecialDate(params: any): Promise<SpecialDatesModel[] | null> {
   try {
     let dbParams = {
       query: {},
@@ -172,7 +174,7 @@ async function search(params: any): Promise<SpecialDatesModel[] | null> {
 
     dbParams.lean = params.lean || true;
 
-    return await specialDatesRepository.search(dbParams);
+    return await specialDatesRepository.searchSpecialDate(dbParams);
   } catch (error) {
     console.error(error);
     throw error;

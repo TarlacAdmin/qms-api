@@ -39,7 +39,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"username\": \"myles\",\r\n  \"firstname\": \"adriel\",\r\n  \"lastname\": \"avila\",\r\n  \"email\": \"myles@gmail.com\",\r\n  \"password\": \"abcd1234!\"\r\n}",
+							"raw": "{\r\n    \"username\": \"johndoe\",\r\n    \"firstname\": \"John\",\r\n    \"middlename\": \"A\",\r\n    \"lastname\": \"Doe\",\r\n    \"email\": \"johndoe@example.com\",\r\n    \"password\": \"securepassword123\",\r\n    \"status\": \"active\",\r\n    \"type\": \"admin\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -69,7 +69,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/api/user/get/all?select=firstname&select=email",
+							"raw": "{{base_url}}/api/user/get/all?select=firstname&select=username&select=email&select=type",
 							"host": [
 								"{{base_url}}"
 							],
@@ -86,7 +86,15 @@
 								},
 								{
 									"key": "select",
+									"value": "username"
+								},
+								{
+									"key": "select",
 									"value": "email"
+								},
+								{
+									"key": "select",
+									"value": "type"
 								}
 							]
 						}
@@ -163,7 +171,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"email\": \"myles@gmail.com\",\r\n    \"password\": \"abcd1234!\"\r\n}",
+							"raw": "{\r\n    \"email\": \"johndoe@example.com\",\r\n    \"password\": \"securepassword123\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -351,7 +359,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"email\": \"testing@gmail.com\",\r\n    \"password\": \"testing123\"\r\n}",
+							"raw": "{\r\n    \"_id\": \"66cacbc608239b1386176ba4\",\r\n    \"username\": \"johndoe\",\r\n    \"firstname\": \"John\",\r\n    \"middlename\": \"A\",\r\n    \"lastname\": \"Doe\",\r\n    \"email\": \"johndoe@example.com\",\r\n    \"password\": \"securepassword123\",\r\n    \"status\": \"active\",\r\n    \"type\": \"user\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -395,7 +403,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/api/queue/get/all?select",
+							"raw": "{{base_url}}/api/queue/get/all?select=metadata.patient&populateArray=metadata.patient&select=queueType&select=queueNumber&limit=300",
 							"host": [
 								"{{base_url}}"
 							],
@@ -408,7 +416,23 @@
 							"query": [
 								{
 									"key": "select",
-									"value": null
+									"value": "metadata.patient"
+								},
+								{
+									"key": "populateArray",
+									"value": "metadata.patient"
+								},
+								{
+									"key": "select",
+									"value": "queueType"
+								},
+								{
+									"key": "select",
+									"value": "queueNumber"
+								},
+								{
+									"key": "limit",
+									"value": "300"
 								}
 							]
 						}
@@ -466,7 +490,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"counter\": \"payment\",\r\n    \"metadata\": {\r\n        \"patient\": {\r\n            \"lastname\": \"Avila\",\r\n            \"firstname\": \"Dariel\",\r\n            \"middlename\": \"Valdez\"\r\n        },\r\n        \"doctor\": \"Peter Lloyd Mallari, MD\"\r\n    }\r\n}",
+							"raw": "{\r\n    \"counter\": \"interview\",\r\n    \"metadata\": {\r\n        \"patient\": {\r\n            \"lastName\": \"Avila\",\r\n            \"firstName\": \"Pauline\",\r\n            \"middleName\": \"M\"\r\n        },\r\n        \"doctor\": \"66bc67091bab1f34ea5621fd\"\r\n    }\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -558,6 +582,38 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Get Total",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/queue/get/total",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"queue",
+								"get",
+								"total"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -582,7 +638,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/api/patient/get/all?select=firstname&select=lastname&select=middlename&limit=10",
+							"raw": "{{base_url}}/api/patient/get/all?select=firstName&select=lastName&select=middleName&select=metadata.queue&select=metadata.bhw&select=chiefComplaint&select=diagnosis&limit=300",
 							"host": [
 								"{{base_url}}"
 							],
@@ -595,19 +651,35 @@
 							"query": [
 								{
 									"key": "select",
-									"value": "firstname"
+									"value": "firstName"
 								},
 								{
 									"key": "select",
-									"value": "lastname"
+									"value": "lastName"
 								},
 								{
 									"key": "select",
-									"value": "middlename"
+									"value": "middleName"
+								},
+								{
+									"key": "select",
+									"value": "metadata.queue"
+								},
+								{
+									"key": "select",
+									"value": "metadata.bhw"
+								},
+								{
+									"key": "select",
+									"value": "chiefComplaint"
+								},
+								{
+									"key": "select",
+									"value": "diagnosis"
 								},
 								{
 									"key": "limit",
-									"value": "10"
+									"value": "300"
 								}
 							]
 						}
@@ -665,7 +737,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"name\": \"Finance Management\",\r\n    \"key\": \"FIM\",\r\n    \"image\": \"https://res.cloudinary.com/pisara-dev/image/upload/v1718781490/pisara-app/Templates/Finance_aurrnu.jpg\"\r\n}",
+							"raw": "{\r\n    \"firstName\": \"Test\",\r\n    \"lastName\": \"Patient\",\r\n    \"middleName\": \"G.\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -753,6 +825,405 @@
 								"api",
 								"patient",
 								"update"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add Chief Complaint",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"_id\": \"66e59083befb6f5fa95a1e58\",\r\n    \"chiefComplaint\": [\r\n        {\r\n            \"text\": \"Headache\",\r\n            \"onsetDateTime\": \"2022-01-15T08:00:00.000Z\",\r\n            \"abatementDateTime\": \"2022-01-16T08:00:00.000Z\",\r\n            \"bodySite\": [\r\n                \"Head\"\r\n            ],\r\n            \"severity\": \"Moderate\"\r\n        }\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/patient/chiefcomplaint",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"patient",
+								"chiefcomplaint"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add Diagnosis",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"_id\": \"66e59083befb6f5fa95a1e58\",\r\n    \"diagnosis\": [\r\n        {\r\n            \"text\": \"Headache\",\r\n            \"onsetDateTime\": \"2022-01-15T08:00:00.000Z\",\r\n            \"abatementDateTime\": \"2022-01-16T08:00:00.000Z\",\r\n            \"bodySite\": [\r\n                \"Head\"\r\n            ],\r\n            \"severity\": \"Moderate\"\r\n        }\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/patient/diagnosis",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"patient",
+								"diagnosis"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add BHW",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"_id\": \"66e59083befb6f5fa95a1e58\",\r\n  \"bhw\": {\r\n    \"profile\": {\r\n      \"firstname\": \"Test\",\r\n      \"lastname\": \"Patient BHW Test\",\r\n      \"middlename\": \"Test middlename\",\r\n      \"barangay\": \"Poblacion\",\r\n      \"city\": \"Manila\"\r\n    },\r\n    \"label\": \"Community Health Worker\",\r\n    \"date\": \"2023-05-15T08:00:00.000Z\"\r\n  }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/patient/bhw",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"patient",
+								"bhw"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"project\": \"firstName\"\r\n\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/patient/search",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"patient",
+								"search"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Special Dates",
+			"item": [
+				{
+					"name": "Get ALL",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/specialdate/get/all?select=name&select=date&select=attachment&limit=10",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"specialdate",
+								"get",
+								"all"
+							],
+							"query": [
+								{
+									"key": "select",
+									"value": "name"
+								},
+								{
+									"key": "select",
+									"value": "date"
+								},
+								{
+									"key": "select",
+									"value": "attachment"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get By Id",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/specialdate/get/6645e9825023751d64fc2db3",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"specialdate",
+								"get",
+								"6645e9825023751d64fc2db3"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Finance Management\",\r\n    \"key\": \"FIM\",\r\n    \"image\": \"https://res.cloudinary.com/pisara-dev/image/upload/v1718781490/pisara-app/Templates/Finance_aurrnu.jpg\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/specialdate/create",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"specialdate",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Remove",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/specialdate/remove/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"specialdate",
+								"remove",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"_id\": \"66728c617c766f251daa0ae8\",\r\n    \"name\": \"Marketing Automation\",\r\n    \"defaultItemTypes\": [\r\n        \"6668c29e68e80f1123636fa8\",\r\n        \"664c6955194ed5bcf94de5a2\"\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/specialdate/update",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"specialdate",
+								"update"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"sort\": \"-date\",\r\n    \"select\": \"name date attachment\",\r\n    \"limit\": 10,\r\n    \"lean\": true,\r\n    \"match\": {\r\n        \"name\": \"Misa de Gallo\"\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/specialdate/search",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"specialdate",
+								"search"
 							]
 						}
 					},
@@ -980,7 +1451,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/api/appointment/get/all?select=firstname&select=lastname&select=middlename&select=doctor&limit=10",
+							"raw": "{{base_url}}/api/appointment/get/all?select=date&select=patient&select=chiefComplaint&select=doctor&limit=300&populateArray=patient&populateArray=doctor",
 							"host": [
 								"{{base_url}}"
 							],
@@ -993,15 +1464,15 @@
 							"query": [
 								{
 									"key": "select",
-									"value": "firstname"
+									"value": "date"
 								},
 								{
 									"key": "select",
-									"value": "lastname"
+									"value": "patient"
 								},
 								{
 									"key": "select",
-									"value": "middlename"
+									"value": "chiefComplaint"
 								},
 								{
 									"key": "select",
@@ -1009,7 +1480,15 @@
 								},
 								{
 									"key": "limit",
-									"value": "10"
+									"value": "300"
+								},
+								{
+									"key": "populateArray",
+									"value": "patient"
+								},
+								{
+									"key": "populateArray",
+									"value": "doctor"
 								}
 							]
 						}
@@ -1034,7 +1513,7 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/api/appointment/get/<id>",
+							"raw": "{{base_url}}/api/appointment/get/66e0f4a4df96c3d69c87a025",
 							"host": [
 								"{{base_url}}"
 							],
@@ -1042,7 +1521,39 @@
 								"api",
 								"appointment",
 								"get",
-								"<id>"
+								"66e0f4a4df96c3d69c87a025"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Total",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/appointment/get/total",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"appointment",
+								"get",
+								"total"
 							]
 						}
 					},
@@ -1067,7 +1578,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"date\": \"2023-10-01T10:00:00Z\",\r\n    \"firstname\": \"John\",\r\n    \"lastname\": \"Doe\",\r\n    \"middlename\": \"A.\",\r\n    \"birthdate\": \"1990-01-01\",\r\n    \"sex\": \"Male\",\r\n    \"civilStatus\": \"Single\",\r\n    \"religion\": \"Christian\",\r\n    \"contactNumber\": \"1234567890\",\r\n    \"barangay\": \"Barangay 1\",\r\n    \"city\": \"Cityville\",\r\n    \"chiefComplaint\": \"Headache\",\r\n    \"doctor\": \"66b2321095ab84a68e7e4ef1\"\r\n}",
+							"raw": "{\r\n    \"date\": \"2024-09-08\",\r\n    \"doctorId\": \"66bc67091bab1f34ea5621fd\",\r\n    \"patient\": {\r\n        \"firstName\": \"Pauline\",\r\n        \"lastName\": \"Avila\"\r\n    },\r\n    \"chiefComplaint\": \"Headache\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1083,6 +1594,87 @@
 								"api",
 								"appointment",
 								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"searchType\": \"all\",\r\n    \"textQuery\": \"2024-08-23\",\r\n    \"populateArray\": [\r\n        {\r\n            \"path\": \"patient\",\r\n            \"select\": \"firstName lastName\"\r\n        },\r\n        {\r\n            \"path\": \"doctor\",\r\n            \"select\": \"firstname lastname\"\r\n        }\r\n    ],\r\n    \"projection\": {\r\n        \"_id\": 1,\r\n        \"firstname\": 1,\r\n        \"lastname\": 1, // in here projection, kung ano gusto mong makit na result.\r\n        \"firstName\": 1,\r\n        \"lastName\": 1,\r\n        \"degree\": 1,\r\n        \"birthdate\": 1,\r\n        \"date\": 1,\r\n        \"chiefComplaint\": 1\r\n    },\r\n    \"options\": {\r\n        \"lean\": true\r\n    },\r\n    \"sort\": {\r\n        \"date\": -1\r\n    },\r\n    \"limit\": 10\r\n}\r\n// FULL SAMPLE\r\n// {\r\n//   \"searchType\": \"all\",\r\n//   \"textQuery\": \"John\",\r\n//   \"startDate\": \"2023-01-01\",\r\n//   \"endDate\": \"2023-12-31\",\r\n//   \"query\": {\r\n//     \"status\": \"active\"\r\n//   },\r\n//   \"match\": {\r\n//     \"age\": { \"$gte\": 18, \"$lte\": 65 }\r\n//   },\r\n//   \"populateArray\": [\r\n//     { \"path\": \"patient\", \"select\": \"firstName lastName birthdate sex cellphoneNumber\" },\r\n//     { \"path\": \"doctor\", \"select\": \"firstname lastname specialization\" }\r\n//   ],\r\n//   \"projection\": {\r\n//     \"_id\": 1,\r\n//     \"date\": 1,\r\n//     \"chiefComplaint\": 1,\r\n//     \"patient\": 1,\r\n//     \"doctor\": 1,\r\n//     \"status\": 1\r\n//   },\r\n//   \"options\": {\r\n//     \"maxTimeMS\": 5000\r\n//   },\r\n//   \"sort\": { \"date\": -1 },\r\n//   \"limit\": 20,\r\n//   \"lean\": true\r\n// }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/appointment/search",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"appointment",
+								"search"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Search Copy",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"firstName\": \"Test\",\r\n    \"lastName\": \"Patient\",\r\n    \"date\": \"2024-09-20\",\r\n    \"lookup\": \"patient\",\r\n    \"sort\": \"-createdAt\",\r\n    \"skip\": 0,\r\n    \"select\": \"_id date status patient\",\r\n    \"limit\": 10,\r\n    \"match\": {\r\n        \"status\": \"done\"\r\n    }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/appointment/search/appointments",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"appointment",
+								"search",
+								"appointments"
 							]
 						}
 					},

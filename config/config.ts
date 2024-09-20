@@ -87,6 +87,7 @@ export const config = {
     MONGODB_NOT_DEFINE: "MONGODB_URI is not defined in the environment variables.",
     CONNECTION_FAILED: "Database connection failed:",
     UNEXPECTED: "An unexpected error occurred. Please try again later.",
+    RATELIMIT: "Too many requests from this IP, please try again after 15 minutes",
 
     USER: {
       NOT_AUTHORIZED: "User is not authorized",
@@ -137,13 +138,21 @@ export const config = {
     PATIENT: {
       ERROR: {
         REQUIRED_PATIENT: "Fill all required patient fields",
+        REQUIRED_CHIEF_COMPLAINT: "Fill all required chief complaint fields",
+        REQUIRED_DIAGNOSIS: "Fill all required diagnosis fields",
+        REQUIRED_BHW: "Fill all required BHW fields",
         INVALID_ID: "Invalid Patient ID",
+        REQUIRED_PATIENT_ID: "Fill all required patient id",
       },
 
       BODY: {
-        PATIENT_FIRSTNAME: "firstname",
-        PATIENT_LASTNAME: "lastname",
-        PATIENT_MIDDLENAME: "middlename",
+        PATIENT_FIRSTNAME: "firstName",
+        PATIENT_LASTNAME: "lastName",
+        PATIENT_MIDDLENAME: "middleName",
+        PATIENT_CHIEF_COMPLAINT: "chiefComplaint",
+        PATIENT_DIAGNOSIS: "diagnosis",
+        PATIENT_BHW: "metadata.bhw",
+        PATIENT_ID: "patientId",
         ID: "_id",
       },
 
@@ -275,6 +284,7 @@ export const config = {
           ID: "patientService.update params._id is missing!",
           REMOVE: "patientService.remove params is missing!",
           SEARCH: "patientService.search params is missing!",
+          ADD_TO_SET: "patientService.addToSetChiefComplaint params is missing!",
         },
       },
       DOCTOR: {

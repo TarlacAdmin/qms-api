@@ -4,18 +4,19 @@ import appointmentRepository from "../repository/appointmentRepository";
 import patientService from "./patientService";
 
 const appointmentService = {
-  getById,
-  getAllAppointments,
-  create,
-  update,
-  remove,
-  search,
+  getAppointment,
+  getAppointments,
   getTotalAppointments,
+  createAppointment,
+  updateAppointment,
+  removeAppointment,
+  searchAppointment,
+  searchAppointments,
 };
 
 export default appointmentService;
 
-async function getById(id: string, params: any): Promise<AppointmentModel | null> {
+async function getAppointment(id: string, params: any): Promise<AppointmentModel | null> {
   if (!id) {
     throw new Error(config.RESPONSE.ERROR.APPOINTMENT.INVALID_PARAMETER.GET);
   }
@@ -37,7 +38,7 @@ async function getById(id: string, params: any): Promise<AppointmentModel | null
       dbParams.options.lean = params.lean;
     }
 
-    return await appointmentRepository.getById(id, dbParams);
+    return await appointmentRepository.getAppointment(id, dbParams);
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);
@@ -47,7 +48,7 @@ async function getById(id: string, params: any): Promise<AppointmentModel | null
   }
 }
 
-async function getAllAppointments(params: any): Promise<AppointmentModel[]> {
+async function getAppointments(params: any): Promise<AppointmentModel[]> {
   if (!params) {
     throw new Error(config.RESPONSE.ERROR.APPOINTMENT.INVALID_PARAMETER.GET_ALL);
   }
@@ -81,7 +82,7 @@ async function getAllAppointments(params: any): Promise<AppointmentModel[]> {
       dbParams.options.lean = params.lean;
     }
 
-    return await appointmentRepository.getAllAppointments(dbParams);
+    return await appointmentRepository.getAppointments(dbParams);
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);
@@ -91,7 +92,19 @@ async function getAllAppointments(params: any): Promise<AppointmentModel[]> {
   }
 }
 
-async function create(
+async function getTotalAppointments(): Promise<number[]> {
+  try {
+    return await appointmentRepository.getTotalAppointments();
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(error.message);
+    } else {
+      throw new Error(String(error));
+    }
+  }
+}
+
+async function createAppointment(
   data: Partial<AppointmentModel> & { doctorId: string; patient: any }
 ): Promise<AppointmentModel> {
   if (!data) {
@@ -102,9 +115,9 @@ async function create(
     const patient = await patientService.findOrCreate(data.patient);
     data.patient = patient._id;
 
-    const appointment = await appointmentRepository.create(data);
+    const appointment = await appointmentRepository.createAppointment(data);
 
-    const addDoctorToAppointment = await appointmentRepository.addDoctorToAppointment(
+    const addDoctorToAppointment = await appointmentRepository.setDoctorForAppointment(
       appointment._id as string,
       data.doctorId
     );
@@ -123,13 +136,15 @@ async function create(
   }
 }
 
-async function update(data: Partial<AppointmentModel>): Promise<AppointmentModel | null> {
+async function updateAppointment(
+  data: Partial<AppointmentModel>
+): Promise<AppointmentModel | null> {
   if (!data) {
     throw new Error(config.RESPONSE.ERROR.APPOINTMENT.INVALID_PARAMETER.UPDATE);
   }
 
   try {
-    return await appointmentRepository.update(data);
+    return await appointmentRepository.updateAppointment(data);
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);
@@ -139,13 +154,13 @@ async function update(data: Partial<AppointmentModel>): Promise<AppointmentModel
   }
 }
 
-async function remove(id: string): Promise<AppointmentModel | null> {
+async function removeAppointment(id: string): Promise<AppointmentModel | null> {
   if (!id) {
     throw new Error(config.RESPONSE.ERROR.APPOINTMENT.INVALID_PARAMETER.REMOVE);
   }
 
   try {
-    return await appointmentRepository.remove(id);
+    return await appointmentRepository.removeAppointment(id);
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);
@@ -155,32 +170,80 @@ async function remove(id: string): Promise<AppointmentModel | null> {
   }
 }
 
-async function search(params: any): Promise<any[]> {
+async function searchAppointment(params: any): Promise<any[]> {
   try {
     if (!params.searchType) {
-      throw new Error("Search type is required");
+      throw new Error(config.RESPONSE.ERROR.APPOINTMENT.INVALID_PARAMETER.SEARCH);
     }
 
-    const results = await appointmentRepository.search(params);
+    const results = await appointmentRepository.searchAppointment(params);
     return results;
   } catch (error) {
-    console.error("Service search error:", error);
     throw error;
   }
 }
 
-async function getTotalAppointments(): Promise<{
-  total: number;
-  appointmentsByDoctor: { [key: string]: number };
-  currentAppointmentsByDateWithDoctor: { [key: string]: { [key: string]: number } };
-}> {
+async function searchAppointments(params: any): Promise<AppointmentModel[] | null> {
   try {
-    return await appointmentRepository.getTotalAppointments();
-  } catch (error) {
-    if (error instanceof Error) {
-      throw new Error(error.message);
-    } else {
-      throw new Error(String(error));
+    let dbParams: {
+      query: Record<string, any>;
+      populateArray: any[];
+      options: Record<string, any>;
+      lean: boolean;
+      match: Record<string, any>;
+      lookup: string | null;
+      firstName?: string;
+      lastName?: string;
+      date?: string;
+      status?: string;
+    } = {
+      query: {},
+      populateArray: [],
+      options: {},
+      lean: true,
+      match: {},
+      lookup: null,
+    };
+    dbParams.query = params.query || {};
+
+    if (params.match) {
+      dbParams.match = { ...dbParams.match, ...params.match };
     }
+    if (params.firstName) {
+      dbParams.match["patient.firstName"] = params.firstName;
+    }
+    if (params.lastName) {
+      dbParams.match["patient.lastName"] = params.lastName;
+    }
+    if (params.date) {
+      dbParams.match["date"] = params.date;
+    }
+    if (params.status) {
+      dbParams.match.status = params.status;
+    }
+
+    //Build Populate Options
+    if (params.populateArray) {
+      dbParams.populateArray = params.populateArray;
+    }
+
+    //Build Query Options
+    dbParams.options = {
+      sort: params.sort || "-createdAt",
+      skip: params.skip || 0,
+      select: params.select || "_id",
+      limit: params.limit || 10,
+    };
+
+    dbParams.lean = params.lean !== undefined ? params.lean : true;
+
+    if (params.lookup && (params.lookup === "patient" || params.lookup === "doctor")) {
+      dbParams.lookup = params.lookup;
+    }
+
+    return await appointmentRepository.searchAppointments(dbParams);
+  } catch (error) {
+    console.error(error);
+    throw error;
   }
 }
