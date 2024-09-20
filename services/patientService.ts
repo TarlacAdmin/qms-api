@@ -207,20 +207,7 @@ async function addToSetDiagnosis(params: {
   }
 }
 
-async function addToSetBhw(params: {
-  _id: string;
-  bhw: {
-    profile: {
-      firstname: string;
-      lastname: string;
-      middlename?: string;
-      barangay: string;
-      city: string;
-    };
-    label: string;
-    date?: Date;
-  };
-}): Promise<PatientModel | null> {
+async function addToSetBhw(params: any): Promise<PatientModel | null> {
   try {
     if (!params._id || !params.bhw) {
       throw new Error(config.RESPONSE.ERROR.PATIENT.INVALID_PARAMETER.ADD_TO_SET);

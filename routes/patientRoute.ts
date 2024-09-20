@@ -195,11 +195,7 @@ async function addToSetChiefComplaint(req: Request, res: Response) {
   await Promise.all([
     body(config.VALIDATION.PATIENT.BODY.ID)
       .notEmpty()
-      .withMessage(config.VALIDATION.PATIENT.ERROR.REQUIRED_PATIENT)
-      .run(req),
-    body(config.VALIDATION.PATIENT.BODY.PATIENT_CHIEF_COMPLAINT)
-      .notEmpty()
-      .withMessage(config.VALIDATION.PATIENT.ERROR.REQUIRED_CHIEF_COMPLAINT)
+      .withMessage(config.VALIDATION.PATIENT.ERROR.REQUIRED_PATIENT_ID)
       .run(req),
   ]);
 
@@ -228,13 +224,9 @@ async function addToSetChiefComplaint(req: Request, res: Response) {
 
 async function addToSetDiagnosis(req: Request, res: Response) {
   await Promise.all([
-    body(config.VALIDATION.PATIENT.BODY.PATIENT_ID)
+    body(config.VALIDATION.PATIENT.BODY.ID)
       .notEmpty()
-      .withMessage(config.VALIDATION.PATIENT.ERROR.REQUIRED_PATIENT)
-      .run(req),
-    body(config.VALIDATION.PATIENT.BODY.PATIENT_DIAGNOSIS)
-      .notEmpty()
-      .withMessage(config.VALIDATION.PATIENT.ERROR.REQUIRED_DIAGNOSIS)
+      .withMessage(config.VALIDATION.PATIENT.ERROR.REQUIRED_PATIENT_ID)
       .run(req),
   ]);
 
@@ -263,13 +255,9 @@ async function addToSetDiagnosis(req: Request, res: Response) {
 
 async function addToSetBhw(req: Request, res: Response) {
   await Promise.all([
-    body(config.VALIDATION.PATIENT.BODY.PATIENT_ID)
+    body(config.VALIDATION.PATIENT.BODY.ID)
       .notEmpty()
-      .withMessage(config.VALIDATION.PATIENT.ERROR.REQUIRED_PATIENT)
-      .run(req),
-    body(config.VALIDATION.PATIENT.BODY.PATIENT_BHW)
-      .notEmpty()
-      .withMessage(config.VALIDATION.PATIENT.ERROR.REQUIRED_BHW)
+      .withMessage(config.VALIDATION.PATIENT.ERROR.REQUIRED_PATIENT_ID)
       .run(req),
   ]);
 

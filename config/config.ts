@@ -142,6 +142,7 @@ export const config = {
         REQUIRED_DIAGNOSIS: "Fill all required diagnosis fields",
         REQUIRED_BHW: "Fill all required BHW fields",
         INVALID_ID: "Invalid Patient ID",
+        REQUIRED_PATIENT_ID: "Fill all required patient id",
       },
 
       BODY: {

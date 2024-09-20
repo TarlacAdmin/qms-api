@@ -195,6 +195,7 @@ async function searchAppointments(params: any): Promise<AppointmentModel[] | nul
       firstName?: string;
       lastName?: string;
       date?: string;
+      status?: string;
     } = {
       query: {},
       populateArray: [],
@@ -208,7 +209,6 @@ async function searchAppointments(params: any): Promise<AppointmentModel[] | nul
     if (params.match) {
       dbParams.match = { ...dbParams.match, ...params.match };
     }
-
     if (params.firstName) {
       dbParams.match["patient.firstName"] = params.firstName;
     }
@@ -217,6 +217,9 @@ async function searchAppointments(params: any): Promise<AppointmentModel[] | nul
     }
     if (params.date) {
       dbParams.match["date"] = params.date;
+    }
+    if (params.status) {
+      dbParams.match.status = params.status;
     }
 
     //Build Populate Options

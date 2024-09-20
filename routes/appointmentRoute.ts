@@ -13,7 +13,8 @@ router.get(API_ENDPOINTS.APPOINTMENT.GET_BY_ID, getAppointment);
 router.post(API_ENDPOINTS.APPOINTMENT.CREATE, createAppointment);
 router.put(API_ENDPOINTS.APPOINTMENT.UPDATE, updateAppointment);
 router.delete(API_ENDPOINTS.APPOINTMENT.REMOVE_BY_ID, removeAppointment);
-router.post(API_ENDPOINTS.APPOINTMENT.SEARCH, searchAppointments);
+router.post(API_ENDPOINTS.APPOINTMENT.SEARCH, searchAppointment);
+router.post(API_ENDPOINTS.APPOINTMENT.SEARCH_APPOINTMENTS, searchAppointments);
 
 export default router;
 
@@ -222,8 +223,8 @@ async function searchAppointment(req: Request, res: Response) {
 }
 
 /*
- * @desc   search appointment
- * @route  POST /api/appointment/search
+ * @desc   search appointments
+ * @route  POST /api/appointments/search
  * @access Private
  */
 async function searchAppointments(req: Request, res: Response) {

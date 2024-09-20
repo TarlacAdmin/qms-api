@@ -38,7 +38,6 @@ export interface PatientModel extends Document {
     abatementDateTime?: Date;
     bodySite?: string[];
     severity: string;
-    doctor?: string;
   }[];
   diagnosis?: {
     code: string;
@@ -49,6 +48,7 @@ export interface PatientModel extends Document {
     onsetDateTime: Date;
     abatementDateTime?: Date;
     bodySite?: string[];
+    doctor?: string;
   }[];
   metadata: {
     bhw?: {
@@ -120,7 +120,6 @@ const patientSchema: Schema = new Schema(
         abatementDateTime: Date,
         bodySite: [String],
         severity: String,
-        doctor: String,
       },
     ],
     diagnosis: [
@@ -133,6 +132,7 @@ const patientSchema: Schema = new Schema(
         onsetDateTime: Date,
         abatementDateTime: Date,
         bodySite: [String],
+        doctor: String,
       },
     ],
     metadata: {

@@ -55,6 +55,7 @@ export const API_ENDPOINTS = {
     CREATE: "/appointment/create",
     UPDATE: "/appointment/update",
     SEARCH: "/appointment/search",
+    SEARCH_APPOINTMENTS: "/appointment/search/appointments",
     REMOVE_BY_ID: "/appointment/remove/:id",
   },
 

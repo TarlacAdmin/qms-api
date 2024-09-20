@@ -248,12 +248,15 @@ async function searchAppointments(params: any = {}): Promise<AppointmentModel[]>
   // Add match stage
   const matchStage: Record<string, any> = { ...params.match };
 
-  // Add status filter, default to "pending" if not specified
-  if (!matchStage.status) {
-    matchStage.status = "pending";
+  // Only add status filter if it's provided in the params
+  if (params.status) {
+    matchStage.status = params.status;
   }
 
-  pipeline.push({ $match: matchStage } as PipelineStage);
+  // Only add the match stage if there are any conditions
+  if (Object.keys(matchStage).length > 0) {
+    pipeline.push({ $match: matchStage } as PipelineStage);
+  }
 
   // Add sort stage
   if (params.options.sort) {
