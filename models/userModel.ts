@@ -1,18 +1,32 @@
 import mongoose, { Document, Schema } from "mongoose";
 
-export interface IUser extends Document {
+export interface UserModel extends Document {
   id: string;
+  customId: string;
   username: string;
   firstname: string;
+  middlename?: string;
   lastname: string;
   email: string;
   password: string;
   status: "active" | "inactive" | "suspended";
-  type: "admin" | "user";
+  role:
+    | "admin"
+    | "doctor"
+    | "receptionist"
+    | "livescreen"
+    | "interview"
+    | "payment"
+    | "assessment"
+    | "consultation";
+  type: "admin" | "user" | "viewer";
 }
 
 const userSchema: Schema = new Schema(
   {
+    customId: {
+      type: String,
+    },
     username: {
       type: String,
       minLength: 1,
@@ -48,9 +62,22 @@ const userSchema: Schema = new Schema(
       enum: ["active", "inactive", "suspended"],
       default: "active",
     },
+    role: {
+      type: String,
+      enum: [
+        "admin",
+        "doctor",
+        "receptionist",
+        "livescreen",
+        "interview",
+        "payment",
+        "assessment",
+        "consultation",
+      ],
+    },
     type: {
       type: String,
-      enum: ["admin", "user"],
+      enum: ["admin", "user", "viewer"],
       default: "user",
     },
   },
@@ -59,4 +86,4 @@ const userSchema: Schema = new Schema(
   }
 );
 
-export default mongoose.model<IUser>("User", userSchema);
+export default mongoose.model<UserModel>("User", userSchema);

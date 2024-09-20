@@ -1,33 +1,31 @@
 import express, { Request, Response } from "express";
 import { body, param, validationResult } from "express-validator";
-import queueService from "../services/queueService";
+import doctorService from "../services/doctorService";
 import { API_ENDPOINTS } from "../config/endpointsConfig";
 import { config } from "../config/config";
 
 const router = express.Router();
 
-router.get(API_ENDPOINTS.QUEUE.GET_ALL, getQueues);
-router.get(API_ENDPOINTS.QUEUE.GET_BY_ID, getQueue);
-router.post(API_ENDPOINTS.QUEUE.CREATE, createQueue);
-router.put(API_ENDPOINTS.QUEUE.UPDATE, updateQueue);
-router.delete(API_ENDPOINTS.QUEUE.REMOVE_BY_ID, removeQueue);
-router.post(API_ENDPOINTS.QUEUE.SEARCH, searchQueue);
+router.get(API_ENDPOINTS.DOCTOR.GET_ALL, getDoctors);
+router.get(API_ENDPOINTS.DOCTOR.GET_BY_ID, getDoctor);
+router.post(API_ENDPOINTS.DOCTOR.CREATE, createDoctor);
+router.put(API_ENDPOINTS.DOCTOR.UPDATE, updateDoctor);
+router.delete(API_ENDPOINTS.DOCTOR.REMOVE_BY_ID, removeDoctor);
+router.post(API_ENDPOINTS.DOCTOR.SEARCH, searchDoctor);
 
 export default router;
 
 /*
- * @desc   get all queues
- * @route  GET /api/queue/get/all
+ * @desc   get all doctor
+ * @route  GET /api/doctor/get/all
  * @access Private
  */
-async function getQueues(req: Request, res: Response) {
+async function getDoctors(req: Request, res: Response) {
   const params = {
     query: req.query.query || {},
     queryArray: req.query.queryArray,
     queryArrayType: req.query.queryArrayType,
-    populateArray: Array.isArray(req.query.populateArray)
-      ? req.query.populateArray
-      : [req.query.populateArray],
+    populateArray: req.query.populateArray || [],
     sort: req.query.sort,
     limit: req.query.limit,
     select: req.query.select,
@@ -35,8 +33,8 @@ async function getQueues(req: Request, res: Response) {
   };
 
   try {
-    const queues = await queueService.getQueues(params);
-    res.status(200).send(queues);
+    const patients = await doctorService.getDoctors(params);
+    res.status(200).send(patients);
   } catch (error) {
     if (error instanceof Error) {
       res.status(400).send({ error: error.message });
@@ -47,14 +45,14 @@ async function getQueues(req: Request, res: Response) {
 }
 
 /*
- * @desc   get queue by id
- * @route  GET /api/queue/get/:id
+ * @desc   get doctor by id
+ * @route  GET /api/doctor/get/:id
  * @access Private
  */
-async function getQueue(req: Request, res: Response) {
-  await param(config.VALIDATION.QUEUE.PARAMS.ID)
+async function getDoctor(req: Request, res: Response) {
+  await param(config.VALIDATION.DOCTOR.PARAMS.ID)
     .isMongoId()
-    .withMessage(config.VALIDATION.QUEUE.PARAMS.INVALID_ID)
+    .withMessage(config.VALIDATION.DOCTOR.PARAMS.INVALID_ID)
     .run(req);
 
   const errors = validationResult(req);
@@ -69,8 +67,8 @@ async function getQueue(req: Request, res: Response) {
   };
 
   try {
-    const queue = await queueService.getQueue(req.params.id, params);
-    res.status(200).send(queue);
+    const patient = await doctorService.getDoctor(req.params.id, params);
+    res.status(200).send(patient);
   } catch (error) {
     if (error instanceof Error) {
       res.status(400).send({ error: error.message });
@@ -81,19 +79,19 @@ async function getQueue(req: Request, res: Response) {
 }
 
 /*
- * @desc   create queue
- * @route  POST /api/queue/create
+ * @desc   create doctor
+ * @route  POST /api/doctor/create
  * @access Private
  */
-async function createQueue(req: Request, res: Response) {
+async function createDoctor(req: Request, res: Response) {
   await Promise.all([
-    body(config.VALIDATION.QUEUE.BODY.PATIENT)
+    body(config.VALIDATION.DOCTOR.BODY.DOCTOR_FIRSTNAME)
       .notEmpty()
-      .withMessage(config.VALIDATION.QUEUE.ERROR.REQUIRED_QUEUE)
+      .withMessage(config.VALIDATION.DOCTOR.ERROR.REQUIRED_DOCTOR)
       .run(req),
-    body(config.VALIDATION.QUEUE.BODY.DOCTOR)
+    body(config.VALIDATION.DOCTOR.BODY.DOCTOR_LASTNAME)
       .notEmpty()
-      .withMessage(config.VALIDATION.QUEUE.ERROR.REQUIRED_QUEUE)
+      .withMessage(config.VALIDATION.DOCTOR.ERROR.REQUIRED_DOCTOR)
       .run(req),
   ]);
 
@@ -103,9 +101,9 @@ async function createQueue(req: Request, res: Response) {
   }
 
   try {
-    const newQueue = await queueService.createQueue(req.body);
-    (req as any).io.emit("queueCreated", newQueue);
-    res.status(200).send(newQueue);
+    const newPatient = await doctorService.createDoctor(req.body);
+    (req as any).io.emit("doctorCreated", newPatient);
+    res.status(200).send(newPatient);
   } catch (error) {
     if (error instanceof Error) {
       res.status(400).send({ error: error.message });
@@ -116,19 +114,19 @@ async function createQueue(req: Request, res: Response) {
 }
 
 /*
- * @desc   update queue
- * @route  PUT /api/queue/update
+ * @desc   update doctor
+ * @route  PUT /api/doctor/update
  * @access Private
  */
-async function updateQueue(req: Request, res: Response) {
+async function updateDoctor(req: Request, res: Response) {
   await Promise.all([
-    body(config.VALIDATION.QUEUE.BODY.PATIENT)
+    body(config.VALIDATION.DOCTOR.BODY.DOCTOR_FIRSTNAME)
       .notEmpty()
-      .withMessage(config.VALIDATION.QUEUE.ERROR.REQUIRED_QUEUE)
+      .withMessage(config.VALIDATION.DOCTOR.ERROR.REQUIRED_DOCTOR)
       .run(req),
-    body(config.VALIDATION.QUEUE.BODY.DOCTOR)
+    body(config.VALIDATION.DOCTOR.BODY.DOCTOR_LASTNAME)
       .notEmpty()
-      .withMessage(config.VALIDATION.QUEUE.ERROR.REQUIRED_QUEUE)
+      .withMessage(config.VALIDATION.DOCTOR.ERROR.REQUIRED_DOCTOR)
       .run(req),
   ]);
 
@@ -138,9 +136,9 @@ async function updateQueue(req: Request, res: Response) {
   }
 
   try {
-    const updatedQueue = await queueService.updateQueue(req.body);
-    (req as any).io.emit("queueUpdated", updatedQueue);
-    res.status(200).send(updatedQueue);
+    const updatedPatient = await doctorService.updateDoctor(req.body);
+    (req as any).io.emit("doctorUpdated", updatedPatient);
+    res.status(200).send(updatedPatient);
   } catch (error) {
     if (error instanceof Error) {
       res.status(400).send({ error: error.message });
@@ -151,14 +149,14 @@ async function updateQueue(req: Request, res: Response) {
 }
 
 /*
- * @desc   remove queue
- * @route  DELETE /api/queue/remove/:id
+ * @desc   remove doctor
+ * @route  DELETE /api/doctor/remove/:id
  * @access Private
  */
-async function removeQueue(req: Request, res: Response) {
-  await param(config.VALIDATION.QUEUE.PARAMS.ID)
+async function removeDoctor(req: Request, res: Response) {
+  await param(config.VALIDATION.DOCTOR.PARAMS.ID)
     .isMongoId()
-    .withMessage(config.VALIDATION.QUEUE.PARAMS.INVALID_ID)
+    .withMessage(config.VALIDATION.DOCTOR.PARAMS.INVALID_ID)
     .run(req);
 
   const errors = validationResult(req);
@@ -167,8 +165,8 @@ async function removeQueue(req: Request, res: Response) {
   }
 
   try {
-    const removedQueue = await queueService.removeQueue(req.params.id);
-    res.status(200).send(removedQueue);
+    const removedPatient = await doctorService.removeDoctor(req.params.id);
+    res.status(200).send(removedPatient);
   } catch (error) {
     if (error instanceof Error) {
       res.status(400).send({ error: error.message });
@@ -179,14 +177,14 @@ async function removeQueue(req: Request, res: Response) {
 }
 
 /*
- * @desc   search queue
- * @route  POST /api/queue/search
+ * @desc   search doctor
+ * @route  POST /api/doctor/search
  * @access Private
  */
-async function searchQueue(req: Request, res: Response) {
+async function searchDoctor(req: Request, res: Response) {
   try {
-    const searchedQueues = await queueService.searchQueue(req.body);
-    res.status(200).send(searchedQueues);
+    const searchedDoctor = await doctorService.searchDoctor(req.body);
+    res.status(200).send(searchedDoctor);
   } catch (error) {
     if (error instanceof Error) {
       res.status(400).send({ error: error.message });

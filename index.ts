@@ -9,6 +9,7 @@ import corsConfig from "./config/corsConfig";
 import sessionConfig from "./config/sessionConfig";
 import connectDb from "./config/dbConnection";
 import routes from "./config/routeConfig";
+import limiter from "./middleware/rateLimiter";
 import { config } from "./config/config";
 import { API_ENDPOINTS } from "./config/endpointsConfig";
 import http from "http";
@@ -21,7 +22,12 @@ const port = process.env.PORT || config.PORT;
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173",
+    origin: [
+      config.CORS.LOCAL,
+      config.CORS.DEV_BRANCH,
+      config.CORS.TEST_BRANCH,
+      config.CORS.PROD_BRANCH,
+    ],
     methods: ["GET", "POST"],
   },
 });
@@ -37,6 +43,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(corsConfig);
 app.use(sessionConfig);
 app.use(conditionalTokenValidation);
+app.use(limiter);
 
 Object.values(routes).forEach((route) => {
   app.use(API_ENDPOINTS.MAIN.DEFAULT, route);
@@ -44,13 +51,6 @@ Object.values(routes).forEach((route) => {
 
 app.use(mainRoute);
 app.use(errorHandler);
-
-// io.on('connection', (socket) => {
-//   console.log('A user connected');
-//   socket.on('disconnect', () => {
-//     console.log('User disconnected');
-//   });
-// });
 
 connectDb()
   .then(() => {

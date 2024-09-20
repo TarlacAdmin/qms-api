@@ -1,33 +1,31 @@
 import express, { Request, Response } from "express";
 import { body, param, validationResult } from "express-validator";
-import queueService from "../services/queueService";
+import specialDatesService from "../services/specialDatesService";
 import { API_ENDPOINTS } from "../config/endpointsConfig";
 import { config } from "../config/config";
 
 const router = express.Router();
 
-router.get(API_ENDPOINTS.QUEUE.GET_ALL, getQueues);
-router.get(API_ENDPOINTS.QUEUE.GET_BY_ID, getQueue);
-router.post(API_ENDPOINTS.QUEUE.CREATE, createQueue);
-router.put(API_ENDPOINTS.QUEUE.UPDATE, updateQueue);
-router.delete(API_ENDPOINTS.QUEUE.REMOVE_BY_ID, removeQueue);
-router.post(API_ENDPOINTS.QUEUE.SEARCH, searchQueue);
+router.get(API_ENDPOINTS.SPECIALDATE.GET_ALL, getSpecialDates);
+router.get(API_ENDPOINTS.SPECIALDATE.GET_BY_ID, getSpecialDate);
+router.post(API_ENDPOINTS.SPECIALDATE.CREATE, createSpecialDate);
+router.put(API_ENDPOINTS.SPECIALDATE.UPDATE, updateSpecialDate);
+router.delete(API_ENDPOINTS.SPECIALDATE.REMOVE_BY_ID, removeSpecialDate);
+router.post(API_ENDPOINTS.SPECIALDATE.SEARCH, searchSpecialDate);
 
 export default router;
 
 /*
- * @desc   get all queues
- * @route  GET /api/queue/get/all
+ * @desc   get all specialdate
+ * @route  GET /api/specialdate/get/all
  * @access Private
  */
-async function getQueues(req: Request, res: Response) {
+async function getSpecialDates(req: Request, res: Response) {
   const params = {
     query: req.query.query || {},
     queryArray: req.query.queryArray,
     queryArrayType: req.query.queryArrayType,
-    populateArray: Array.isArray(req.query.populateArray)
-      ? req.query.populateArray
-      : [req.query.populateArray],
+    populateArray: req.query.populateArray || [],
     sort: req.query.sort,
     limit: req.query.limit,
     select: req.query.select,
@@ -35,8 +33,8 @@ async function getQueues(req: Request, res: Response) {
   };
 
   try {
-    const queues = await queueService.getQueues(params);
-    res.status(200).send(queues);
+    const specialDates = await specialDatesService.getSpecialDates(params);
+    res.status(200).send(specialDates);
   } catch (error) {
     if (error instanceof Error) {
       res.status(400).send({ error: error.message });
@@ -47,14 +45,14 @@ async function getQueues(req: Request, res: Response) {
 }
 
 /*
- * @desc   get queue by id
- * @route  GET /api/queue/get/:id
+ * @desc   get specialdate by id
+ * @route  GET /api/specialdate/get/:id
  * @access Private
  */
-async function getQueue(req: Request, res: Response) {
-  await param(config.VALIDATION.QUEUE.PARAMS.ID)
+async function getSpecialDate(req: Request, res: Response) {
+  await param(config.VALIDATION.SPECIALDATE.PARAMS.ID)
     .isMongoId()
-    .withMessage(config.VALIDATION.QUEUE.PARAMS.INVALID_ID)
+    .withMessage(config.VALIDATION.SPECIALDATE.PARAMS.INVALID_ID)
     .run(req);
 
   const errors = validationResult(req);
@@ -69,8 +67,8 @@ async function getQueue(req: Request, res: Response) {
   };
 
   try {
-    const queue = await queueService.getQueue(req.params.id, params);
-    res.status(200).send(queue);
+    const specialDates = await specialDatesService.getSpecialDate(req.params.id, params);
+    res.status(200).send(specialDates);
   } catch (error) {
     if (error instanceof Error) {
       res.status(400).send({ error: error.message });
@@ -81,19 +79,15 @@ async function getQueue(req: Request, res: Response) {
 }
 
 /*
- * @desc   create queue
- * @route  POST /api/queue/create
+ * @desc   create specialdate
+ * @route  POST /api/specialdate/create
  * @access Private
  */
-async function createQueue(req: Request, res: Response) {
+async function createSpecialDate(req: Request, res: Response) {
   await Promise.all([
-    body(config.VALIDATION.QUEUE.BODY.PATIENT)
+    body(config.VALIDATION.SPECIALDATE.BODY.SPECIALDATE_DATE)
       .notEmpty()
-      .withMessage(config.VALIDATION.QUEUE.ERROR.REQUIRED_QUEUE)
-      .run(req),
-    body(config.VALIDATION.QUEUE.BODY.DOCTOR)
-      .notEmpty()
-      .withMessage(config.VALIDATION.QUEUE.ERROR.REQUIRED_QUEUE)
+      .withMessage(config.VALIDATION.SPECIALDATE.ERROR.REQUIRED_SPECIALDATE)
       .run(req),
   ]);
 
@@ -103,9 +97,9 @@ async function createQueue(req: Request, res: Response) {
   }
 
   try {
-    const newQueue = await queueService.createQueue(req.body);
-    (req as any).io.emit("queueCreated", newQueue);
-    res.status(200).send(newQueue);
+    const newSpecialDates = await specialDatesService.createSpecialDate(req.body);
+    (req as any).io.emit("specialDatesCreated", newSpecialDates);
+    res.status(200).send(newSpecialDates);
   } catch (error) {
     if (error instanceof Error) {
       res.status(400).send({ error: error.message });
@@ -116,19 +110,15 @@ async function createQueue(req: Request, res: Response) {
 }
 
 /*
- * @desc   update queue
- * @route  PUT /api/queue/update
+ * @desc   update specialdate
+ * @route  PUT /api/specialdate/update
  * @access Private
  */
-async function updateQueue(req: Request, res: Response) {
+async function updateSpecialDate(req: Request, res: Response) {
   await Promise.all([
-    body(config.VALIDATION.QUEUE.BODY.PATIENT)
+    body(config.VALIDATION.SPECIALDATE.BODY.SPECIALDATE_DATE)
       .notEmpty()
-      .withMessage(config.VALIDATION.QUEUE.ERROR.REQUIRED_QUEUE)
-      .run(req),
-    body(config.VALIDATION.QUEUE.BODY.DOCTOR)
-      .notEmpty()
-      .withMessage(config.VALIDATION.QUEUE.ERROR.REQUIRED_QUEUE)
+      .withMessage(config.VALIDATION.SPECIALDATE.ERROR.REQUIRED_SPECIALDATE)
       .run(req),
   ]);
 
@@ -138,9 +128,9 @@ async function updateQueue(req: Request, res: Response) {
   }
 
   try {
-    const updatedQueue = await queueService.updateQueue(req.body);
-    (req as any).io.emit("queueUpdated", updatedQueue);
-    res.status(200).send(updatedQueue);
+    const updatedSpecialDates = await specialDatesService.updateSpecialDate(req.body);
+    (req as any).io.emit("specialDatesUpdated", updatedSpecialDates);
+    res.status(200).send(updatedSpecialDates);
   } catch (error) {
     if (error instanceof Error) {
       res.status(400).send({ error: error.message });
@@ -151,14 +141,14 @@ async function updateQueue(req: Request, res: Response) {
 }
 
 /*
- * @desc   remove queue
- * @route  DELETE /api/queue/remove/:id
+ * @desc   remove specialdate
+ * @route  DELETE /api/specialdate/remove/:id
  * @access Private
  */
-async function removeQueue(req: Request, res: Response) {
-  await param(config.VALIDATION.QUEUE.PARAMS.ID)
+async function removeSpecialDate(req: Request, res: Response) {
+  await param(config.VALIDATION.SPECIALDATE.PARAMS.ID)
     .isMongoId()
-    .withMessage(config.VALIDATION.QUEUE.PARAMS.INVALID_ID)
+    .withMessage(config.VALIDATION.SPECIALDATE.PARAMS.INVALID_ID)
     .run(req);
 
   const errors = validationResult(req);
@@ -167,8 +157,8 @@ async function removeQueue(req: Request, res: Response) {
   }
 
   try {
-    const removedQueue = await queueService.removeQueue(req.params.id);
-    res.status(200).send(removedQueue);
+    const removedSpecialDates = await specialDatesService.removeSpecialDate(req.params.id);
+    res.status(200).send(removedSpecialDates);
   } catch (error) {
     if (error instanceof Error) {
       res.status(400).send({ error: error.message });
@@ -179,14 +169,14 @@ async function removeQueue(req: Request, res: Response) {
 }
 
 /*
- * @desc   search queue
- * @route  POST /api/queue/search
+ * @desc   search specialdate
+ * @route  POST /api/specialdate/search
  * @access Private
  */
-async function searchQueue(req: Request, res: Response) {
+async function searchSpecialDate(req: Request, res: Response) {
   try {
-    const searchedQueues = await queueService.searchQueue(req.body);
-    res.status(200).send(searchedQueues);
+    const searchedSpecialDates = await specialDatesService.searchSpecialDate(req.body);
+    res.status(200).send(searchedSpecialDates);
   } catch (error) {
     if (error instanceof Error) {
       res.status(400).send({ error: error.message });

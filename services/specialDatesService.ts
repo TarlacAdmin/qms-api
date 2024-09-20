@@ -1,23 +1,21 @@
 import { config } from "../config/config";
-import { QueueModel } from "../models/queueModel";
-import { ObjectId } from "mongodb";
-import queueRepository from "../repository/queueRepository";
-import patientService from "./patientService";
+import { SpecialDatesModel } from "../models/specialDatesModel";
+import specialDatesRepository from "../repository/specialDatesRepository";
 
-const queueService = {
-  getQueue,
-  getQueues,
-  createQueue,
-  updateQueue,
-  removeQueue,
-  searchQueue,
+const specialDatesService = {
+  getSpecialDate,
+  getSpecialDates,
+  createSpecialDate,
+  updateSpecialDate,
+  removeSpecialDate,
+  searchSpecialDate,
 };
 
-export default queueService;
+export default specialDatesService;
 
-async function getQueue(id: string, params: any): Promise<QueueModel | null> {
+async function getSpecialDate(id: string, params: any): Promise<SpecialDatesModel | null> {
   if (!id) {
-    throw new Error(config.RESPONSE.ERROR.QUEUE.INVALID_PARAMETER.GET);
+    throw new Error(config.RESPONSE.ERROR.SPECIALDATE.INVALID_PARAMETER.GET);
   }
 
   try {
@@ -37,7 +35,7 @@ async function getQueue(id: string, params: any): Promise<QueueModel | null> {
       dbParams.options.lean = params.lean;
     }
 
-    return await queueRepository.getQueue(id, dbParams);
+    return await specialDatesRepository.getSpecialDate(id, dbParams);
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);
@@ -47,9 +45,9 @@ async function getQueue(id: string, params: any): Promise<QueueModel | null> {
   }
 }
 
-async function getQueues(params: any): Promise<QueueModel[]> {
+async function getSpecialDates(params: any): Promise<SpecialDatesModel[]> {
   if (!params) {
-    throw new Error(config.RESPONSE.ERROR.QUEUE.INVALID_PARAMETER.GET_ALL);
+    throw new Error(config.RESPONSE.ERROR.SPECIALDATE.INVALID_PARAMETER.GET_ALL);
   }
 
   try {
@@ -62,9 +60,7 @@ async function getQueues(params: any): Promise<QueueModel[]> {
     }
 
     if (params.populateArray) {
-      dbParams.options.populateArray = Array.isArray(params.populateArray)
-        ? params.populateArray
-        : [params.populateArray];
+      dbParams.options.populateArray = params.populateArray;
     }
 
     if (params.sort) {
@@ -83,7 +79,7 @@ async function getQueues(params: any): Promise<QueueModel[]> {
       dbParams.options.lean = params.lean;
     }
 
-    return await queueRepository.getQueues(dbParams);
+    return await specialDatesRepository.getSpecialDates(dbParams);
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);
@@ -93,25 +89,13 @@ async function getQueues(params: any): Promise<QueueModel[]> {
   }
 }
 
-async function createQueue(data: Partial<QueueModel>): Promise<QueueModel> {
+async function createSpecialDate(data: Partial<SpecialDatesModel>): Promise<SpecialDatesModel> {
   if (!data) {
-    throw new Error(config.RESPONSE.ERROR.QUEUE.INVALID_PARAMETER.CREATE);
+    throw new Error(config.RESPONSE.ERROR.SPECIALDATE.INVALID_PARAMETER.CREATE);
   }
 
   try {
-    if (data.counter === "interview") {
-      data.queueNumber = await generateQueueNumber(data.counter);
-    }
-
-    if (data.metadata?.patient) {
-      const patient = await patientService.findOrCreate(data.metadata.patient);
-      data.metadata.patient = patient._id as ObjectId;
-    }
-
-    let createdQueue = await queueRepository.createQueue(data);
-    createdQueue = await createdQueue.populate("metadata.patient");
-
-    return createdQueue;
+    return await specialDatesRepository.createSpecialDate(data);
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);
@@ -121,13 +105,15 @@ async function createQueue(data: Partial<QueueModel>): Promise<QueueModel> {
   }
 }
 
-async function updateQueue(data: Partial<QueueModel>): Promise<QueueModel | null> {
+async function updateSpecialDate(
+  data: Partial<SpecialDatesModel>
+): Promise<SpecialDatesModel | null> {
   if (!data) {
-    throw new Error(config.RESPONSE.ERROR.QUEUE.INVALID_PARAMETER.UPDATE);
+    throw new Error(config.RESPONSE.ERROR.SPECIALDATE.INVALID_PARAMETER.UPDATE);
   }
 
   try {
-    return await queueRepository.updateQueue(data);
+    return await specialDatesRepository.updateSpecialDate(data);
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);
@@ -137,13 +123,13 @@ async function updateQueue(data: Partial<QueueModel>): Promise<QueueModel | null
   }
 }
 
-async function removeQueue(id: string): Promise<QueueModel | null> {
+async function removeSpecialDate(id: string): Promise<SpecialDatesModel | null> {
   if (!id) {
-    throw new Error(config.RESPONSE.ERROR.QUEUE.INVALID_PARAMETER.REMOVE);
+    throw new Error(config.RESPONSE.ERROR.SPECIALDATE.INVALID_PARAMETER.REMOVE);
   }
 
   try {
-    return await queueRepository.removeQueue(id);
+    return await specialDatesRepository.removeSpecialDate(id);
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);
@@ -153,17 +139,20 @@ async function removeQueue(id: string): Promise<QueueModel | null> {
   }
 }
 
-async function searchQueue(params: any): Promise<QueueModel[] | null> {
-  //TODO: VAlidation
-
+async function searchSpecialDate(params: any): Promise<SpecialDatesModel[] | null> {
   try {
     let dbParams = {
       query: {},
       populateArray: [],
       options: {},
       lean: true,
+      match: {},
     };
     dbParams.query = params.query;
+
+    if (params.match) {
+      dbParams.query = { ...dbParams.query, ...params.match };
+    }
 
     //Build Populate Options
     if (params.populateArray) {
@@ -185,33 +174,9 @@ async function searchQueue(params: any): Promise<QueueModel[] | null> {
 
     dbParams.lean = params.lean || true;
 
-    return await queueRepository.searchQueue(dbParams);
+    return await specialDatesRepository.searchSpecialDate(dbParams);
   } catch (error) {
     console.error(error);
     throw error;
-  }
-}
-
-async function generateQueueNumber(counterName: string): Promise<string> {
-  const today = new Date();
-  today.setUTCHours(0, 0, 0, 0);
-
-  const queues = await searchQueue({
-    query: {
-      counter: counterName,
-      createdAt: { $gte: today },
-    },
-    sort: "-createdAt",
-    limit: 999,
-    select: "queueNumber",
-  });
-
-  let queueNumber;
-  //TODO: Check if counter = interview. Generate new number. ELSE, use existing "data.queueNumber"
-  if (queues && queues.length > 0) {
-    const latestNumber = parseInt(queues[0].queueNumber, 10);
-    return (queueNumber = String(latestNumber + 1).padStart(3, "0"));
-  } else {
-    return (queueNumber = "001");
   }
 }

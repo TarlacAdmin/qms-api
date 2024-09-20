@@ -1,4 +1,4 @@
-import Queue, { QueueModel } from "../models/queueModel";
+import Video, { VideoModel } from "../models/videoModel";
 
 interface DbParams {
   query?: any;
@@ -11,19 +11,19 @@ interface DbParams {
   };
 }
 
-const queueRepository = {
-  getQueue,
-  getQueues,
-  createQueue,
-  updateQueue,
-  removeQueue,
-  searchQueue,
+const videoRepository = {
+  getVideo,
+  getVideos,
+  createVideo,
+  updateVideo,
+  removeVideo,
+  searchVideo,
 };
 
-export default queueRepository;
+export default videoRepository;
 
-async function getQueue(id: string, dbParams: DbParams = {}): Promise<QueueModel | null> {
-  let query = Queue.findById(id);
+async function getVideo(id: string, dbParams: DbParams = {}): Promise<VideoModel | null> {
+  let query = Video.findById(id);
 
   (dbParams.options?.populateArray || []).forEach((populateOption) => {
     query = query.populate(populateOption);
@@ -39,8 +39,8 @@ async function getQueue(id: string, dbParams: DbParams = {}): Promise<QueueModel
   return query.exec();
 }
 
-async function getQueues(dbParams: DbParams = {}): Promise<QueueModel[]> {
-  let query = Queue.find(dbParams.query);
+async function getVideos(dbParams: DbParams = {}): Promise<VideoModel[]> {
+  let query = Video.find(dbParams.query);
 
   (dbParams.options?.populateArray || []).forEach((populateOption) => {
     query = query.populate(populateOption);
@@ -58,24 +58,28 @@ async function getQueues(dbParams: DbParams = {}): Promise<QueueModel[]> {
   return query.exec();
 }
 
-async function createQueue(data: Partial<QueueModel>): Promise<QueueModel> {
-  return await Queue.create(data);
+async function createVideo(data: Partial<VideoModel>): Promise<VideoModel> {
+  return await Video.create(data);
 }
 
-async function updateQueue(data: Partial<QueueModel>): Promise<QueueModel | null> {
-  return await Queue.findByIdAndUpdate(data._id, data, { new: true }).lean();
+async function updateVideo(data: Partial<VideoModel>): Promise<VideoModel | null> {
+  return await Video.findByIdAndUpdate(data._id, data, { new: true }).lean();
 }
 
-async function removeQueue(id: string): Promise<QueueModel | null> {
-  return await Queue.findByIdAndDelete(id);
+async function removeVideo(id: string): Promise<VideoModel | null> {
+  return await Video.findByIdAndDelete(id).lean();
 }
 
-async function searchQueue(params: any = {}): Promise<QueueModel[]> {
-  let query = Queue.find();
+async function searchVideo(params: any = {}): Promise<VideoModel[]> {
+  let query = Video.find();
   query.setQuery(params.query);
   query.populate(params.populateArray);
   query.projection(params.projection);
   query.setOptions(params.options);
   query.lean(params.lean);
+
+  if (params.match) {
+    query.where(params.match);
+  }
   return query.exec();
 }

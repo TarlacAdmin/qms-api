@@ -1,21 +1,23 @@
 import { config } from "../config/config";
-import { ObjectId } from "bson";
 import { PatientModel } from "../models/patientModel";
 import patientRepository from "../repository/patientRepository";
 
 const patientService = {
-  getById,
-  getAllPatients,
-  create,
-  update,
-  remove,
-  search,
+  getPatient,
+  getPatients,
+  createPatient,
+  updatePatient,
+  removePatient,
+  searchPatient,
   findOrCreate,
+  addToSetChiefComplaint,
+  addToSetDiagnosis,
+  addToSetBhw,
 };
 
 export default patientService;
 
-async function getById(id: string, params: any): Promise<PatientModel | null> {
+async function getPatient(id: string, params: any): Promise<PatientModel | null> {
   if (!id) {
     throw new Error(config.RESPONSE.ERROR.PATIENT.INVALID_PARAMETER.GET);
   }
@@ -37,7 +39,7 @@ async function getById(id: string, params: any): Promise<PatientModel | null> {
       dbParams.options.lean = params.lean;
     }
 
-    return await patientRepository.getById(id, dbParams);
+    return await patientRepository.getPatient(id, dbParams);
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);
@@ -47,7 +49,7 @@ async function getById(id: string, params: any): Promise<PatientModel | null> {
   }
 }
 
-async function getAllPatients(params: any): Promise<PatientModel[]> {
+async function getPatients(params: any): Promise<PatientModel[]> {
   if (!params) {
     throw new Error(config.RESPONSE.ERROR.PATIENT.INVALID_PARAMETER.GET_ALL);
   }
@@ -81,7 +83,7 @@ async function getAllPatients(params: any): Promise<PatientModel[]> {
       dbParams.options.lean = params.lean;
     }
 
-    return await patientRepository.getAllPatients(dbParams);
+    return await patientRepository.getPatients(dbParams);
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);
@@ -91,26 +93,13 @@ async function getAllPatients(params: any): Promise<PatientModel[]> {
   }
 }
 
-async function findOrCreate(
-  patientQueryOrData: Partial<PatientModel> | ObjectId
-): Promise<PatientModel> {
-  const query =
-    patientQueryOrData instanceof ObjectId ? { _id: patientQueryOrData } : patientQueryOrData;
-
-  let patient = await patientRepository.findOne(query);
-  if (!patient) {
-    patient = await patientRepository.create(patientQueryOrData as Partial<PatientModel>);
-  }
-  return patient;
-}
-
-async function create(data: Partial<PatientModel>): Promise<PatientModel> {
+async function createPatient(data: Partial<PatientModel>): Promise<PatientModel> {
   if (!data) {
     throw new Error(config.RESPONSE.ERROR.PATIENT.INVALID_PARAMETER.CREATE);
   }
 
   try {
-    return await patientRepository.create(data);
+    return await patientRepository.createPatient(data);
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);
@@ -120,13 +109,13 @@ async function create(data: Partial<PatientModel>): Promise<PatientModel> {
   }
 }
 
-async function update(data: Partial<PatientModel>): Promise<PatientModel | null> {
+async function updatePatient(data: Partial<PatientModel>): Promise<PatientModel | null> {
   if (!data) {
     throw new Error(config.RESPONSE.ERROR.PATIENT.INVALID_PARAMETER.UPDATE);
   }
 
   try {
-    return await patientRepository.update(data);
+    return await patientRepository.updatePatient(data);
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);
@@ -136,13 +125,13 @@ async function update(data: Partial<PatientModel>): Promise<PatientModel | null>
   }
 }
 
-async function remove(id: string): Promise<PatientModel | null> {
+async function removePatient(id: string): Promise<PatientModel | null> {
   if (!id) {
     throw new Error(config.RESPONSE.ERROR.PATIENT.INVALID_PARAMETER.REMOVE);
   }
 
   try {
-    return await patientRepository.remove(id);
+    return await patientRepository.removePatient(id);
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);
@@ -152,39 +141,83 @@ async function remove(id: string): Promise<PatientModel | null> {
   }
 }
 
-async function search(params: any): Promise<PatientModel[] | null> {
+async function searchPatient(params: any): Promise<PatientModel[] | null> {
   try {
     let dbParams = {
-      query: {},
-      populateArray: [],
-      options: {},
-      lean: true,
+      search: params.search,
+      sort: params.sort || "-createdAt",
+      project: params.project,
+      limit: params.limit || 10,
     };
-    dbParams.query = params.query;
-
-    //Build Populate Options
-    if (params.populateArray) {
-      dbParams["populateArray"] = params.populateArray;
-    }
-
-    //Build Query Options
-    let optionsObj = {
-      sort: "",
-      skip: 0,
-      select: "",
-      limit: 0,
-    };
-    optionsObj["sort"] = params.sort || "-createdAt";
-    optionsObj["skip"] = params.skip || 0;
-    optionsObj["select"] = params.select || "_id";
-    optionsObj["limit"] = params.limit || 10;
-    dbParams.options = optionsObj;
-
-    dbParams.lean = params.lean || true;
-
-    return await patientRepository.search(dbParams);
+    return await patientRepository.searchPatient(dbParams);
   } catch (error) {
     console.error(error);
+    throw error;
+  }
+}
+
+async function findOrCreate(patientQueryOrData: any): Promise<PatientModel> {
+  const query = patientQueryOrData._id
+    ? { _id: patientQueryOrData._id }
+    : {
+        firstName: patientQueryOrData.firstName,
+        lastName: patientQueryOrData.lastName,
+      };
+
+  let patient = await patientRepository.findOrCreate(query);
+  if (!patient) {
+    patient = await patientRepository.createPatient(patientQueryOrData as Partial<PatientModel>);
+  }
+  return patient;
+}
+
+async function addToSetChiefComplaint(params: {
+  _id: string;
+  chiefComplaint: any;
+}): Promise<PatientModel | null> {
+  try {
+    if (!params._id || !params.chiefComplaint) {
+      throw new Error(config.RESPONSE.ERROR.PATIENT.INVALID_PARAMETER.ADD_TO_SET);
+    }
+
+    return await patientRepository.addToSet({
+      _id: params._id,
+      chiefComplaint: params.chiefComplaint,
+    });
+  } catch (error) {
+    throw error;
+  }
+}
+
+async function addToSetDiagnosis(params: {
+  _id: string;
+  diagnosis: any;
+}): Promise<PatientModel | null> {
+  try {
+    if (!params._id || !params.diagnosis) {
+      throw new Error(config.RESPONSE.ERROR.PATIENT.INVALID_PARAMETER.ADD_TO_SET);
+    }
+
+    return await patientRepository.addToSet({
+      _id: params._id,
+      diagnosis: params.diagnosis,
+    });
+  } catch (error) {
+    throw error;
+  }
+}
+
+async function addToSetBhw(params: any): Promise<PatientModel | null> {
+  try {
+    if (!params._id || !params.bhw) {
+      throw new Error(config.RESPONSE.ERROR.PATIENT.INVALID_PARAMETER.ADD_TO_SET);
+    }
+
+    return await patientRepository.addToSet({
+      _id: params._id,
+      "metadata.bhw": params.bhw,
+    });
+  } catch (error) {
     throw error;
   }
 }

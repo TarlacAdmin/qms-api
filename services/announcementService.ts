@@ -1,23 +1,21 @@
 import { config } from "../config/config";
-import { QueueModel } from "../models/queueModel";
-import { ObjectId } from "mongodb";
-import queueRepository from "../repository/queueRepository";
-import patientService from "./patientService";
+import { AnnouncementModel } from "../models/announcementModel";
+import announcementRepository from "../repository/announcementRepository";
 
-const queueService = {
-  getQueue,
-  getQueues,
-  createQueue,
-  updateQueue,
-  removeQueue,
-  searchQueue,
+const announcementService = {
+  getAnnouncement,
+  getAnnouncements,
+  createAnnouncement,
+  updateAnnouncement,
+  removeAnnouncement,
+  searchAnnouncement,
 };
 
-export default queueService;
+export default announcementService;
 
-async function getQueue(id: string, params: any): Promise<QueueModel | null> {
+async function getAnnouncement(id: string, params: any): Promise<AnnouncementModel | null> {
   if (!id) {
-    throw new Error(config.RESPONSE.ERROR.QUEUE.INVALID_PARAMETER.GET);
+    throw new Error(config.RESPONSE.ERROR.ANNOUNCEMENT.INVALID_PARAMETER.GET);
   }
 
   try {
@@ -37,7 +35,7 @@ async function getQueue(id: string, params: any): Promise<QueueModel | null> {
       dbParams.options.lean = params.lean;
     }
 
-    return await queueRepository.getQueue(id, dbParams);
+    return await announcementRepository.getAnnouncement(id, dbParams);
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);
@@ -47,9 +45,9 @@ async function getQueue(id: string, params: any): Promise<QueueModel | null> {
   }
 }
 
-async function getQueues(params: any): Promise<QueueModel[]> {
+async function getAnnouncements(params: any): Promise<AnnouncementModel[]> {
   if (!params) {
-    throw new Error(config.RESPONSE.ERROR.QUEUE.INVALID_PARAMETER.GET_ALL);
+    throw new Error(config.RESPONSE.ERROR.ANNOUNCEMENT.INVALID_PARAMETER.GET_ALL);
   }
 
   try {
@@ -62,9 +60,7 @@ async function getQueues(params: any): Promise<QueueModel[]> {
     }
 
     if (params.populateArray) {
-      dbParams.options.populateArray = Array.isArray(params.populateArray)
-        ? params.populateArray
-        : [params.populateArray];
+      dbParams.options.populateArray = params.populateArray;
     }
 
     if (params.sort) {
@@ -83,7 +79,7 @@ async function getQueues(params: any): Promise<QueueModel[]> {
       dbParams.options.lean = params.lean;
     }
 
-    return await queueRepository.getQueues(dbParams);
+    return await announcementRepository.getAnnouncements(dbParams);
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);
@@ -93,25 +89,13 @@ async function getQueues(params: any): Promise<QueueModel[]> {
   }
 }
 
-async function createQueue(data: Partial<QueueModel>): Promise<QueueModel> {
+async function createAnnouncement(data: Partial<AnnouncementModel>): Promise<AnnouncementModel> {
   if (!data) {
-    throw new Error(config.RESPONSE.ERROR.QUEUE.INVALID_PARAMETER.CREATE);
+    throw new Error(config.RESPONSE.ERROR.ANNOUNCEMENT.INVALID_PARAMETER.CREATE);
   }
 
   try {
-    if (data.counter === "interview") {
-      data.queueNumber = await generateQueueNumber(data.counter);
-    }
-
-    if (data.metadata?.patient) {
-      const patient = await patientService.findOrCreate(data.metadata.patient);
-      data.metadata.patient = patient._id as ObjectId;
-    }
-
-    let createdQueue = await queueRepository.createQueue(data);
-    createdQueue = await createdQueue.populate("metadata.patient");
-
-    return createdQueue;
+    return await announcementRepository.createAnnouncement(data);
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);
@@ -121,13 +105,15 @@ async function createQueue(data: Partial<QueueModel>): Promise<QueueModel> {
   }
 }
 
-async function updateQueue(data: Partial<QueueModel>): Promise<QueueModel | null> {
+async function updateAnnouncement(
+  data: Partial<AnnouncementModel>
+): Promise<AnnouncementModel | null> {
   if (!data) {
-    throw new Error(config.RESPONSE.ERROR.QUEUE.INVALID_PARAMETER.UPDATE);
+    throw new Error(config.RESPONSE.ERROR.ANNOUNCEMENT.INVALID_PARAMETER.UPDATE);
   }
 
   try {
-    return await queueRepository.updateQueue(data);
+    return await announcementRepository.updateAnnouncement(data);
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);
@@ -137,13 +123,13 @@ async function updateQueue(data: Partial<QueueModel>): Promise<QueueModel | null
   }
 }
 
-async function removeQueue(id: string): Promise<QueueModel | null> {
+async function removeAnnouncement(id: string): Promise<AnnouncementModel | null> {
   if (!id) {
-    throw new Error(config.RESPONSE.ERROR.QUEUE.INVALID_PARAMETER.REMOVE);
+    throw new Error(config.RESPONSE.ERROR.ANNOUNCEMENT.INVALID_PARAMETER.REMOVE);
   }
 
   try {
-    return await queueRepository.removeQueue(id);
+    return await announcementRepository.removeAnnouncement(id);
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);
@@ -153,17 +139,20 @@ async function removeQueue(id: string): Promise<QueueModel | null> {
   }
 }
 
-async function searchQueue(params: any): Promise<QueueModel[] | null> {
-  //TODO: VAlidation
-
+async function searchAnnouncement(params: any): Promise<AnnouncementModel[] | null> {
   try {
     let dbParams = {
       query: {},
       populateArray: [],
       options: {},
       lean: true,
+      match: {},
     };
     dbParams.query = params.query;
+
+    if (params.match) {
+      dbParams.query = { ...dbParams.query, ...params.match };
+    }
 
     //Build Populate Options
     if (params.populateArray) {
@@ -185,33 +174,9 @@ async function searchQueue(params: any): Promise<QueueModel[] | null> {
 
     dbParams.lean = params.lean || true;
 
-    return await queueRepository.searchQueue(dbParams);
+    return await announcementRepository.searchAnnouncement(dbParams);
   } catch (error) {
     console.error(error);
     throw error;
-  }
-}
-
-async function generateQueueNumber(counterName: string): Promise<string> {
-  const today = new Date();
-  today.setUTCHours(0, 0, 0, 0);
-
-  const queues = await searchQueue({
-    query: {
-      counter: counterName,
-      createdAt: { $gte: today },
-    },
-    sort: "-createdAt",
-    limit: 999,
-    select: "queueNumber",
-  });
-
-  let queueNumber;
-  //TODO: Check if counter = interview. Generate new number. ELSE, use existing "data.queueNumber"
-  if (queues && queues.length > 0) {
-    const latestNumber = parseInt(queues[0].queueNumber, 10);
-    return (queueNumber = String(latestNumber + 1).padStart(3, "0"));
-  } else {
-    return (queueNumber = "001");
   }
 }

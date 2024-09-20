@@ -5,20 +5,21 @@ import { trimAll } from "../helper/trimHelper";
 import { generateToken, sendResponseCookie } from "../utils/token";
 import bcrypt from "bcrypt";
 import validator from "validator";
-import { CustomRequest } from "./types";
+import { CustomRequest } from "../types/types";
+import { UserModel } from "../models/userModel";
 
 const saltFactor = 10;
 
 const userService = {
-  registerUser,
   getUser,
+  getUsers,
+  createUser,
   updateUser,
   deleteUser,
-  getUsers,
   loginUser,
-  currentUser,
   logoutUser,
-  search,
+  currentUser,
+  searchUser,
 };
 
 export default userService;
@@ -110,12 +111,23 @@ async function getUsers(req: Request, res: Response, next: NextFunction): Promis
   }
 }
 
-async function registerUser(req: Request, res: Response, next: NextFunction): Promise<Response> {
+async function createUser(req: Request, res: Response, next: NextFunction): Promise<Response> {
   const trimmedBody = trimAll(req.body);
   try {
-    const { email, password, username, firstname, lastname } = trimmedBody;
+    const {
+      customId,
+      email,
+      password,
+      username,
+      firstname,
+      lastname,
+      middlename,
+      type,
+      role,
+      status,
+    } = trimmedBody;
 
-    const userAvailable = await userRepository.findByEmail(email);
+    const userAvailable = await userRepository.searchAndUpdate({ email });
     if (userAvailable) {
       return res.status(400).json({ message: config.ERROR.USER.ALREADY_EXIST });
     }
@@ -123,10 +135,15 @@ async function registerUser(req: Request, res: Response, next: NextFunction): Pr
     const hashedPassword = await bcrypt.hash(password, saltFactor);
 
     const user = await userRepository.createUser({
+      customId,
       username,
       firstname,
+      middlename,
       lastname,
       email,
+      type,
+      role,
+      status,
       password: hashedPassword,
     });
 
@@ -140,14 +157,14 @@ async function registerUser(req: Request, res: Response, next: NextFunction): Pr
   }
 }
 
-async function updateUser(
-  req: CustomRequest,
-  res: Response,
-  next: NextFunction
-): Promise<Response> {
+async function updateUser(req: Request, res: Response, next: NextFunction): Promise<Response> {
   const trimmedBody = trimAll(req.body);
   try {
-    const { email, password, firstname, lastname, username, ...otherUpdates } = trimmedBody;
+    const { _id, email, password, firstname, lastname, username, ...otherUpdates } = trimmedBody;
+
+    if (!_id) {
+      return res.status(400).json({ message: "User ID is required" });
+    }
 
     if (email && !validator.isEmail(email)) {
       return res.status(400).json({ message: config.ERROR.USER.INVALID_EMAIL });
@@ -164,7 +181,7 @@ async function updateUser(
     if (lastname) updates.lastname = lastname;
     if (username) updates.username = username;
 
-    const updatedUser = await userRepository.updateUser(req.user!.id, updates);
+    const updatedUser = await userRepository.updateUser(_id, updates);
 
     if (!updatedUser) {
       return res.status(400).json({ message: config.ERROR.USER.NOT_FOUND });
@@ -178,13 +195,15 @@ async function updateUser(
       return res.status(400).json({ message: config.ERROR.USER.EMAIL_ALREADY_EXISTS });
     } else {
       if (error instanceof Error) {
-        return res
-          .status(500)
-          .json({ message: config.ERROR.USER.UPDATE_FAILED, error: error.message });
+        return res.status(500).json({
+          message: config.ERROR.USER.UPDATE_FAILED,
+          error: error.message,
+        });
       } else {
-        return res
-          .status(500)
-          .json({ message: config.ERROR.USER.UPDATE_FAILED, error: "Unknown error" });
+        return res.status(500).json({
+          message: config.ERROR.USER.UPDATE_FAILED,
+          error: "Unknown error",
+        });
       }
     }
   }
@@ -212,45 +231,33 @@ async function loginUser(req: Request, res: Response, next: NextFunction): Promi
   try {
     const { email, password } = trimmedBody;
 
-    const user = await userRepository.findByEmail(email);
-    if (!user) {
+    const userResult = await userRepository.searchAndUpdate({ email });
+    if (!userResult) {
       return res.status(400).json({ message: config.ERROR.USER.NO_ACCOUNT });
     }
+
+    const user = userResult as UserModel;
+
     if (!(await bcrypt.compare(password, user.password))) {
       return res.status(400).json({ message: config.ERROR.USER.INVALID_CREDENTIALS });
     }
 
     const userResponse = {
       id: user.id,
+      customId: user.customId,
       email: user.email,
+      username: user.username,
       firstname: user.firstname,
+      middlename: user.middlename,
       lastname: user.lastname,
+      role: user.role,
+      type: user.type,
     };
 
     const token = generateToken(user);
     sendResponseCookie(res, token);
 
-    return res.status(200).json({ user: userResponse, token });
-  } catch (error) {
-    if (error instanceof Error) {
-      return res.status(500).json({ message: error.message });
-    } else {
-      return res.status(500).json({ message: "Unknown error" });
-    }
-  }
-}
-
-async function currentUser(
-  req: CustomRequest,
-  res: Response,
-  next: NextFunction
-): Promise<Response> {
-  try {
-    if (!req.user) {
-      return res.status(401).json({ message: config.ERROR.USER.NOT_AUTHORIZED });
-    }
-    const { password, ...userWithoutPassword } = req.user;
-    return res.status(200).json({ user: userWithoutPassword, token: (req as any).token });
+    return { user: userResponse, token };
   } catch (error) {
     if (error instanceof Error) {
       return res.status(500).json({ message: error.message });
@@ -280,10 +287,30 @@ async function logoutUser(req: CustomRequest, res: Response, next: NextFunction)
   }
 }
 
-async function search(req: Request, res: Response, next: NextFunction): Promise<Response> {
+async function currentUser(
+  req: CustomRequest,
+  res: Response,
+  next: NextFunction
+): Promise<Response> {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ message: config.ERROR.USER.NOT_AUTHORIZED });
+    }
+    const { password, ...userWithoutPassword } = req.user;
+    return res.status(200).json({ user: userWithoutPassword, token: (req as any).token });
+  } catch (error) {
+    if (error instanceof Error) {
+      return res.status(500).json({ message: error.message });
+    } else {
+      return res.status(500).json({ message: "Unknown error" });
+    }
+  }
+}
+
+async function searchUser(req: Request, res: Response, next: NextFunction): Promise<Response> {
   try {
     const query = req.query.search as string;
-    const users = await userRepository.search(query);
+    const users = await userRepository.searchUser(query);
     return res.status(200).json(users);
   } catch (error) {
     if (error instanceof Error) {

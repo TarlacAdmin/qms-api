@@ -57,14 +57,19 @@ export const config = {
     LOCAL: "http://localhost:5173",
     DEV_BRANCH: "https://qms-app-dev.web.app",
     TEST_BRANCH: "https://qms-app-test.web.app",
+    PROD_BRANCH: "https://qms-app-prod.web.app",
     DEV_SITE: function (origin: string, callback: CallbackFunction) {
       wildCardOrigin(origin, callback, "https://qms-app-dev");
     },
     TEST_SITE: function (origin: string, callback: CallbackFunction) {
       wildCardOrigin(origin, callback, "https://qms-app-test");
     },
+    PROD_SITE: function (origin: string, callback: CallbackFunction) {
+      wildCardOrigin(origin, callback, "https://qms-app-prod");
+    },
   },
 
+  //TODO: process.env
   DB: {
     URI: "mongodb+srv://tarlacsolutionsinc:RJc83AVcrahVG4RC@tarlac-prod-clusterm2.ofhfszm.mongodb.net/prod?retryWrites=true&w=majority&appName=Tarlac-Prod-ClusterM2",
     COLLECTION: "sessions",
@@ -82,6 +87,7 @@ export const config = {
     MONGODB_NOT_DEFINE: "MONGODB_URI is not defined in the environment variables.",
     CONNECTION_FAILED: "Database connection failed:",
     UNEXPECTED: "An unexpected error occurred. Please try again later.",
+    RATELIMIT: "Too many requests from this IP, please try again after 15 minutes",
 
     USER: {
       NOT_AUTHORIZED: "User is not authorized",
@@ -118,7 +124,8 @@ export const config = {
       },
 
       BODY: {
-        QUEUE_NUMBER: "queueNumber",
+        PATIENT: "metadata.patient",
+        DOCTOR: "metadata.doctor",
         ID: "_id",
       },
 
@@ -131,19 +138,114 @@ export const config = {
     PATIENT: {
       ERROR: {
         REQUIRED_PATIENT: "Fill all required patient fields",
+        REQUIRED_CHIEF_COMPLAINT: "Fill all required chief complaint fields",
+        REQUIRED_DIAGNOSIS: "Fill all required diagnosis fields",
+        REQUIRED_BHW: "Fill all required BHW fields",
         INVALID_ID: "Invalid Patient ID",
+        REQUIRED_PATIENT_ID: "Fill all required patient id",
       },
 
       BODY: {
-        PATIENT_FIRSTNAME: "firstname",
-        PATIENT_LASTNAME: "lastname",
-        PATIENT_MIDDLENAME: "middlename",
+        PATIENT_FIRSTNAME: "firstName",
+        PATIENT_LASTNAME: "lastName",
+        PATIENT_MIDDLENAME: "middleName",
+        PATIENT_CHIEF_COMPLAINT: "chiefComplaint",
+        PATIENT_DIAGNOSIS: "diagnosis",
+        PATIENT_BHW: "metadata.bhw",
+        PATIENT_ID: "patientId",
         ID: "_id",
       },
 
       PARAMS: {
         ID: "id",
         INVALID_ID: "Invalid patient id",
+      },
+    },
+
+    DOCTOR: {
+      ERROR: {
+        REQUIRED_DOCTOR: "Fill all required doctor fields",
+        INVALID_ID: "Invalid Doctor ID",
+      },
+
+      BODY: {
+        DOCTOR_FIRSTNAME: "firstname",
+        DOCTOR_LASTNAME: "lastname",
+        DOCTOR_MIDDLENAME: "middlename",
+        ID: "_id",
+      },
+
+      PARAMS: {
+        ID: "id",
+        INVALID_ID: "Invalid doctor id",
+      },
+    },
+
+    APPOINTMENT: {
+      ERROR: {
+        REQUIRED_APPOINTMENT: "Fill all required appointment fields",
+        INVALID_ID: "Invalid Appointment ID",
+      },
+
+      BODY: {
+        APPOINTMENT_DATE: "date",
+        ID: "_id",
+      },
+
+      PARAMS: {
+        ID: "id",
+        INVALID_ID: "Invalid appointment id",
+      },
+    },
+
+    ANNOUNCEMENT: {
+      ERROR: {
+        REQUIRED_ANNOUNCEMENT: "Fill all required announcement fields",
+        INVALID_ID: "Invalid Announcement ID",
+      },
+
+      BODY: {
+        ANNOUNCEMENT_HEADLINE: "headline",
+        ID: "_id",
+      },
+
+      PARAMS: {
+        ID: "id",
+        INVALID_ID: "Invalid announcement id",
+      },
+    },
+
+    SPECIALDATE: {
+      ERROR: {
+        REQUIRED_SPECIALDATE: "Fill all required special date fields",
+        INVALID_ID: "Invalid Special Date ID",
+      },
+
+      BODY: {
+        SPECIALDATE_DATE: "date",
+        ID: "_id",
+      },
+
+      PARAMS: {
+        ID: "id",
+        INVALID_ID: "Invalid special date id",
+      },
+    },
+
+    VIDEO: {
+      ERROR: {
+        REQUIRED_VIDEO: "Fill all required video fields",
+        INVALID_ID: "Invalid Video ID",
+      },
+
+      BODY: {
+        VIDEO_URL: "url",
+        ID: "_id",
+      },
+
+      PARAMS: {
+        ID: "id",
+        INVALID_ID: "Invalid video id",
       },
     },
   },
@@ -182,8 +284,112 @@ export const config = {
           ID: "patientService.update params._id is missing!",
           REMOVE: "patientService.remove params is missing!",
           SEARCH: "patientService.search params is missing!",
+          ADD_TO_SET: "patientService.addToSetChiefComplaint params is missing!",
+        },
+      },
+      DOCTOR: {
+        ID: "doctorId is missing!",
+        NOT_FOUND: "Doctor not found",
+        REMOVE: "Error removing field",
+        UPDATE: "Error updating field",
+        ALREADY_EXISTS: "Doctor already exists",
+        NOT_FOUND_ID: "Doctor not found! with the provided _id",
+        INVALID_PARAMETER: {
+          GET: "doctorService.get params is missing!",
+          GET_ALL: "doctorService.getAllField params is missing!",
+          CREATE: "doctorService.create params is missing!",
+          UPDATE: "doctorService.update params is missing!",
+          ID: "doctorService.update params._id is missing!",
+          REMOVE: "doctorService.remove params is missing!",
+          SEARCH: "doctorService.search params is missing!",
+        },
+      },
+
+      APPOINTMENT: {
+        ID: "appointmentId is missing!",
+        NOT_FOUND: "Appointment not found",
+        REMOVE: "Error removing field",
+        UPDATE: "Error updating field",
+        ALREADY_EXISTS: "Appointment already exists",
+        NOT_FOUND_ID: "Appointment not found! with the provided _id",
+        FAILED: "Failed to associate doctor with the appointment.",
+        EXISTS: "Appointment already exists",
+        PATIENT_NOT_EXIST: "Patient does not exist",
+        INVALID_PARAMETER: {
+          GET: "appointmentService.get params is missing!",
+          GET_ALL: "appointmentService.getAllField params is missing!",
+          CREATE: "appointmentService.create params is missing!",
+          UPDATE: "appointmentService.update params is missing!",
+          ID: "appointmentService.update params._id is missing!",
+          REMOVE: "appointmentService.remove params is missing!",
+          SEARCH: "appointmentService.search params is missing!",
+        },
+      },
+
+      ANNOUNCEMENT: {
+        ID: "announcementId is missing!",
+        NOT_FOUND: "Announcement not found",
+        REMOVE: "Error removing field",
+        UPDATE: "Error updating field",
+        ALREADY_EXISTS: "Announcement already exists",
+        NOT_FOUND_ID: "Announcement not found! with the provided _id",
+        INVALID_PARAMETER: {
+          GET: "announcementService.get params is missing!",
+          GET_ALL: "announcementService.getAllField params is missing!",
+          CREATE: "announcementService.create params is missing!",
+          UPDATE: "announcementService.update params is missing!",
+          ID: "announcementService.update params._id is missing!",
+          REMOVE: "announcementService.remove params is missing!",
+          SEARCH: "announcementService.search params is missing!",
+        },
+      },
+
+      SPECIALDATE: {
+        ID: "specialDateId is missing!",
+        NOT_FOUND: "SpecialDate not found",
+        REMOVE: "Error removing field",
+        UPDATE: "Error updating field",
+        ALREADY_EXISTS: "SpecialDate already exists",
+        NOT_FOUND_ID: "SpecialDate not found! with the provided _id",
+        INVALID_PARAMETER: {
+          GET: "specialDateService.get params is missing!",
+          GET_ALL: "specialDateService.getAllField params is missing!",
+          CREATE: "specialDateService.create params is missing!",
+          UPDATE: "specialDateService.update params is missing!",
+          ID: "specialDateService.update params._id is missing!",
+          REMOVE: "specialDateService.remove params is missing!",
+          SEARCH: "specialDateService.search params is missing!",
+        },
+      },
+
+      VIDEO: {
+        ID: "videoId is missing!",
+        NOT_FOUND: "Video not found",
+        REMOVE: "Error removing field",
+        UPDATE: "Error updating field",
+        ALREADY_EXISTS: "Video already exists",
+        NOT_FOUND_ID: "Video not found! with the provided _id",
+        INVALID_PARAMETER: {
+          GET: "videoService.get params is missing!",
+          GET_ALL: "videoService.getAllField params is missing!",
+          CREATE: "videoService.create params is missing!",
+          UPDATE: "videoService.update params is missing!",
+          ID: "videoService.update params._id is missing!",
+          REMOVE: "videoService.remove params is missing!",
+          SEARCH: "videoService.search params is missing!",
         },
       },
     },
   },
 };
+
+export const CIVIL_STATUS = [
+  "single",
+  "married",
+  "divorced",
+  "widower",
+  "window",
+  "widowed",
+  "separated",
+  "partnered",
+];

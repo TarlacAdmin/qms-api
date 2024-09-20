@@ -7,14 +7,25 @@ import { API_ENDPOINTS } from "../config/endpointsConfig";
 const router = express.Router();
 
 router.route(API_ENDPOINTS.USER.GET_ALL).get(getUsers);
-router.route(API_ENDPOINTS.USER.CREATE).post(registerUser);
 router.route(API_ENDPOINTS.USER.GET_BY_ID).get(getUser);
+router.route(API_ENDPOINTS.USER.CREATE).post(createUser);
 router.route(API_ENDPOINTS.USER.UPDATE).put(updateUser);
 router.route(API_ENDPOINTS.USER.REMOVE).delete(deleteUser);
 router.route(API_ENDPOINTS.USER.LOGIN).post(loginUser);
-router.route(API_ENDPOINTS.USER.CHECKLOGIN).get(currentUser);
 router.route(API_ENDPOINTS.USER.LOGOUT).get(logoutUser);
-router.route(API_ENDPOINTS.USER.SEARCH).get(search);
+router.route(API_ENDPOINTS.USER.CHECKLOGIN).get(currentUser);
+router.route(API_ENDPOINTS.USER.SEARCH).get(searchUser);
+
+export default router;
+
+/*
+ * @desc   Get all users
+ * @route  GET /api/user/get/all
+ * @access Public
+ */
+async function getUsers(req: Request, res: Response, next: NextFunction) {
+  await userService.getUsers(req, res, next);
+}
 
 /*
  * @desc   Get user
@@ -40,7 +51,7 @@ async function getUser(req: Request, res: Response, next: NextFunction) {
  * @route  POST /api/user/create
  * @access Public
  */
-async function registerUser(req: Request, res: Response, next: NextFunction) {
+async function createUser(req: Request, res: Response, next: NextFunction) {
   await Promise.all([
     body(config.VALIDATION.USER.EMAIL)
       .isEmail()
@@ -57,7 +68,7 @@ async function registerUser(req: Request, res: Response, next: NextFunction) {
     return res.status(400).json({ errors: errors.array() });
   }
 
-  userService.registerUser(req, res, next);
+  userService.createUser(req, res, next);
 }
 
 /*
@@ -67,11 +78,14 @@ async function registerUser(req: Request, res: Response, next: NextFunction) {
  */
 async function updateUser(req: Request, res: Response, next: NextFunction) {
   await Promise.all([
+    body("_id").isMongoId().withMessage("Invalid user ID").run(req),
     body(config.VALIDATION.USER.EMAIL)
+      .optional()
       .isEmail()
       .withMessage(config.ERROR.USER.INVALID_EMAIL)
       .run(req),
-    body(config.VALIDATION.USER.EMAIL, config.VALIDATION.USER.PASSWORD)
+    body(config.VALIDATION.USER.PASSWORD)
+      .optional()
       .notEmpty()
       .withMessage(config.ERROR.USER.REQUIRED_FIELDS)
       .run(req),
@@ -150,24 +164,6 @@ async function loginUser(req: Request, res: Response, next: NextFunction) {
 }
 
 /*
- * @desc   Get all users
- * @route  GET /api/user/get/all
- * @access Public
- */
-async function getUsers(req: Request, res: Response, next: NextFunction) {
-  await userService.getUsers(req, res, next);
-}
-
-/*
- * @desc   Check login
- * @route  GET /api/user/login
- * @access Private
- */
-async function currentUser(req: Request, res: Response, next: NextFunction) {
-  await userService.currentUser(req, res, next);
-}
-
-/*
  * @desc   Logout user
  * @route  GET /api/user/logout
  * @access Private
@@ -190,12 +186,19 @@ async function logoutUser(req: Request, res: Response, next: NextFunction) {
 }
 
 /*
+ * @desc   Check login
+ * @route  GET /api/user/login
+ * @access Private
+ */
+async function currentUser(req: Request, res: Response, next: NextFunction) {
+  await userService.currentUser(req, res, next);
+}
+
+/*
  * @desc   Search user
  * @route  GET /api/user/search
  * @access Private
  */
-async function search(req: Request, res: Response, next: NextFunction) {
-  await userService.search(req, res, next);
+async function searchUser(req: Request, res: Response, next: NextFunction) {
+  await userService.searchUser(req, res, next);
 }
-
-export default router;
