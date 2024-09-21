@@ -210,10 +210,10 @@ async function searchAppointments(params: any): Promise<AppointmentModel[] | nul
       dbParams.match = { ...dbParams.match, ...params.match };
     }
     if (params.firstName) {
-      dbParams.match["patient.firstName"] = params.firstName;
+      dbParams.match["patient.firstName"] = { $regex: new RegExp(params.firstName, "i") };
     }
     if (params.lastName) {
-      dbParams.match["patient.lastName"] = params.lastName;
+      dbParams.match["patient.lastName"] = { $regex: new RegExp(params.lastName, "i") };
     }
     if (params.date) {
       dbParams.match["date"] = params.date;
