@@ -3,7 +3,6 @@ import Patient from "../models/patientModel";
 import Doctor from "../models/doctorModel";
 import { SearchParams } from "../types/searchTypes";
 import { buildSearchQuery, formatResults } from "../helper/searchHelpers";
-
 import { PipelineStage } from "mongoose";
 
 interface DbParams {
