@@ -11,6 +11,7 @@ export interface UserModel extends Document {
   password: string;
   status: "active" | "inactive" | "suspended";
   role:
+    | "public"
     | "admin"
     | "doctor"
     | "receptionist"
@@ -65,6 +66,7 @@ const userSchema: Schema = new Schema(
     role: {
       type: String,
       enum: [
+        "public",
         "admin",
         "doctor",
         "receptionist",
